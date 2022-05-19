@@ -11,11 +11,11 @@ namespace CompanionApp.Models
         }
 
         public Guid Id { get; set; }
-        public string FirstName { get; set; } = null!;
-        public string LastName { get; set; } = null!;
-        public string Email { get; set; } = null!;
-        public string Major { get; set; } = null!;
-        public string Class { get; set; } = null!;
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public string? Email { get; set; }
+        public string? Major { get; set; }
+        public string? Class { get; set; }
 
         public virtual CourseTakenBy CourseTakenBy { get; set; } = null!;
         public virtual Following FollowingUser { get; set; } = null!;

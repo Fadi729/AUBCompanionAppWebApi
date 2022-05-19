@@ -7,21 +7,13 @@ namespace CompanionApp.Models
 {
     public partial class MyDatabaseContext : DbContext
     {
-        private readonly IConfiguration? config;
-
         public MyDatabaseContext()
         {
         }
 
-        //public MyDatabaseContext(IConfiguration config)
-        //{
-        //    this.config = config;
-        //}        
-
         public MyDatabaseContext(DbContextOptions<MyDatabaseContext> options)
             : base(options)
         {
-            
         }
 
         public virtual DbSet<Comment> Comments { get; set; } = null!;
@@ -32,18 +24,14 @@ namespace CompanionApp.Models
         public virtual DbSet<Post> Posts { get; set; } = null!;
         public virtual DbSet<Profile> Profiles { get; set; } = null!;
         public virtual DbSet<Semester> Semesters { get; set; } = null!;
-        
-        
 
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    if (!optionsBuilder.IsConfigured)
-        //    {
-        //        //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        //        //optionsBuilder.UseSqlServer("***REMOVED***");
-        //        optionsBuilder.UseSqlServer(config.GetConnectionString("CompanioAppDB"));
-        //    }
-        //}
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlServer("name=CompanioAppDB");
+            }
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -92,7 +80,7 @@ namespace CompanionApp.Models
                     .HasColumnName("CRN");
 
                 entity.Property(e => e.Attribute)
-                    .HasMaxLength(1)
+                    .HasMaxLength(50)
                     .IsUnicode(false)
                     .HasColumnName("ATTRIBUTE");
 
@@ -110,12 +98,12 @@ namespace CompanionApp.Models
                     .HasColumnName("END_TIME");
 
                 entity.Property(e => e.Instructor)
-                    .HasMaxLength(1)
+                    .HasMaxLength(255)
                     .IsUnicode(false)
                     .HasColumnName("INSTRUCTOR");
 
                 entity.Property(e => e.Location)
-                    .HasMaxLength(1)
+                    .HasMaxLength(50)
                     .IsUnicode(false)
                     .HasColumnName("LOCATION");
 
@@ -129,7 +117,7 @@ namespace CompanionApp.Models
                     .HasColumnName("SUBJECT");
 
                 entity.Property(e => e.Title)
-                    .HasMaxLength(1)
+                    .HasMaxLength(255)
                     .IsUnicode(false)
                     .HasColumnName("TITLE");
             });
@@ -266,27 +254,27 @@ namespace CompanionApp.Models
                     .HasColumnName("ID");
 
                 entity.Property(e => e.Class)
-                    .HasMaxLength(1)
+                    .HasMaxLength(50)
                     .IsUnicode(false)
                     .HasColumnName("CLASS");
 
                 entity.Property(e => e.Email)
-                    .HasMaxLength(1)
+                    .HasMaxLength(50)
                     .IsUnicode(false)
                     .HasColumnName("EMAIL");
 
                 entity.Property(e => e.FirstName)
-                    .HasMaxLength(1)
+                    .HasMaxLength(50)
                     .IsUnicode(false)
                     .HasColumnName("FIRST_NAME");
 
                 entity.Property(e => e.LastName)
-                    .HasMaxLength(1)
+                    .HasMaxLength(50)
                     .IsUnicode(false)
                     .HasColumnName("LAST_NAME");
 
                 entity.Property(e => e.Major)
-                    .HasMaxLength(1)
+                    .HasMaxLength(50)
                     .IsUnicode(false)
                     .HasColumnName("MAJOR");
             });
@@ -300,12 +288,12 @@ namespace CompanionApp.Models
                     .HasColumnName("ID");
 
                 entity.Property(e => e.Title)
-                    .HasMaxLength(1)
+                    .HasMaxLength(50)
                     .IsUnicode(false)
                     .HasColumnName("TITLE");
 
                 entity.Property(e => e.Year)
-                    .HasMaxLength(1)
+                    .HasMaxLength(50)
                     .IsUnicode(false)
                     .HasColumnName("YEAR");
             });
