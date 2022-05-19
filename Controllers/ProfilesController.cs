@@ -6,8 +6,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CompanionApp.Models;
+using CompanionApp.ModelsDTO;
+using CompanionApp.Extensions;
 
-namespace AUB_Companion_App_REST_API.Controllers
+namespace CompanionApp.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -22,24 +24,26 @@ namespace AUB_Companion_App_REST_API.Controllers
 
         // GET: api/Profiles
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Profile>>> GetProfiles()
+        public async Task<ActionResult<IEnumerable<ProfileDTO>>> GetProfiles()
         {
-          if (_context.Profiles == null)
-          {
-              return NotFound();
-          }
-            return await _context.Profiles.ToListAsync();
+            if (_context.Profiles == null)
+            {
+                return NotFound();
+            }
+
+            return await _context.Profiles.Select(x => x.ToProfileDTO()).ToListAsync();
+
         }
 
         // GET: api/Profiles/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Profile>> GetProfile(Guid id)
+        public async Task<ActionResult<ProfileDTO>> GetProfile(Guid id)
         {
-          if (_context.Profiles == null)
-          {
-              return NotFound();
-          }
-            var profile = await _context.Profiles.FindAsync(id);
+            if (_context.Profiles == null)
+            {
+                return NotFound();
+            }
+            var profile = await _context.Profiles.Where(p => p.Id == id).Select(x => x.ToProfileDTO()).SingleOrDefaultAsync();
 
             if (profile == null)
             {
@@ -52,14 +56,14 @@ namespace AUB_Companion_App_REST_API.Controllers
         // PUT: api/Profiles/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutProfile(Guid id, Profile profile)
+        public async Task<IActionResult> PutProfile(Guid id, ProfileDTO profile)
         {
             if (id != profile.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(profile).State = EntityState.Modified;
+            _context.Entry(profile.ToProfile()).State = EntityState.Modified;
 
             try
             {
@@ -83,20 +87,30 @@ namespace AUB_Companion_App_REST_API.Controllers
         // POST: api/Profiles
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Profile>> PostProfile(Profile profile)
+        public async Task<ActionResult<ProfileDTOPOST>> PostProfile(ProfileDTOPOST profile)
         {
-          if (_context.Profiles == null)
-          {
-              return Problem("Entity set 'MyDatabaseContext.Profiles'  is null.");
-          }
-            _context.Profiles.Add(profile);
+            if (_context.Profiles == null)
+            {
+                return Problem("Entity set 'MyDatabaseContext.Profiles'  is null.");
+            }
+            //create a Profile object from the ProfileDTO
+            Profile newProfile = new()
+            {
+                Id = Guid.NewGuid(),
+                FirstName = profile.FirstName,
+                LastName = profile.LastName,
+                Email = profile.Email,
+                Major = profile.Major,
+                Class = profile.Class,
+            };
+            _context.Profiles.Add(newProfile);
             try
             {
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateException)
             {
-                if (ProfileExists(profile.Id))
+                if (ProfileExists(newProfile.Id))
                 {
                     return Conflict();
                 }
@@ -106,7 +120,7 @@ namespace AUB_Companion_App_REST_API.Controllers
                 }
             }
 
-            return CreatedAtAction("GetProfile", new { id = profile.Id }, profile);
+            return CreatedAtAction("GetProfile", new { id = newProfile.Id }, newProfile.ToProfileDTO());
         }
 
         // DELETE: api/Profiles/5
