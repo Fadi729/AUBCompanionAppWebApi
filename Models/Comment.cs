@@ -11,6 +11,5 @@ namespace CompanionApp.Models
         public DateTime DateCreated { get; set; }
 
         public virtual Post Post { get; set; } = null!;
-        public virtual Post User { get; set; } = null!;
     }
 }

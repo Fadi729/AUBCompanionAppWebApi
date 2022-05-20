@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CompanionApp.Models;
+using CompanionApp.ModelsDTO;
+using CompanionApp.Extensions;
 
 namespace AUB_Companion_App_REST_API.Controllers
 {
@@ -22,18 +24,18 @@ namespace AUB_Companion_App_REST_API.Controllers
 
         // GET: api/Profiles
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Profile>>> GetProfiles()
+        public async Task<ActionResult<IEnumerable<ProfileDTO>>> GetProfiles()
         {
           if (_context.Profiles == null)
           {
               return NotFound();
           }
-            return await _context.Profiles.ToListAsync();
+            return await _context.Profiles.Select(p => p.ToProfileDTO()).ToListAsync();
         }
 
         // GET: api/Profiles/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Profile>> GetProfile(Guid id)
+        public async Task<ActionResult<ProfileDTO>> GetProfile(Guid id)
         {
           if (_context.Profiles == null)
           {
@@ -46,20 +48,25 @@ namespace AUB_Companion_App_REST_API.Controllers
                 return NotFound();
             }
 
-            return profile;
+            return profile.ToProfileDTO();
         }
 
         // PUT: api/Profiles/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutProfile(Guid id, Profile profile)
+        public async Task<IActionResult> PutProfile(Guid id, ProfileDTOPUT profile)
         {
-            if (id != profile.Id)
+            //if (id != profile.Id)
+            //{
+            //    return BadRequest();
+            //}
+
+            if (!ProfileExists(id))
             {
-                return BadRequest();
+                return NotFound();
             }
 
-            _context.Entry(profile).State = EntityState.Modified;
+            _context.Entry(profile.ToProfile(id)).State = EntityState.Modified;
 
             try
             {
@@ -76,29 +83,11 @@ namespace AUB_Companion_App_REST_API.Controllers
                     throw;
                 }
             }
-
-            return NoContent();
-        }
-
-        // POST: api/Profiles
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Profile>> PostProfile(Profile profile)
-        {
-          if (_context.Profiles == null)
-          {
-              return Problem("Entity set 'MyDatabaseContext.Profiles'  is null.");
-          }
-            _context.Profiles.Add(profile);
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
             catch (DbUpdateException)
             {
-                if (ProfileExists(profile.Id))
+                if (ProfileExists(profile.Email))
                 {
-                    return Conflict();
+                    return Conflict("Email already exists.");
                 }
                 else
                 {
@@ -106,9 +95,42 @@ namespace AUB_Companion_App_REST_API.Controllers
                 }
             }
 
-            return CreatedAtAction("GetProfile", new { id = profile.Id }, profile);
+
+            return NoContent();
         }
 
+        // POST: api/Profiles
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost]
+        public async Task<ActionResult<ProfileDTO>> PostProfile(ProfileDTOPOST profile)
+        {
+          if (_context.Profiles == null)
+          {
+              return Problem("Entity set 'MyDatabaseContext.Profiles'  is null.");
+          }
+            Profile newprofile = profile.ToProfile();
+            newprofile.Id = Guid.NewGuid();
+            _context.Profiles.Add(newprofile);
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                if (ProfileExists(profile.Email))
+                {
+                    return Conflict("Email already exists.");
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return CreatedAtAction("GetProfile", new { id = newprofile.ToProfileDTO().Id }, newprofile.ToProfileDTO()); 
+        }
+
+        
         // DELETE: api/Profiles/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProfile(Guid id)
@@ -132,6 +154,11 @@ namespace AUB_Companion_App_REST_API.Controllers
         private bool ProfileExists(Guid id)
         {
             return (_context.Profiles?.Any(e => e.Id == id)).GetValueOrDefault();
+        }
+
+        private bool ProfileExists(string? email)
+        {
+            return (_context.Profiles?.Any(e => e.Email == email)).GetValueOrDefault();
         }
     }
 }

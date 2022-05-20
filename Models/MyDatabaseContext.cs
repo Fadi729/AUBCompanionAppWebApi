@@ -19,7 +19,6 @@ namespace CompanionApp.Models
         public virtual DbSet<Comment> Comments { get; set; } = null!;
         public virtual DbSet<Course> Courses { get; set; } = null!;
         public virtual DbSet<CourseTakenBy> CourseTakenBies { get; set; } = null!;
-        public virtual DbSet<Following> Followings { get; set; } = null!;
         public virtual DbSet<Like> Likes { get; set; } = null!;
         public virtual DbSet<Post> Posts { get; set; } = null!;
         public virtual DbSet<Profile> Profiles { get; set; } = null!;
@@ -29,7 +28,7 @@ namespace CompanionApp.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("name=CompanioAppDB");
+                optionsBuilder.UseSqlServer("name=CompanionAppDB");
             }
         }
 
@@ -39,8 +38,7 @@ namespace CompanionApp.Models
 
             modelBuilder.Entity<Comment>(entity =>
             {
-                entity.HasKey(e => new { e.PostId, e.UserId })
-                    .HasName("PK__COMMENTS__31B5D277D8B748BE");
+                entity.HasKey(e => new { e.PostId, e.UserId });
 
                 entity.ToTable("COMMENTS");
 
@@ -55,17 +53,10 @@ namespace CompanionApp.Models
                 entity.Property(e => e.Text).HasColumnName("TEXT");
 
                 entity.HasOne(d => d.Post)
-                    .WithMany(p => p.CommentPosts)
+                    .WithMany(p => p.Comments)
                     .HasForeignKey(d => d.PostId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__COMMENTS__postID__44CA3770");
-
-                entity.HasOne(d => d.User)
-                    .WithMany(p => p.CommentUsers)
-                    .HasPrincipalKey(p => p.UserId)
-                    .HasForeignKey(d => d.UserId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__COMMENTS__userID__45BE5BA9");
             });
 
             modelBuilder.Entity<Course>(entity =>
@@ -124,23 +115,20 @@ namespace CompanionApp.Models
 
             modelBuilder.Entity<CourseTakenBy>(entity =>
             {
-                entity.HasKey(e => e.UserId)
-                    .HasName("PK__COURSE_T__CB9A1CDFC655761F");
+                entity.HasKey(e => new { e.UserId, e.CCrn, e.SemesterId });
 
                 entity.ToTable("COURSE_TAKEN_BY");
 
-                entity.Property(e => e.UserId)
-                    .ValueGeneratedNever()
-                    .HasColumnName("userID");
+                entity.Property(e => e.UserId).HasColumnName("userID");
 
                 entity.Property(e => e.CCrn).HasColumnName("cCRN");
+
+                entity.Property(e => e.SemesterId).HasColumnName("semesterID");
 
                 entity.Property(e => e.Grade)
                     .HasMaxLength(2)
                     .IsUnicode(false)
                     .HasColumnName("GRADE");
-
-                entity.Property(e => e.SemesterId).HasColumnName("semesterID");
 
                 entity.HasOne(d => d.CCrnNavigation)
                     .WithMany(p => p.CourseTakenBies)
@@ -155,71 +143,32 @@ namespace CompanionApp.Models
                     .HasConstraintName("FK__COURSE_TA__semes__3A4CA8FD");
 
                 entity.HasOne(d => d.User)
-                    .WithOne(p => p.CourseTakenBy)
-                    .HasForeignKey<CourseTakenBy>(d => d.UserId)
+                    .WithMany(p => p.CourseTakenBies)
+                    .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__COURSE_TA__userI__3864608B");
-            });
-
-            modelBuilder.Entity<Following>(entity =>
-            {
-                entity.HasKey(e => e.UserId)
-                    .HasName("PK__FOLLOWIN__CB9A1CDF41C083DB");
-
-                entity.ToTable("FOLLOWING");
-
-                entity.Property(e => e.UserId)
-                    .ValueGeneratedNever()
-                    .HasColumnName("userID");
-
-                entity.Property(e => e.UserFollowingid).HasColumnName("userFOLLOWINGID");
-
-                entity.HasOne(d => d.UserFollowing)
-                    .WithMany(p => p.FollowingUserFollowings)
-                    .HasForeignKey(d => d.UserFollowingid)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__FOLLOWING__userF__3E1D39E1");
-
-                entity.HasOne(d => d.User)
-                    .WithOne(p => p.FollowingUser)
-                    .HasForeignKey<Following>(d => d.UserId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__FOLLOWING__userI__3D2915A8");
+                    .HasConstraintName("FK_COURSE_TAKEN_BY_PROFILE");
             });
 
             modelBuilder.Entity<Like>(entity =>
             {
-                entity.HasKey(e => e.PostId)
-                    .HasName("PK__LIKES__DD0C73BAC4577D5B");
+                entity.HasKey(e => new { e.PostId, e.UserId });
 
                 entity.ToTable("LIKES");
 
-                entity.Property(e => e.PostId)
-                    .ValueGeneratedNever()
-                    .HasColumnName("postID");
+                entity.Property(e => e.PostId).HasColumnName("postID");
 
                 entity.Property(e => e.UserId).HasColumnName("userID");
 
                 entity.HasOne(d => d.Post)
-                    .WithOne(p => p.LikePost)
-                    .HasForeignKey<Like>(d => d.PostId)
+                    .WithMany(p => p.Likes)
+                    .HasForeignKey(d => d.PostId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__LIKES__postID__489AC854");
-
-                entity.HasOne(d => d.User)
-                    .WithMany(p => p.LikeUsers)
-                    .HasPrincipalKey(p => p.UserId)
-                    .HasForeignKey(d => d.UserId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__LIKES__userID__498EEC8D");
             });
 
             modelBuilder.Entity<Post>(entity =>
             {
                 entity.ToTable("POST");
-
-                entity.HasIndex(e => e.UserId, "UQ__POST__CB9A1CDECB786E76")
-                    .IsUnique();
 
                 entity.Property(e => e.Id)
                     .ValueGeneratedNever()
@@ -236,10 +185,10 @@ namespace CompanionApp.Models
                 entity.Property(e => e.UserId).HasColumnName("userID");
 
                 entity.HasOne(d => d.User)
-                    .WithOne(p => p.Post)
-                    .HasForeignKey<Post>(d => d.UserId)
+                    .WithMany(p => p.Posts)
+                    .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__POST__userID__41EDCAC5");
+                    .HasConstraintName("FK_POST_PROFILE");
             });
 
             modelBuilder.Entity<Profile>(entity =>
@@ -277,6 +226,40 @@ namespace CompanionApp.Models
                     .HasMaxLength(50)
                     .IsUnicode(false)
                     .HasColumnName("MAJOR");
+
+                entity.HasMany(d => d.UserFollowings)
+                    .WithMany(p => p.Users)
+                    .UsingEntity<Dictionary<string, object>>(
+                        "Following",
+                        l => l.HasOne<Profile>().WithMany().HasForeignKey("UserFollowingid").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__FOLLOWING__userF__3E1D39E1"),
+                        r => r.HasOne<Profile>().WithMany().HasForeignKey("UserId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_FOLLOWING_PROFILE"),
+                        j =>
+                        {
+                            j.HasKey("UserId", "UserFollowingid");
+
+                            j.ToTable("FOLLOWING");
+
+                            j.IndexerProperty<Guid>("UserId").HasColumnName("userID");
+
+                            j.IndexerProperty<Guid>("UserFollowingid").HasColumnName("userFOLLOWINGID");
+                        });
+
+                entity.HasMany(d => d.Users)
+                    .WithMany(p => p.UserFollowings)
+                    .UsingEntity<Dictionary<string, object>>(
+                        "Following",
+                        l => l.HasOne<Profile>().WithMany().HasForeignKey("UserId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_FOLLOWING_PROFILE"),
+                        r => r.HasOne<Profile>().WithMany().HasForeignKey("UserFollowingid").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__FOLLOWING__userF__3E1D39E1"),
+                        j =>
+                        {
+                            j.HasKey("UserId", "UserFollowingid");
+
+                            j.ToTable("FOLLOWING");
+
+                            j.IndexerProperty<Guid>("UserId").HasColumnName("userID");
+
+                            j.IndexerProperty<Guid>("UserFollowingid").HasColumnName("userFOLLOWINGID");
+                        });
             });
 
             modelBuilder.Entity<Semester>(entity =>

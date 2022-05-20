@@ -7,9 +7,8 @@ namespace CompanionApp.Models
     {
         public Post()
         {
-            CommentPosts = new HashSet<Comment>();
-            CommentUsers = new HashSet<Comment>();
-            LikeUsers = new HashSet<Like>();
+            Comments = new HashSet<Comment>();
+            Likes = new HashSet<Like>();
         }
 
         public Guid Id { get; set; }
@@ -19,9 +18,7 @@ namespace CompanionApp.Models
         public DateTime DateCreated { get; set; }
 
         public virtual Profile User { get; set; } = null!;
-        public virtual Like LikePost { get; set; } = null!;
-        public virtual ICollection<Comment> CommentPosts { get; set; }
-        public virtual ICollection<Comment> CommentUsers { get; set; }
-        public virtual ICollection<Like> LikeUsers { get; set; }
+        public virtual ICollection<Comment> Comments { get; set; }
+        public virtual ICollection<Like> Likes { get; set; }
     }
 }
