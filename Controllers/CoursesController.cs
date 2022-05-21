@@ -54,14 +54,14 @@ namespace CompanionApp.Controllers
         // PUT: api/Courses/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCourse(int id, Course course)
+        public async Task<IActionResult> PutCourse(int id, CourseDTO course)
         {
             if (id != course.Crn)
             {
-                return BadRequest();
+                return BadRequest("id and crn must match");
             }
 
-            _context.Entry(course).State = EntityState.Modified;
+            _context.Entry(course.ToCourse()).State = EntityState.Modified;
 
             try
             {

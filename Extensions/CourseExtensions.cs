@@ -36,32 +36,11 @@ namespace CompanionApp.Extensions
                 Credits      = courseDTO.Credits,
                 Attribute    = courseDTO.Attribute,
                 Days         = courseDTO.Days,
-                //StartTime  = TimeSpan.Parse(courseDTO.StartTime),
-                //EndTime    = TimeSpan.Parse(courseDTO.EndTime),
                 StartTime    = !String.IsNullOrEmpty(courseDTO.StartTime) ? TimeSpan.Parse(courseDTO.StartTime) : null,
                 EndTime      = !String.IsNullOrEmpty(courseDTO.EndTime)   ? TimeSpan.Parse(courseDTO.EndTime) : null,
-
                 Location     = courseDTO.Location,
                 Instructor   = courseDTO.Instructor
             };
-        }
-
-        //public static Course ToCourse(this CourseDTOPOST courseDTOPOST)
-        //{
-        //    return new Course
-        //    {
-        //        Crn        = courseDTOPOST.Crn,
-        //        Title      = courseDTOPOST.Title,
-        //        Subject    = courseDTOPOST.Subject,
-        //        Code       = courseDTOPOST.Code,
-        //        Credits    = courseDTOPOST.Credits,
-        //        Attribute  = courseDTOPOST.Attribute,
-        //        Days       = courseDTOPOST.Days,
-        //        StartTime  = TimeSpan.Parse(courseDTOPOST.StartTime),
-        //        EndTime    = TimeSpan.Parse(courseDTOPOST.EndTime),
-        //        Location   = courseDTOPOST.Location,
-        //        Instructor = courseDTOPOST.Instructor
-        //    };
-        //}        
+        }     
     }
 }
