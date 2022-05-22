@@ -20,6 +20,7 @@ namespace CompanionApp.Extensions
                 Email = profile.Email,
                 Major = profile.Major,
                 Class = profile.Class,
+                FollowingIsFollowingNavigations = profile.FollowingIsFollowingNavigations,
             };
         }
 

@@ -17,7 +17,7 @@ IConfiguration config = new ConfigurationBuilder()
     .AddCommandLine(args)
     .Build();
 
-builder.Services.AddDbContext<MyDatabaseContext>(options =>
+builder.Services.AddDbContext<CompanionAppDBContext>(options =>
         options.UseSqlServer(config.GetConnectionString("CompanionAppDB")));
 
 var app = builder.Build();

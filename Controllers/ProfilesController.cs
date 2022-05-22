@@ -15,22 +15,22 @@ namespace AUB_Companion_App_REST_API.Controllers
     [ApiController]
     public class ProfilesController : ControllerBase
     {
-        private readonly MyDatabaseContext _context;
+        private readonly CompanionAppDBContext _context;
 
-        public ProfilesController(MyDatabaseContext context)
+        public ProfilesController(CompanionAppDBContext context)
         {
             _context = context;
         }
 
         // GET: api/Profiles
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ProfileDTO>>> GetProfiles()
+        public async Task<ActionResult<IEnumerable<Profile>>> GetProfiles()
         {
           if (_context.Profiles == null)
           {
               return NotFound();
           }
-            return await _context.Profiles.Select(p => p.ToProfileDTO()).ToListAsync();
+            return await _context.Profiles.Select(p => p).ToListAsync();
         }
 
         // GET: api/Profiles/5

@@ -8,9 +8,9 @@ namespace CompanionApp.Models
         public Profile()
         {
             CourseTakenBies = new HashSet<CourseTakenBy>();
+            FollowingIsFollowingNavigations = new HashSet<Following>();
+            FollowingUsers = new HashSet<Following>();
             Posts = new HashSet<Post>();
-            UserFollowings = new HashSet<Profile>();
-            Users = new HashSet<Profile>();
         }
 
         public Guid Id { get; set; }
@@ -21,9 +21,8 @@ namespace CompanionApp.Models
         public string? Class { get; set; }
 
         public virtual ICollection<CourseTakenBy> CourseTakenBies { get; set; }
+        public virtual ICollection<Following> FollowingIsFollowingNavigations { get; set; }
+        public virtual ICollection<Following> FollowingUsers { get; set; }
         public virtual ICollection<Post> Posts { get; set; }
-
-        public virtual ICollection<Profile> UserFollowings { get; set; }
-        public virtual ICollection<Profile> Users { get; set; }
     }
 }

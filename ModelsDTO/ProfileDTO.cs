@@ -1,4 +1,6 @@
-﻿namespace CompanionApp.ModelsDTO
+﻿using CompanionApp.Models;
+
+namespace CompanionApp.ModelsDTO
 {
     public class ProfileDTO
     {
@@ -8,6 +10,7 @@
         public string? Email { get; set; }
         public string? Major { get; set; }
         public string? Class { get; set; }
+        public virtual ICollection<Following> FollowingIsFollowingNavigations { get; set; }
     }
 
     public class ProfileDTOPOST

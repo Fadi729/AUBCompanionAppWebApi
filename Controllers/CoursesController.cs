@@ -15,9 +15,9 @@ namespace CompanionApp.Controllers
     [ApiController]
     public class CoursesController : ControllerBase
     {
-        private readonly MyDatabaseContext _context;
+        private readonly CompanionAppDBContext _context;
 
-        public CoursesController(MyDatabaseContext context)
+        public CoursesController(CompanionAppDBContext context)
         {
             _context = context;
         }

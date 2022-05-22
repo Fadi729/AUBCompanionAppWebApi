@@ -5,13 +5,13 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace CompanionApp.Models
 {
-    public partial class MyDatabaseContext : DbContext
+    public partial class CompanionAppDBContext : DbContext
     {
-        public MyDatabaseContext()
+        public CompanionAppDBContext()
         {
         }
 
-        public MyDatabaseContext(DbContextOptions<MyDatabaseContext> options)
+        public CompanionAppDBContext(DbContextOptions<CompanionAppDBContext> options)
             : base(options)
         {
         }
@@ -19,6 +19,7 @@ namespace CompanionApp.Models
         public virtual DbSet<Comment> Comments { get; set; } = null!;
         public virtual DbSet<Course> Courses { get; set; } = null!;
         public virtual DbSet<CourseTakenBy> CourseTakenBies { get; set; } = null!;
+        public virtual DbSet<Following> Followings { get; set; } = null!;
         public virtual DbSet<Like> Likes { get; set; } = null!;
         public virtual DbSet<Post> Posts { get; set; } = null!;
         public virtual DbSet<Profile> Profiles { get; set; } = null!;
@@ -34,13 +35,11 @@ namespace CompanionApp.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasDefaultSchema("CompanionApp");
-
             modelBuilder.Entity<Comment>(entity =>
             {
                 entity.HasKey(e => new { e.PostId, e.UserId });
 
-                entity.ToTable("COMMENTS");
+                entity.ToTable("COMMENTS", "CompanionApp");
 
                 entity.Property(e => e.PostId).HasColumnName("postID");
 
@@ -64,7 +63,7 @@ namespace CompanionApp.Models
                 entity.HasKey(e => e.Crn)
                     .HasName("PK__COURSE__C1F887FFF352CD8D");
 
-                entity.ToTable("COURSE");
+                entity.ToTable("COURSE", "CompanionApp");
 
                 entity.Property(e => e.Crn)
                     .ValueGeneratedNever()
@@ -117,7 +116,7 @@ namespace CompanionApp.Models
             {
                 entity.HasKey(e => new { e.UserId, e.CCrn, e.SemesterId });
 
-                entity.ToTable("COURSE_TAKEN_BY");
+                entity.ToTable("COURSE_TAKEN_BY", "CompanionApp");
 
                 entity.Property(e => e.UserId).HasColumnName("userID");
 
@@ -149,11 +148,38 @@ namespace CompanionApp.Models
                     .HasConstraintName("FK_COURSE_TAKEN_BY_PROFILE");
             });
 
+            modelBuilder.Entity<Following>(entity =>
+            {
+                entity.HasKey(e => new { e.UserId, e.IsFollowing });
+
+                entity.ToTable("FOLLOWING", "CompanionApp");
+
+                entity.Property(e => e.UserId).HasColumnName("userID");
+
+                entity.Property(e => e.IsFollowing).HasColumnName("Is_Following");
+
+                entity.Property(e => e.DateFollowed)
+                    .HasColumnType("datetime")
+                    .HasColumnName("DATE_FOLLOWED");
+                
+                entity.HasOne(d => d.IsFollowingNavigation)
+                    .WithMany(p => p.FollowingIsFollowingNavigations)
+                    .HasForeignKey(d => d.IsFollowing)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__FOLLOWING__Is_Fo__793DFFAF");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.FollowingUsers)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__FOLLOWING__userI__7849DB76");
+            });
+
             modelBuilder.Entity<Like>(entity =>
             {
                 entity.HasKey(e => new { e.PostId, e.UserId });
 
-                entity.ToTable("LIKES");
+                entity.ToTable("LIKES", "CompanionApp");
 
                 entity.Property(e => e.PostId).HasColumnName("postID");
 
@@ -168,7 +194,7 @@ namespace CompanionApp.Models
 
             modelBuilder.Entity<Post>(entity =>
             {
-                entity.ToTable("POST");
+                entity.ToTable("POST", "CompanionApp");
 
                 entity.Property(e => e.Id)
                     .ValueGeneratedNever()
@@ -193,7 +219,7 @@ namespace CompanionApp.Models
 
             modelBuilder.Entity<Profile>(entity =>
             {
-                entity.ToTable("PROFILE");
+                entity.ToTable("PROFILE", "CompanionApp");
 
                 entity.HasIndex(e => e.Email, "UQ__PROFILE__161CF72470A5A43A")
                     .IsUnique();
@@ -226,45 +252,11 @@ namespace CompanionApp.Models
                     .HasMaxLength(50)
                     .IsUnicode(false)
                     .HasColumnName("MAJOR");
-
-                entity.HasMany(d => d.UserFollowings)
-                    .WithMany(p => p.Users)
-                    .UsingEntity<Dictionary<string, object>>(
-                        "Following",
-                        l => l.HasOne<Profile>().WithMany().HasForeignKey("UserFollowingid").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__FOLLOWING__userF__3E1D39E1"),
-                        r => r.HasOne<Profile>().WithMany().HasForeignKey("UserId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_FOLLOWING_PROFILE"),
-                        j =>
-                        {
-                            j.HasKey("UserId", "UserFollowingid");
-
-                            j.ToTable("FOLLOWING");
-
-                            j.IndexerProperty<Guid>("UserId").HasColumnName("userID");
-
-                            j.IndexerProperty<Guid>("UserFollowingid").HasColumnName("userFOLLOWINGID");
-                        });
-
-                entity.HasMany(d => d.Users)
-                    .WithMany(p => p.UserFollowings)
-                    .UsingEntity<Dictionary<string, object>>(
-                        "Following",
-                        l => l.HasOne<Profile>().WithMany().HasForeignKey("UserId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_FOLLOWING_PROFILE"),
-                        r => r.HasOne<Profile>().WithMany().HasForeignKey("UserFollowingid").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__FOLLOWING__userF__3E1D39E1"),
-                        j =>
-                        {
-                            j.HasKey("UserId", "UserFollowingid");
-
-                            j.ToTable("FOLLOWING");
-
-                            j.IndexerProperty<Guid>("UserId").HasColumnName("userID");
-
-                            j.IndexerProperty<Guid>("UserFollowingid").HasColumnName("userFOLLOWINGID");
-                        });
             });
 
             modelBuilder.Entity<Semester>(entity =>
             {
-                entity.ToTable("SEMESTER");
+                entity.ToTable("SEMESTER", "CompanionApp");
 
                 entity.Property(e => e.Id)
                     .ValueGeneratedNever()
