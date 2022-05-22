@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CompanionApp.Models;
+using CompanionApp.ModelsDTO;
+using CompanionApp.Extensions;
 
 namespace CompanionApp.Controllers
 {
@@ -20,76 +22,66 @@ namespace CompanionApp.Controllers
             _context = context;
         }
 
-        // GET: api/Followings
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Following>>> GetFollowings()
-        {
-          if (_context.Followings == null)
-          {
-              return NotFound();
-          }
-            return await _context.Followings.ToListAsync();
-        }
-
         // GET: api/Followings/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Following>> GetFollowing(Guid id)
+        public async Task<ActionResult<IEnumerable<FollowingDTO>>> GetFollowing(Guid id)
         {
           if (_context.Followings == null)
           {
               return NotFound();
           }
-            var following = await _context.Followings.FindAsync(id);
+            var following = await _context.Followings.Include(f => f.IsFollowingNavigation).Where(f => f.UserId == id).ToListAsync();
 
             if (following == null)
             {
                 return NotFound();
             }
 
-            return following;
+            return following.Select(f => f.ToFollowingDTO()).ToList();
         }
 
         // PUT: api/Followings/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutFollowing(Guid id, Following following)
-        {
-            if (id != following.UserId)
-            {
-                return BadRequest();
-            }
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> PutFollowing(Guid id, Following following)
+        //{
+        //    if (id != following.UserId)
+        //    {
+        //        return BadRequest();
+        //    }
 
-            _context.Entry(following).State = EntityState.Modified;
+        //    _context.Entry(following).State = EntityState.Modified;
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!FollowingExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+        //    try
+        //    {
+        //        await _context.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!FollowingExists(id))
+        //        {
+        //            return NotFound();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
 
-            return NoContent();
-        }
-
+        //    return NoContent();
+        //}
+        
         // POST: api/Followings
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Following>> PostFollowing(Following following)
+        public async Task<ActionResult<Following>> PostFollowing(FollowingPOSTDTO following)
         {
           if (_context.Followings == null)
           {
               return Problem("Entity set 'CompanionAppDBContext.Followings'  is null.");
           }
-            _context.Followings.Add(following);
+            Following newfollowing = following.ToFollowing();
+            _context.Followings.Add(newfollowing);
             try
             {
                 await _context.SaveChangesAsync();
@@ -109,21 +101,21 @@ namespace CompanionApp.Controllers
             return CreatedAtAction("GetFollowing", new { id = following.UserId }, following);
         }
 
-        // DELETE: api/Followings/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteFollowing(Guid id)
+        // DELETE: api/Followings/
+        [HttpDelete]
+        public async Task<IActionResult> DeleteFollowing(FollowingPOSTDTO following)
         {
             if (_context.Followings == null)
             {
                 return NotFound();
             }
-            var following = await _context.Followings.FindAsync(id);
-            if (following == null)
+            var deletefollowing = await _context.Followings.FindAsync(following.UserId, following.IsFollowing);
+            if (deletefollowing == null)
             {
                 return NotFound();
             }
 
-            _context.Followings.Remove(following);
+            _context.Followings.Remove(deletefollowing);
             await _context.SaveChangesAsync();
 
             return NoContent();

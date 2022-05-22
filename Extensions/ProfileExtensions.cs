@@ -1,5 +1,6 @@
 ﻿using CompanionApp.Models;
 using CompanionApp.ModelsDTO;
+using CompanionApp.Extensions;
 
 namespace CompanionApp.Extensions
 {
@@ -19,8 +20,7 @@ namespace CompanionApp.Extensions
                 LastName = profile.LastName,
                 Email = profile.Email,
                 Major = profile.Major,
-                Class = profile.Class,
-                FollowingIsFollowingNavigations = profile.FollowingIsFollowingNavigations,
+                Class = profile.Class
             };
         }
 

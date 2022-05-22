@@ -24,15 +24,16 @@ namespace AUB_Companion_App_REST_API.Controllers
 
         // GET: api/Profiles
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Profile>>> GetProfiles()
+        public async Task<ActionResult<IEnumerable<ProfileDTO>>> GetProfiles()
         {
           if (_context.Profiles == null)
           {
               return NotFound();
           }
-            return await _context.Profiles.Select(p => p).ToListAsync();
-        }
 
+            return await _context.Profiles.Select(p => p.ToProfileDTO()).ToListAsync();
+        }
+        
         // GET: api/Profiles/5
         [HttpGet("{id}")]
         public async Task<ActionResult<ProfileDTO>> GetProfile(Guid id)
