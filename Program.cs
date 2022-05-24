@@ -14,14 +14,28 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers().AddJsonOptions(x =>
                 x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
-IConfiguration config = new ConfigurationBuilder()
+builder.Configuration
     .AddJsonFile("appsettings.json")
+    .AddJsonFile("appsettings.Development.json")
+    .AddUserSecrets<Program>(true)
     .AddEnvironmentVariables()
     .AddCommandLine(args)
     .Build();
 
-builder.Services.AddDbContext<CompanionAppDBContext>(options =>
-        options.UseSqlServer(config.GetConnectionString("CompanionAppDB")));
+//builder.Services.AddDbContext<CompanionAppDBContext>(options =>
+//        options.UseSqlServer(builder.Configuration.GetConnectionString("CompanionAppDB")));
+
+#if DEBUG
+
+    builder.Services.AddDbContext<CompanionAppDBContext>(options =>
+            options.UseSqlServer(builder.Configuration["ConnectionStrings:DevDB"]));
+
+#else
+
+    builder.Services.AddDbContext<CompanionAppDBContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("CompanionAppDB")));
+#endif
+
 
 var app = builder.Build();
 
@@ -39,3 +53,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+

@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>CompanionApp</RootNamespace>
+    <UserSecretsId>1e23a9ef-bf04-4784-be7c-2b29cb0c4abe</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
