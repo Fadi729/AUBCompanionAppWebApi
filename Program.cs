@@ -31,7 +31,6 @@ builder.Configuration
             options.UseSqlServer(builder.Configuration["ConnectionStrings:DevDB"]));
 
 #else
-
     builder.Services.AddDbContext<CompanionAppDBContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("CompanionAppDB")));
 #endif
