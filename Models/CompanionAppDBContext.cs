@@ -7,6 +7,7 @@ namespace CompanionApp.Models
 {
     public partial class CompanionAppDBContext : DbContext
     {
+        private readonly string _connectionString;
         public CompanionAppDBContext()
         {
         }
@@ -14,6 +15,7 @@ namespace CompanionApp.Models
         public CompanionAppDBContext(DbContextOptions<CompanionAppDBContext> options)
             : base(options)
         {
+            _connectionString = Database.GetDbConnection().ConnectionString;
         }
 
         public virtual DbSet<Comment> Comments { get; set; } = null!;
@@ -29,7 +31,7 @@ namespace CompanionApp.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("name=CompanionAppDB");
+                optionsBuilder.UseSqlServer(_connectionString);
             }
         }
 
@@ -97,6 +99,15 @@ namespace CompanionApp.Models
                     .IsUnicode(false)
                     .HasColumnName("LOCATION");
 
+                entity.Property(e => e.Prerequisites).HasColumnType("text");
+
+                entity.Property(e => e.Restrictions).HasColumnType("text");
+
+                entity.Property(e => e.SemesterId)
+                    .HasMaxLength(6)
+                    .IsUnicode(false)
+                    .HasColumnName("semesterID");
+
                 entity.Property(e => e.StartTime)
                     .HasColumnType("time(0)")
                     .HasColumnName("START_TIME");
@@ -110,6 +121,12 @@ namespace CompanionApp.Models
                     .HasMaxLength(255)
                     .IsUnicode(false)
                     .HasColumnName("TITLE");
+
+                entity.HasOne(d => d.Semester)
+                    .WithMany(p => p.Courses)
+                    .HasForeignKey(d => d.SemesterId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_COURSE_SEMESTER");
             });
 
             modelBuilder.Entity<CourseTakenBy>(entity =>
@@ -122,7 +139,10 @@ namespace CompanionApp.Models
 
                 entity.Property(e => e.CCrn).HasColumnName("cCRN");
 
-                entity.Property(e => e.SemesterId).HasColumnName("semesterID");
+                entity.Property(e => e.SemesterId)
+                    .HasMaxLength(6)
+                    .IsUnicode(false)
+                    .HasColumnName("semesterID");
 
                 entity.Property(e => e.Grade)
                     .HasMaxLength(2)
@@ -139,7 +159,7 @@ namespace CompanionApp.Models
                     .WithMany(p => p.CourseTakenBies)
                     .HasForeignKey(d => d.SemesterId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__COURSE_TA__semes__3A4CA8FD");
+                    .HasConstraintName("FK_COURSE_TAKEN_BY_SEMESTER");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.CourseTakenBies)
@@ -161,7 +181,7 @@ namespace CompanionApp.Models
                 entity.Property(e => e.DateFollowed)
                     .HasColumnType("datetime")
                     .HasColumnName("DATE_FOLLOWED");
-                
+
                 entity.HasOne(d => d.IsFollowingNavigation)
                     .WithMany(p => p.FollowingIsFollowingNavigations)
                     .HasForeignKey(d => d.IsFollowing)
@@ -259,7 +279,8 @@ namespace CompanionApp.Models
                 entity.ToTable("SEMESTER", "CompanionApp");
 
                 entity.Property(e => e.Id)
-                    .ValueGeneratedNever()
+                    .HasMaxLength(6)
+                    .IsUnicode(false)
                     .HasColumnName("ID");
 
                 entity.Property(e => e.Title)

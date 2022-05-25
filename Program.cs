@@ -16,17 +16,12 @@ builder.Services.AddControllers().AddJsonOptions(x =>
 
 builder.Configuration
     .AddJsonFile("appsettings.json")
-    .AddJsonFile("appsettings.Development.json")
     .AddUserSecrets<Program>(true)
     .AddEnvironmentVariables()
     .AddCommandLine(args)
     .Build();
 
-//builder.Services.AddDbContext<CompanionAppDBContext>(options =>
-//        options.UseSqlServer(builder.Configuration.GetConnectionString("CompanionAppDB")));
-
 #if DEBUG
-
     builder.Services.AddDbContext<CompanionAppDBContext>(options =>
             options.UseSqlServer(builder.Configuration["ConnectionStrings:DevDB"]));
 

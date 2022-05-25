@@ -9,7 +9,7 @@ using CompanionApp.Models;
 using CompanionApp.ModelsDTO;
 using CompanionApp.Extensions;
 
-namespace AUB_Companion_App_REST_API.Controllers
+namespace CompanionApp.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -26,22 +26,22 @@ namespace AUB_Companion_App_REST_API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProfileDTO>>> GetProfiles()
         {
-          if (_context.Profiles == null)
-          {
-              return NotFound();
-          }
+            if (_context.Profiles == null)
+            {
+                return NotFound();
+            }
 
             return await _context.Profiles.Select(p => p.ToProfileDTO()).ToListAsync();
         }
-        
+
         // GET: api/Profiles/5
         [HttpGet("{id}")]
         public async Task<ActionResult<ProfileDTO>> GetProfile(Guid id)
         {
-          if (_context.Profiles == null)
-          {
-              return NotFound();
-          }
+            if (_context.Profiles == null)
+            {
+                return Problem("Entity set 'CompanionAppDBContext.Profiles'  is null.");
+            }
             var profile = await _context.Profiles.FindAsync(id);
 
             if (profile == null)
@@ -105,10 +105,10 @@ namespace AUB_Companion_App_REST_API.Controllers
         [HttpPost]
         public async Task<ActionResult<ProfileDTO>> PostProfile(ProfileDTOPOST profile)
         {
-          if (_context.Profiles == null)
-          {
-              return Problem("Entity set 'MyDatabaseContext.Profiles'  is null.");
-          }
+            if (_context.Profiles == null)
+            {
+                return Problem("Entity set 'CompanionAppDBContext.Profiles'  is null.");
+            }
             Profile newprofile = profile.ToProfile();
             newprofile.Id = Guid.NewGuid();
             _context.Profiles.Add(newprofile);
@@ -128,9 +128,9 @@ namespace AUB_Companion_App_REST_API.Controllers
                 }
             }
 
-            return CreatedAtAction("GetProfile", new { id = newprofile.ToProfileDTO().Id }, newprofile.ToProfileDTO()); 
+            return CreatedAtAction("GetProfile", new { id = newprofile.ToProfileDTO().Id }, newprofile.ToProfileDTO());
         }
-        
+
         // DELETE: api/Profiles/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProfile(Guid id)
@@ -139,9 +139,9 @@ namespace AUB_Companion_App_REST_API.Controllers
             {
                 return NotFound();
             }
-            
+
             var profile = await _context.Profiles.FindAsync(id);
-            
+
             if (profile == null)
             {
                 return NotFound();

@@ -20,8 +20,12 @@ namespace CompanionApp.Models
         public TimeSpan? StartTime { get; set; }
         public TimeSpan? EndTime { get; set; }
         public string? Location { get; set; }
+        public string SemesterId { get; set; } = null!;
+        public string? Prerequisites { get; set; }
+        public string? Restrictions { get; set; }
         public string? Instructor { get; set; }
 
+        public virtual Semester Semester { get; set; } = null!;
         public virtual ICollection<CourseTakenBy> CourseTakenBies { get; set; }
     }
 }

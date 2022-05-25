@@ -7,7 +7,7 @@ namespace CompanionApp.Models
     {
         public Guid UserId { get; set; }
         public int CCrn { get; set; }
-        public Guid SemesterId { get; set; }
+        public string SemesterId { get; set; } = null!;
         public string? Grade { get; set; }
 
         public virtual Course CCrnNavigation { get; set; } = null!;

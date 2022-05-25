@@ -100,14 +100,13 @@ namespace CompanionApp.Controllers
             {
                 if (CourseExists(course.Crn))
                 {
-                    return Conflict();
+                    return Conflict("Course Already Exists");
                 }
                 else
                 {
                     throw;
                 }
             }
-
             return CreatedAtAction("GetCourse", new { id = course.Crn }, course);
         }
 

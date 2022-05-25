@@ -1,4 +1,7 @@
-﻿namespace CompanionApp.Models
+﻿using System;
+using System.Collections.Generic;
+
+namespace CompanionApp.Models
 {
     public partial class Post
     {
