@@ -33,12 +33,12 @@ namespace CompanionApp.Extensions
         {
             return new Profile
             {
-                Id = profile.Id,
+                Id        = profile.Id,
                 FirstName = profile.FirstName,
-                LastName = profile.LastName,
-                Email = profile.Email,
-                Major = profile.Major,
-                Class = profile.Class,
+                LastName  = profile.LastName,
+                Email     = profile.Email,
+                Major     = profile.Major,
+                Class     = profile.Class,
             };
         }
 
@@ -52,12 +52,12 @@ namespace CompanionApp.Extensions
         {
             return new Profile
             {
-                Id = id,
+                Id        = id,
                 FirstName = profile.FirstName,
-                LastName = profile.LastName,
-                Email = profile.Email,
-                Major = profile.Major,
-                Class = profile.Class,
+                LastName  = profile.LastName,
+                Email     = profile.Email,
+                Major     = profile.Major,
+                Class     = profile.Class,
             };
         }
 
@@ -71,10 +71,10 @@ namespace CompanionApp.Extensions
             return new Profile
             {
                 FirstName = profile.FirstName,
-                LastName = profile.LastName,
-                Email = profile.Email,
-                Major = profile.Major,
-                Class = profile.Class,
+                LastName  = profile.LastName,
+                Email     = profile.Email,
+                Major     = profile.Major,
+                Class     = profile.Class,
             };
         }
     }

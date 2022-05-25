@@ -8,7 +8,6 @@ namespace CompanionApp.Extensions
     {
         public static CourseDTO ToCourseDTO(this Course course)
         {
-            Debug.WriteLine(course.StartTime);
             return new CourseDTO
             {
                 Crn        = course.Crn,

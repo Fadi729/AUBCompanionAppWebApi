@@ -130,7 +130,6 @@ namespace AUB_Companion_App_REST_API.Controllers
 
             return CreatedAtAction("GetProfile", new { id = newprofile.ToProfileDTO().Id }, newprofile.ToProfileDTO()); 
         }
-
         
         // DELETE: api/Profiles/5
         [HttpDelete("{id}")]
@@ -140,11 +139,19 @@ namespace AUB_Companion_App_REST_API.Controllers
             {
                 return NotFound();
             }
+            
             var profile = await _context.Profiles.FindAsync(id);
+            
             if (profile == null)
             {
                 return NotFound();
             }
+
+            if (id != profile.Id)
+            {
+                return Unauthorized();
+            }
+
 
             _context.Profiles.Remove(profile);
             await _context.SaveChangesAsync();
