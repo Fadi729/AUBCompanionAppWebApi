@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace CompanionApp.Models
+﻿namespace CompanionApp.Models
 {
     public partial class Course
     {

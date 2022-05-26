@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>AUB Companion App REST API</name>
+    </assembly>
+    <members>
+        <member name="M:CompanionApp.Extensions.ProfileExtensions.ToProfileDTO(CompanionApp.Models.Profile)">
+            <summary>
+            Covert a Profile to ProfileDTO
+            </summary>
+            <param name="profile">A Profile instance</param>
+            <returns></returns>
+        </member>
+        <member name="M:CompanionApp.Extensions.ProfileExtensions.ToProfile(CompanionApp.ModelsDTO.ProfileDTO)">
+            <summary>
+            Covert a ProfileDTO to Profile
+            </summary>
+            <param name="profile">A ProfileDTO instance</param>
+            <returns></returns>
+        </member>
+        <member name="M:CompanionApp.Extensions.ProfileExtensions.ToProfile(CompanionApp.ModelsDTO.ProfileDTOPUT,System.Guid)">
+            <summary>
+            Covert a ProfileDTOPUT to Profile
+            </summary>
+            <param name="profile">A ProfileDTOPUT instance</param>
+            <param name="id">Profile ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:CompanionApp.Extensions.ProfileExtensions.ToProfile(CompanionApp.ModelsDTO.ProfileDTOPOST)">
+            <summary>
+            Covert a ProfileDTOPOST to Profile
+            </summary>
+            <param name="profile">A ProfileDTOPOST instance</param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

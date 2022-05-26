@@ -1,6 +1,5 @@
 ﻿using CompanionApp.Models;
 using CompanionApp.ModelsDTO;
-using System.Diagnostics;
 
 namespace CompanionApp.Extensions
 {
