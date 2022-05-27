@@ -202,6 +202,10 @@ namespace CompanionApp.Models
 
                 entity.Property(e => e.UserId).HasColumnName("userID");
 
+                entity.Property(e => e.DateLiked)
+                    .HasColumnType("datetime")
+                    .HasColumnName("DATE_LIKED");
+
                 entity.HasOne(d => d.Post)
                     .WithMany(p => p.Likes)
                     .HasForeignKey(d => d.PostId)

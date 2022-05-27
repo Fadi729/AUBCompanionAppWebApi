@@ -8,5 +8,6 @@
         public DateTime DateCreated { get; set; }
 
         public virtual Post Post { get; set; } = null!;
+        public virtual Profile User { get; set; } = null!;
     }
 }
