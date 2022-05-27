@@ -211,6 +211,12 @@ namespace CompanionApp.Models
                     .HasForeignKey(d => d.PostId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__LIKES__postID__489AC854");
+                
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.Likes)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__LIKES__PROFILE");
             });
 
             modelBuilder.Entity<Post>(entity =>
