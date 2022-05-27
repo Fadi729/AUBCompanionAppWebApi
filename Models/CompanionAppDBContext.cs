@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace CompanionApp.Models
 {
@@ -36,25 +39,33 @@ namespace CompanionApp.Models
         {
             modelBuilder.Entity<Comment>(entity =>
             {
-                entity.HasKey(e => new { e.PostId, e.UserId });
-
                 entity.ToTable("COMMENTS", "CompanionApp");
 
-                entity.Property(e => e.PostId).HasColumnName("postID");
-
-                entity.Property(e => e.UserId).HasColumnName("userID");
+                entity.Property(e => e.Id)
+                    .ValueGeneratedNever()
+                    .HasColumnName("ID");
 
                 entity.Property(e => e.DateCreated)
                     .HasColumnType("datetime")
                     .HasColumnName("DATE_CREATED");
 
+                entity.Property(e => e.PostId).HasColumnName("postID");
+
                 entity.Property(e => e.Text).HasColumnName("TEXT");
+
+                entity.Property(e => e.UserId).HasColumnName("userID");
 
                 entity.HasOne(d => d.Post)
                     .WithMany(p => p.Comments)
                     .HasForeignKey(d => d.PostId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__COMMENTS__postID__44CA3770");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.Comments)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_COMMENTS_PROFILE");
             });
 
             modelBuilder.Entity<Course>(entity =>
@@ -211,12 +222,12 @@ namespace CompanionApp.Models
                     .HasForeignKey(d => d.PostId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__LIKES__postID__489AC854");
-                
+
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.Likes)
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__LIKES__PROFILE");
+                    .HasConstraintName("FK_LIKES_PROFILE1");
             });
 
             modelBuilder.Entity<Post>(entity =>

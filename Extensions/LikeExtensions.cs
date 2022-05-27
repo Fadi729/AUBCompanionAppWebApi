@@ -25,6 +25,15 @@ namespace CompanionApp.Extensions
             };
         }
         
+        public static LikeDTOUsers ToLikeDTOUsers(this Like like)
+        {
+            return new LikeDTOUsers
+            {
+                User = like.User.ToProfileDTO(),
+                DateLiked = like.DateLiked
+            };
+        }
+        
         public static Like ToLike(this LikeDTO like)
         {
             return new Like

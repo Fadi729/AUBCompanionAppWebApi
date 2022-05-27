@@ -6,6 +6,11 @@
         public Guid UserId { get; set; }
         public DateTime DateLiked { get; set; }
     }
+    public class LikeDTOUsers
+    {
+        public virtual ProfileDTO User { get; set; }
+        public DateTime DateLiked { get; set; }
+    }
     public class LikeDTOwObjects
     {
         public virtual PostDTO Post { get; set; } = null!;

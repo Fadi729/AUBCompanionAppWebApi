@@ -33,7 +33,7 @@ namespace CompanionApp.Controllers
 
         // GET: api/Likes/5
         [HttpGet("{postID}")]
-        public async Task<ActionResult<IEnumerable<LikeDTO>>> GetPostLikes(Guid postID)
+        public async Task<ActionResult<IEnumerable<LikeDTOUsers>>> GetPostLikes(Guid postID)
         {
             if (_context.Likes == null)
             {
@@ -45,7 +45,7 @@ namespace CompanionApp.Controllers
                 return NotFound("Post with id " + postID + " does not exist.");
             }
 
-            return await _context.Likes.Where(l => l.PostId == postID).Select(l => l.ToLikeDTO()).ToListAsync();
+            return await _context.Likes.Include(l => l.User).Where(l => l.PostId == postID).Select(l => l.ToLikeDTOUsers()).ToListAsync();
         }
 
         // GET: api/Likes/counter/5
@@ -69,7 +69,7 @@ namespace CompanionApp.Controllers
 
         // POST api/Likes
         [HttpPost]
-        public async Task<ActionResult<ProfileDTO>> PostLike(LikePOSTDTO like)
+        public async Task<ActionResult<LikeDTO>> PostLike(LikePOSTDTO like)
         {
             if (_context.Likes == null)
             {
@@ -131,6 +131,11 @@ namespace CompanionApp.Controllers
             if (like == null)
             {
                 return NotFound("Like with postID " + postID + " and userID " + userID + " does not exist.");
+            }
+
+            if (like.UserId != userID)
+            {
+                return Unauthorized();
             }
 
             _context.Likes.Remove(like);
