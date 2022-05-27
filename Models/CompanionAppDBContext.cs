@@ -17,7 +17,7 @@ namespace CompanionApp.Models
 
         public virtual DbSet<Comment> Comments { get; set; } = null!;
         public virtual DbSet<Course> Courses { get; set; } = null!;
-        public virtual DbSet<CourseTakenBy> CourseTakenBies { get; set; } = null!;
+        public virtual DbSet<CourseTakenBy> CourseTakenBy { get; set; } = null!;
         public virtual DbSet<Following> Followings { get; set; } = null!;
         public virtual DbSet<Like> Likes { get; set; } = null!;
         public virtual DbSet<Post> Posts { get; set; } = null!;
