@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace CompanionApp.Models
 {
     public partial class CompanionAppDBContext : DbContext
     {
-        private readonly string _connectionString;
+        readonly string _connectionString;
         public CompanionAppDBContext()
         {
         }
@@ -18,14 +15,14 @@ namespace CompanionApp.Models
             _connectionString = Database.GetDbConnection().ConnectionString;
         }
 
-        public virtual DbSet<Comment> Comments { get; set; } = null!;
-        public virtual DbSet<Course> Courses { get; set; } = null!;
+        public virtual DbSet<Comment>       Comments      { get; set; } = null!;
+        public virtual DbSet<Course>        Courses       { get; set; } = null!;
         public virtual DbSet<CourseTakenBy> CourseTakenBy { get; set; } = null!;
-        public virtual DbSet<Following> Followings { get; set; } = null!;
-        public virtual DbSet<Like> Likes { get; set; } = null!;
-        public virtual DbSet<Post> Posts { get; set; } = null!;
-        public virtual DbSet<Profile> Profiles { get; set; } = null!;
-        public virtual DbSet<Semester> Semesters { get; set; } = null!;
+        public virtual DbSet<Following>     Followings    { get; set; } = null!;
+        public virtual DbSet<Like>          Likes         { get; set; } = null!;
+        public virtual DbSet<Post>          Posts         { get; set; } = null!;
+        public virtual DbSet<Profile>       Profiles      { get; set; } = null!;
+        public virtual DbSet<Semester>      Semesters     { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -88,37 +85,76 @@ namespace CompanionApp.Models
 
                 entity.Property(e => e.Credits).HasColumnName("CREDITS");
 
-                entity.Property(e => e.Days)
-                    .HasMaxLength(7)
-                    .IsUnicode(false)
-                    .HasColumnName("DAYS");
-
-                entity.Property(e => e.EndTime)
-                    .HasColumnType("time(0)")
-                    .HasColumnName("END_TIME");
-
-                entity.Property(e => e.Instructor)
-                    .HasMaxLength(255)
-                    .IsUnicode(false)
-                    .HasColumnName("INSTRUCTOR");
-
-                entity.Property(e => e.Location)
+                entity.Property(e => e.Type1)
                     .HasMaxLength(50)
                     .IsUnicode(false)
-                    .HasColumnName("LOCATION");
+                    .HasColumnName("TYPE_1");
+                
+                entity.Property(e => e.Type2)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("TYPE_2");
+                
+                entity.Property(e => e.Days1)
+                    .HasMaxLength(7)
+                    .IsUnicode(false)
+                    .HasColumnName("DAYS_1");
+                
+
+                entity.Property(e => e.Days2)
+                    .HasMaxLength(7)
+                    .IsUnicode(false)
+                    .HasColumnName("DAYS_2");
+
+                entity.Property(e => e.EndTime1)
+                    .HasColumnType("time(0)")
+                    .HasColumnName("END_TIME_1");
+
+                entity.Property(e => e.EndTime2)
+                    .HasColumnType("time(0)")
+                    .HasColumnName("END_TIME_2");
+
+                entity.Property(e => e.Instructor1)
+                    .HasMaxLength(255)
+                    .IsUnicode(false)
+                    .HasColumnName("INSTRUCTOR_1");
+
+                entity.Property(e => e.Instructor2)
+                    .HasMaxLength(255)
+                    .IsUnicode(false)
+                    .HasColumnName("INSTRUCTOR_2");
+
+                entity.Property(e => e.Location1)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("LOCATION_1");
+
+                entity.Property(e => e.Location2)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("LOCATION_2");
 
                 entity.Property(e => e.Prerequisites).HasColumnType("text");
 
                 entity.Property(e => e.Restrictions).HasColumnType("text");
+
+                entity.Property(e => e.Section)
+                    .HasMaxLength(20)
+                    .IsUnicode(false)
+                    .HasColumnName("SECTION");
 
                 entity.Property(e => e.SemesterId)
                     .HasMaxLength(6)
                     .IsUnicode(false)
                     .HasColumnName("semesterID");
 
-                entity.Property(e => e.StartTime)
+                entity.Property(e => e.StartTime1)
                     .HasColumnType("time(0)")
-                    .HasColumnName("START_TIME");
+                    .HasColumnName("START_TIME_1");
+
+                entity.Property(e => e.StartTime2)
+                    .HasColumnType("time(0)")
+                    .HasColumnName("START_TIME_2");
 
                 entity.Property(e => e.Subject)
                     .HasMaxLength(10)
@@ -158,19 +194,19 @@ namespace CompanionApp.Models
                     .HasColumnName("GRADE");
 
                 entity.HasOne(d => d.CCrnNavigation)
-                    .WithMany(p => p.CourseTakenBies)
+                    .WithMany(p => p.CourseTakenBy)
                     .HasForeignKey(d => d.CCrn)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__COURSE_TAK__cCRN__395884C4");
 
                 entity.HasOne(d => d.Semester)
-                    .WithMany(p => p.CourseTakenBies)
+                    .WithMany(p => p.CourseTakenBy)
                     .HasForeignKey(d => d.SemesterId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_COURSE_TAKEN_BY_SEMESTER");
 
                 entity.HasOne(d => d.User)
-                    .WithMany(p => p.CourseTakenBies)
+                    .WithMany(p => p.CourseTakenBy)
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_COURSE_TAKEN_BY_PROFILE");

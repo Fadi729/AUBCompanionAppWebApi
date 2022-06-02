@@ -9,31 +9,28 @@ namespace CompanionApp.Extensions
         {
             return new LikeDTO
             {
-                UserId = like.UserId,
-                PostId = like.PostId,
+                UserId    = like.UserId,
+                PostId    = like.PostId,
                 DateLiked = like.DateLiked
             };
         }
-        
         public static LikeDTOwObjects ToLikeDTOwObjects(this Like like)
         {
             return new LikeDTOwObjects
             {
-                User = like.User.ToProfileDTO(),
-                Post = like.Post.ToPostDTO(),
+                User      = like.User.ToProfileDTO(),
+                Post      = like.Post.ToPostDTO(),
                 DateLiked = like.DateLiked
             };
-        }
-        
+        }      
         public static LikeDTOUsers ToLikeDTOUsers(this Like like)
         {
             return new LikeDTOUsers
             {
-                User = like.User.ToProfileDTO(),
+                User      = like.User.ToProfileDTO(),
                 DateLiked = like.DateLiked
             };
         }
-        
         public static Like ToLike(this LikeDTO like)
         {
             return new Like
@@ -41,14 +38,13 @@ namespace CompanionApp.Extensions
                 UserId = like.UserId,
                 PostId = like.PostId,
             };
-        }
-        
+        } 
         public static Like ToLike(this LikePOSTDTO like)
         {
             return new Like
             {
-                UserId = like.UserId,
-                PostId = like.PostId,
+                UserId    = like.UserId,
+                PostId    = like.PostId,
                 DateLiked = DateTime.Now
             };
         }

@@ -6,7 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>CompanionApp</RootNamespace>
     <UserSecretsId>1e23a9ef-bf04-4784-be7c-2b29cb0c4abe</UserSecretsId>
-    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <GenerateDocumentationFile>False</GenerateDocumentationFile>
     <DocumentationFile>API Documentation</DocumentationFile>
     <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
   </PropertyGroup>

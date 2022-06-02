@@ -9,17 +9,16 @@ namespace CompanionApp.Extensions
         {
             return new FollowingDTO
             {
-                DateFollowed = following.DateFollowed,
+                DateFollowed          = following.DateFollowed,
                 IsFollowingNavigation = following.IsFollowingNavigation.ToProfileDTO()
             };
-        }
-        
+        } 
         public static Following ToFollowing(this FollowingPOSTDTO following)
         {
             return new Following
             {
-                UserId = following.UserId,
-                IsFollowing = following.IsFollowing,
+                UserId       = following.UserId,
+                IsFollowing  = following.IsFollowing,
                 DateFollowed = DateTime.Now,
             };
         }

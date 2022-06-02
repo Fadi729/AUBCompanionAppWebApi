@@ -52,11 +52,6 @@ namespace CompanionApp.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutProfile(Guid id, ProfileDTOPUT profile)
         {
-            //if (id != profile.Id)
-            //{
-            //    return BadRequest();
-            //}
-
             if (!ProfileExists(id))
             {
                 return NotFound();

@@ -16,7 +16,6 @@ namespace CompanionApp.Extensions
                 User        = post.User is not null ? post.User.ToProfileDTO() : null
             };
         }
-        
         public static PostsByUserDTO ToPostsByUserDTO(this Post post)
         {
             return new PostsByUserDTO
@@ -28,7 +27,6 @@ namespace CompanionApp.Extensions
                 DateCreated = post.DateCreated,
             };
         }
-        
         public static Post ToPost(this PostPOSTDTO post)
         {
             return new Post

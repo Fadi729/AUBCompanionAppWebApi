@@ -27,18 +27,5 @@ namespace CompanionApp.Extensions
                 DateCreated = DateTime.Now
             };
         }
-        
-        //public static Comment ToComment(this CommentPUTDTO comment)
-        //{
-        //    return new Comment
-        //    {
-        //        Id          = Guid.NewGuid(),
-        //        PostId      = comment.PostId,
-        //        UserId      = comment.UserId,
-        //        Text        = comment.Text,
-        //        DateCreated = DateTime.Now
-        //    };
-        //}
-        
     }
 }

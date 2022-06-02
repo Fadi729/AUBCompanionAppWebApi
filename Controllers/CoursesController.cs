@@ -79,7 +79,7 @@ namespace CompanionApp.Controllers
 
         // POST: api/Courses
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
+        [HttpPost("single")]
         public async Task<ActionResult<CourseDTO>> PostCourse(CourseDTO course)
         {
             if (_context.Courses == null)
@@ -103,6 +103,33 @@ namespace CompanionApp.Controllers
                 }
             }
             return CreatedAtAction("GetCourse", new { id = course.Crn }, course);
+        }
+
+        // POST: api/Courses/5
+        [HttpPost("many")]
+        public async Task<ActionResult<CourseDTO>> PostCourses(List<CourseDTO> courses)
+        {
+            if (_context.Courses == null)
+            {
+                return Problem("Entity set 'MyDatabaseContext.Courses'  is null.");
+            }
+
+            courses.ForEach(course =>
+            {
+                _context.Courses.Add(course.ToCourse());
+            });
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+
+                throw;
+
+            }
+            return CreatedAtAction("GetCourses", courses);
         }
 
         // DELETE: api/Courses/5

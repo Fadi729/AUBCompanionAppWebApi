@@ -1,6 +1,5 @@
 ﻿using CompanionApp.Models;
 using CompanionApp.ModelsDTO;
-using CompanionApp.Extensions;
 
 namespace CompanionApp.Extensions
 {
@@ -15,15 +14,15 @@ namespace CompanionApp.Extensions
         {
             return new ProfileDTO
             {
-                Id = profile.Id,
+                Id        = profile.Id,
                 FirstName = profile.FirstName,
-                LastName = profile.LastName,
-                Email = profile.Email,
-                Major = profile.Major,
-                Class = profile.Class
+                LastName  = profile.LastName,
+                Email     = profile.Email,
+                Major     = profile.Major,
+                Class     = profile.Class
             };
         }
-
+        
         /// <summary>
         /// Covert a ProfileDTO to Profile
         /// </summary>
