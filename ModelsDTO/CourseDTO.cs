@@ -9,6 +9,7 @@
         public byte    Credits       { get; set; }
         public string? Section       { get; set; }
         public string? Attribute     { get; set; }
+        public string? Levels        { get; set; }
         public string? Days1         { get; set; }
         public string? StartTime1    { get; set; }
         public string? EndTime1      { get; set; }

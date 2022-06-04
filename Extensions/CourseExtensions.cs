@@ -15,6 +15,7 @@ namespace CompanionApp.Extensions
                 Code           = course.Code,
                 Credits        = course.Credits,
                 Attribute      = course.Attribute,
+                Levels         = course.Levels,
                 SemesterId     = course.SemesterId,
                 Section        = course.Section,
                 
@@ -46,6 +47,7 @@ namespace CompanionApp.Extensions
                 Code           = courseDTO.Code,
                 Credits        = courseDTO.Credits,
                 Attribute      = courseDTO.Attribute,
+                Levels         = courseDTO.Levels,
                 Section        = courseDTO.Section,
                 SemesterId     = courseDTO.SemesterId,
                 
