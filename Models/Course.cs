@@ -4,7 +4,7 @@
     {
         public Course()
         {
-            CourseTakenBies = new HashSet<CourseTakenBy>();
+            CourseTakenBy = new HashSet<CourseTakenBy>();
         }
 
         #region Attributes
@@ -34,7 +34,7 @@
 
         #region Navigation Properties
         public virtual Semester                   Semester        { get; set; } = null!;
-        public virtual ICollection<CourseTakenBy> CourseTakenBies { get; set; }
+        public virtual ICollection<CourseTakenBy> CourseTakenBy { get; set; }
         #endregion
     }
 }

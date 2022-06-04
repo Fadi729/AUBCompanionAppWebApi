@@ -5,7 +5,7 @@
         public Profile()
         {
             Comments                        = new HashSet<Comment>();
-            CourseTakenBies                 = new HashSet<CourseTakenBy>();
+            CourseTakenBy                 = new HashSet<CourseTakenBy>();
             FollowingIsFollowingNavigations = new HashSet<Following>();
             FollowingUsers                  = new HashSet<Following>();
             Likes                           = new HashSet<Like>();
@@ -23,7 +23,7 @@
 
         #region Navigation Properties
         public virtual ICollection<Comment      > Comments                        { get; set; }
-        public virtual ICollection<CourseTakenBy> CourseTakenBies                 { get; set; }
+        public virtual ICollection<CourseTakenBy> CourseTakenBy                 { get; set; }
         public virtual ICollection<Following    > FollowingIsFollowingNavigations { get; set; }
         public virtual ICollection<Following    > FollowingUsers                  { get; set; }
         public virtual ICollection<Like         > Likes                           { get; set; }

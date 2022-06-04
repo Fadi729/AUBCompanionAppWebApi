@@ -17,7 +17,7 @@ namespace CompanionApp.Models
 
         public virtual DbSet<Comment      > Comments        { get; set; } = null!;
         public virtual DbSet<Course       > Courses         { get; set; } = null!;
-        public virtual DbSet<CourseTakenBy> CourseTakenBies { get; set; } = null!;
+        public virtual DbSet<CourseTakenBy> CourseTakenBy { get; set; } = null!;
         public virtual DbSet<Following    > Followings      { get; set; } = null!;
         public virtual DbSet<Like         > Likes           { get; set; } = null!;
         public virtual DbSet<Post         > Posts           { get; set; } = null!;
@@ -196,19 +196,19 @@ namespace CompanionApp.Models
                     .HasColumnName("GRADE");
 
                 entity.HasOne(d => d.CCrnNavigation)
-                    .WithMany(p => p.CourseTakenBies)
+                    .WithMany(p => p.CourseTakenBy)
                     .HasForeignKey(d => d.CCrn)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__COURSE_TAK__cCRN__395884C4");
 
                 entity.HasOne(d => d.Semester)
-                    .WithMany(p => p.CourseTakenBies)
+                    .WithMany(p => p.CourseTakenBy)
                     .HasForeignKey(d => d.SemesterId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_COURSE_TAKEN_BY_SEMESTER");
 
                 entity.HasOne(d => d.User)
-                    .WithMany(p => p.CourseTakenBies)
+                    .WithMany(p => p.CourseTakenBy)
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_COURSE_TAKEN_BY_PROFILE");
