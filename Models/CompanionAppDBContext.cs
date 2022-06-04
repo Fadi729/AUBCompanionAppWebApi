@@ -4,7 +4,7 @@ namespace CompanionApp.Models
 {
     public partial class CompanionAppDBContext : DbContext
     {
-        readonly string _connectionString;
+        private readonly string _connectionString;
         public CompanionAppDBContext()
         {
         }
@@ -15,14 +15,14 @@ namespace CompanionApp.Models
             _connectionString = Database.GetDbConnection().ConnectionString;
         }
 
-        public virtual DbSet<Comment>       Comments      { get; set; } = null!;
-        public virtual DbSet<Course>        Courses       { get; set; } = null!;
-        public virtual DbSet<CourseTakenBy> CourseTakenBy { get; set; } = null!;
-        public virtual DbSet<Following>     Followings    { get; set; } = null!;
-        public virtual DbSet<Like>          Likes         { get; set; } = null!;
-        public virtual DbSet<Post>          Posts         { get; set; } = null!;
-        public virtual DbSet<Profile>       Profiles      { get; set; } = null!;
-        public virtual DbSet<Semester>      Semesters     { get; set; } = null!;
+        public virtual DbSet<Comment      > Comments        { get; set; } = null!;
+        public virtual DbSet<Course       > Courses         { get; set; } = null!;
+        public virtual DbSet<CourseTakenBy> CourseTakenBies { get; set; } = null!;
+        public virtual DbSet<Following    > Followings      { get; set; } = null!;
+        public virtual DbSet<Like         > Likes           { get; set; } = null!;
+        public virtual DbSet<Post         > Posts           { get; set; } = null!;
+        public virtual DbSet<Profile      > Profiles        { get; set; } = null!;
+        public virtual DbSet<Semester     > Semesters       { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -81,25 +81,17 @@ namespace CompanionApp.Models
                     .IsUnicode(false)
                     .HasColumnName("ATTRIBUTE");
 
-                entity.Property(e => e.Code).HasColumnName("CODE");
+                entity.Property(e => e.Code)
+                    .HasMaxLength(10)
+                    .IsUnicode(false)
+                    .HasColumnName("CODE");
 
                 entity.Property(e => e.Credits).HasColumnName("CREDITS");
 
-                entity.Property(e => e.Type1)
-                    .HasMaxLength(50)
-                    .IsUnicode(false)
-                    .HasColumnName("TYPE_1");
-                
-                entity.Property(e => e.Type2)
-                    .HasMaxLength(50)
-                    .IsUnicode(false)
-                    .HasColumnName("TYPE_2");
-                
                 entity.Property(e => e.Days1)
                     .HasMaxLength(7)
                     .IsUnicode(false)
                     .HasColumnName("DAYS_1");
-                
 
                 entity.Property(e => e.Days2)
                     .HasMaxLength(7)
@@ -166,6 +158,16 @@ namespace CompanionApp.Models
                     .IsUnicode(false)
                     .HasColumnName("TITLE");
 
+                entity.Property(e => e.Type1)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("TYPE_1");
+
+                entity.Property(e => e.Type2)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("TYPE_2");
+
                 entity.HasOne(d => d.Semester)
                     .WithMany(p => p.Courses)
                     .HasForeignKey(d => d.SemesterId)
@@ -194,19 +196,19 @@ namespace CompanionApp.Models
                     .HasColumnName("GRADE");
 
                 entity.HasOne(d => d.CCrnNavigation)
-                    .WithMany(p => p.CourseTakenBy)
+                    .WithMany(p => p.CourseTakenBies)
                     .HasForeignKey(d => d.CCrn)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__COURSE_TAK__cCRN__395884C4");
 
                 entity.HasOne(d => d.Semester)
-                    .WithMany(p => p.CourseTakenBy)
+                    .WithMany(p => p.CourseTakenBies)
                     .HasForeignKey(d => d.SemesterId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_COURSE_TAKEN_BY_SEMESTER");
 
                 entity.HasOne(d => d.User)
-                    .WithMany(p => p.CourseTakenBy)
+                    .WithMany(p => p.CourseTakenBies)
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_COURSE_TAKEN_BY_PROFILE");

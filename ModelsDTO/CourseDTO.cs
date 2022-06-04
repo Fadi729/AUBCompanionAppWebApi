@@ -5,7 +5,7 @@
         public int     Crn           { get; set; }
         public string  Title         { get; set; } = null!;
         public string  Subject       { get; set; } = null!;
-        public short   Code          { get; set; }
+        public string  Code          { get; set; } = null!;
         public byte    Credits       { get; set; }
         public string? Section       { get; set; }
         public string? Attribute     { get; set; }

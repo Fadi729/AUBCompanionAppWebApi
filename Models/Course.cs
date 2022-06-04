@@ -4,13 +4,14 @@
     {
         public Course()
         {
-            CourseTakenBy = new HashSet<CourseTakenBy>();
+            CourseTakenBies = new HashSet<CourseTakenBy>();
         }
 
+        #region Attributes
         public int       Crn           { get; set; }
         public string    Title         { get; set; } = null!;
         public string    Subject       { get; set; } = null!;
-        public short     Code          { get; set; }
+        public string    Code          { get; set; } = null!;
         public byte      Credits       { get; set; }
         public string?   Section       { get; set; }
         public string?   Attribute     { get; set; }
@@ -29,8 +30,11 @@
         public string    SemesterId    { get; set; } = null!;
         public string?   Prerequisites { get; set; }
         public string?   Restrictions  { get; set; }
+        #endregion
 
-        public virtual Semester                   Semester      { get; set; } = null!;
-        public virtual ICollection<CourseTakenBy> CourseTakenBy { get; set; }
+        #region Navigation Properties
+        public virtual Semester                   Semester        { get; set; } = null!;
+        public virtual ICollection<CourseTakenBy> CourseTakenBies { get; set; }
+        #endregion
     }
 }
