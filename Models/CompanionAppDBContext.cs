@@ -142,9 +142,23 @@ namespace CompanionApp.Models
                     .IsUnicode(false)
                     .HasColumnName("LOCATION_2");
 
-                entity.Property(e => e.Prerequisites).HasColumnType("text");
+                entity
+                    .Property(e => e.Prerequisites)
+                    .HasColumnType("text")
+                    .HasColumnName("Prerequisites");
 
-                entity.Property(e => e.Restrictions).HasColumnType("text");
+                entity
+                    .Property(e => e.Restrictions)
+                    .HasColumnType("text")
+                    .HasColumnName("Restrictions");
+                entity
+                    .Property(e => e.Corequisites)
+                    .HasColumnType("text")
+                    .HasColumnName("Corequisites");
+                entity
+                    .Property(e => e.MutualExclusion)
+                    .HasColumnType("text")
+                    .HasColumnName("Mutual_Exclusion");
 
                 entity
                     .Property(e => e.Section)

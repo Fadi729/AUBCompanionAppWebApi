@@ -30,6 +30,8 @@
         public string?   Instructor2      { get; set; }
         public string    SemesterId       { get; set; } = null!;
         public string?   Prerequisites    { get; set; }
+	    public string?   Corequisites     { get; set; }
+        public string?   MutualExclusion  { get; set; }
         public string?   Restrictions     { get; set; }
         #endregion
 

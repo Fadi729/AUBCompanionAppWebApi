@@ -1,5 +1,4 @@
-﻿
-namespace CompanionApp.Models
+﻿namespace CompanionApp.Models
 {
     public partial class Profile
     {
