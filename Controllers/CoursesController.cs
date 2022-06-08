@@ -116,7 +116,11 @@ namespace CompanionApp.Controllers
 
             courses.ForEach(course =>
             {
-                _context.Courses.Add(course.ToCourse());
+                if(CourseExists(course.Crn))
+                {
+                    _context.Entry(course.ToCourse()).State = EntityState.Modified;    
+                }else
+                     _context.Courses.Add(course.ToCourse());
             });
 
             try
@@ -129,7 +133,7 @@ namespace CompanionApp.Controllers
                 throw;
 
             }
-            return CreatedAtAction("GetCourses", courses);
+            return Ok();
         }
 
         // DELETE: api/Courses/5
