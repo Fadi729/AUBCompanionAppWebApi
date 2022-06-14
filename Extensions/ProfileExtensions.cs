@@ -6,13 +6,13 @@ namespace CompanionApp.Extensions
     public static class ProfileExtensions
     {
         /// <summary>
-        /// Covert a Profile to ProfileDTO
+        /// Covert a Profile to ProfileQuerryDTO
         /// </summary>
         /// <param name="profile">A Profile instance</param>
         /// <returns></returns>
-        public static ProfileDTO ToProfileDTO(this Profile profile)
+        public static ProfileQuerryDTO ToProfileQuerryDTO(this Profile profile)
         {
-            return new ProfileDTO
+            return new ProfileQuerryDTO
             {
                 Id        = profile.Id,
                 FirstName = profile.FirstName,
@@ -24,11 +24,11 @@ namespace CompanionApp.Extensions
         }
         
         /// <summary>
-        /// Covert a ProfileDTO to Profile
+        /// Covert a ProfileQuerryDTO to Profile
         /// </summary>
-        /// <param name="profile">A ProfileDTO instance</param>
+        /// <param name="profile">A ProfileQuerryDTO instance</param>
         /// <returns></returns>
-        public static Profile ToProfile(this ProfileDTO profile)
+        public static Profile ToProfile(this ProfileQuerryDTO profile)
         {
             return new Profile
             {
@@ -42,12 +42,12 @@ namespace CompanionApp.Extensions
         }
 
         /// <summary>
-        /// Covert a ProfileDTOPUT to Profile
+        /// Covert a ProfileQuerryDTOPUT to Profile
         /// </summary>
-        /// <param name="profile">A ProfileDTOPUT instance</param>
+        /// <param name="profile">A ProfileQuerryDTOPUT instance</param>
         /// <param name="id">Profile ID</param>
         /// <returns></returns>
-        public static Profile ToProfile(this ProfileDTOPUT profile, Guid id)
+        public static Profile ToProfile(this ProfileCommandDTO profile, Guid id)
         {
             return new Profile
             {
@@ -61,11 +61,11 @@ namespace CompanionApp.Extensions
         }
 
         /// <summary>
-        /// Covert a ProfileDTOPOST to Profile
+        /// Covert a ProfileQuerryDTOPOST to Profile
         /// </summary>
-        /// <param name="profile">A ProfileDTOPOST instance</param>
+        /// <param name="profile">A ProfileQuerryDTOPOST instance</param>
         /// <returns></returns>
-        public static Profile ToProfile(this ProfileDTOPOST profile)
+        public static Profile ToProfile(this ProfileCommandDTO profile)
         {
             return new Profile
             {

@@ -1,6 +1,8 @@
 //using CompanionApp.Models;
 //using CompanionApp.Models;
 using CompanionApp.Models;
+using CompanionApp.Repositories;
+using CompanionApp.Repositories.Contracts;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
@@ -22,13 +24,15 @@ builder.Configuration
     .Build();
 
 #if DEBUG
-    builder.Services.AddDbContext<CompanionAppDBContext>(options =>
-            options.UseSqlServer(builder.Configuration["ConnectionStrings:DevDB"]));
+builder.Services.AddDbContext<CompanionAppDBContext>(options =>
+        options.UseSqlServer(builder.Configuration["ConnectionStrings:DevDB"]));
 
 #else
     builder.Services.AddDbContext<CompanionAppDBContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("CompanionAppDB")));
 #endif
+
+builder.Services.AddScoped<IProfileRespository, ProfileRepository>();
 
 var app = builder.Build();
 

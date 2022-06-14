@@ -9,7 +9,7 @@ namespace CompanionApp.Extensions
         {
             return new CourseTakenByDTO
             {
-                User     = courseTakenBy.User.ToProfileDTO(),
+                User     = courseTakenBy.User.ToProfileQuerryDTO(),
                 Course   = courseTakenBy.CCrnNavigation.ToCourseDTO(),
                 Semester = courseTakenBy.Semester.ToSemesterDTO(),
                 Grade    = courseTakenBy.Grade,
@@ -30,7 +30,7 @@ namespace CompanionApp.Extensions
             return new CourseTakenBy_Course_DTO
             {
                 Grade    = courseTakenBy.Grade,
-                User     = courseTakenBy.User.ToProfileDTO(),
+                User     = courseTakenBy.User.ToProfileQuerryDTO(),
                 Semester = courseTakenBy.Semester.ToSemesterDTO()
             };
         } 

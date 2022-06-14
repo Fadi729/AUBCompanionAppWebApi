@@ -18,7 +18,7 @@ namespace CompanionApp.Extensions
         {
             return new LikeDTOwObjects
             {
-                User      = like.User.ToProfileDTO(),
+                User      = like.User.ToProfileQuerryDTO(),
                 Post      = like.Post.ToPostDTO(),
                 DateLiked = like.DateLiked
             };
@@ -27,7 +27,7 @@ namespace CompanionApp.Extensions
         {
             return new LikeDTOUsers
             {
-                User      = like.User.ToProfileDTO(),
+                User      = like.User.ToProfileQuerryDTO(),
                 DateLiked = like.DateLiked
             };
         }

@@ -13,7 +13,7 @@ namespace CompanionApp.Extensions
                 Text        = post.Text,
                 Attachment  = post.Attachment,
                 DateCreated = post.DateCreated,
-                User        = post.User is not null ? post.User.ToProfileDTO() : null
+                User        = post.User is not null ? post.User.ToProfileQuerryDTO() : null
             };
         }
         public static PostsByUserDTO ToPostsByUserDTO(this Post post)

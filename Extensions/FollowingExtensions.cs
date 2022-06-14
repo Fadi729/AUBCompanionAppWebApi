@@ -10,7 +10,7 @@ namespace CompanionApp.Extensions
             return new FollowingDTO
             {
                 DateFollowed          = following.DateFollowed,
-                IsFollowingNavigation = following.IsFollowingNavigation.ToProfileDTO()
+                IsFollowingNavigation = following.IsFollowingNavigation.ToProfileQuerryDTO()
             };
         } 
         public static Following ToFollowing(this FollowingPOSTDTO following)

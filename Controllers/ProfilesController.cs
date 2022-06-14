@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using CompanionApp.Exceptions.ProfileExceptions;
+using CompanionApp.Extensions;
 using CompanionApp.Models;
 using CompanionApp.ModelsDTO;
-using CompanionApp.Extensions;
+using CompanionApp.Repositories.Contracts;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CompanionApp.Controllers
 {
@@ -10,153 +12,89 @@ namespace CompanionApp.Controllers
     [ApiController]
     public class ProfilesController : ControllerBase
     {
-        private readonly CompanionAppDBContext _context;
-
-        public ProfilesController(CompanionAppDBContext context)
+        public IProfileRespository profileRespository { get; }
+        public ProfilesController(IProfileRespository ProfileRespository)
         {
-            _context = context;
+            profileRespository = ProfileRespository;
         }
 
-        // GET: api/Profiles
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<ProfileDTO>>> GetProfiles()
-        {
-            if (_context.Profiles == null)
-            {
-                return NotFound();
-            }
-
-            return await _context.Profiles.Select(p => p.ToProfileDTO()).ToListAsync();
-        }
-
-        // GET: api/Profiles/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ProfileDTO>> GetProfile(Guid id)
+        public async Task<ActionResult<ProfileQuerryDTO>> GetProfile(Guid id)
         {
-            if (_context.Profiles == null)
+            try
             {
-                return Problem("Entity set 'CompanionAppDBContext.Profiles'  is null.");
+                ProfileQuerryDTO profile = await profileRespository.GetProfile(id);
+                return profile;
             }
-            var profile = await _context.Profiles.FindAsync(id);
-
-            if (profile == null)
+            catch (ProfileNotFoundException ex)
             {
-                return NotFound();
+                return NotFound(ex.Message);
             }
-
-            return profile.ToProfileDTO();
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        // PUT: api/Profiles/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutProfile(Guid id, ProfileDTOPUT profile)
+        public async Task<IActionResult> PutProfile(Guid id, ProfileCommandDTO profile)
         {
-            if (!ProfileExists(id))
-            {
-                return NotFound();
-            }
-
-            _context.Entry(profile.ToProfile(id)).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                await profileRespository.EditProfile(id, profile);
+                return NoContent();
             }
-            catch (DbUpdateConcurrencyException)
+            catch (ProfileNotFoundException ex)
             {
-                if (!ProfileExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return NotFound(ex.Message);
             }
-            catch (DbUpdateException)
+            catch (ProfileCommandException ex)
             {
-                if (ProfileExists(profile.Email))
-                {
-                    return Conflict("Email already exists.");
-                }
-                else
-                {
-                    throw;
-                }
+                return BadRequest(ex.Message);
             }
-
-
-            return NoContent();
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        // POST: api/Profiles
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<ProfileDTO>> PostProfile(ProfileDTOPOST profile)
+        public async Task<ActionResult<ProfileQuerryDTO>> PostProfile(ProfileCommandDTO profile)
         {
-            if (_context.Profiles == null)
-            {
-                return Problem("Entity set 'CompanionAppDBContext.Profiles'  is null.");
-            }
-            Profile newprofile = profile.ToProfile();
-            newprofile.Id = Guid.NewGuid();
-            _context.Profiles.Add(newprofile);
             try
             {
-                await _context.SaveChangesAsync();
+                return await profileRespository.CreateProfile(profile);
             }
-            catch (DbUpdateException)
+            catch (ProfileAlreadyExistsException ex)
             {
-                if (ProfileExists(profile.Email))
-                {
-                    return Conflict("Email already exists.");
-                }
-                else
-                {
-                    throw;
-                }
+                return BadRequest(ex.Message);
             }
-
-            return CreatedAtAction("GetProfile", new { id = newprofile.ToProfileDTO().Id }, newprofile.ToProfileDTO());
+            catch (ProfileCommandException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        // DELETE: api/Profiles/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProfile(Guid id)
         {
-            if (_context.Profiles == null)
+            try
             {
-                return NotFound();
+                await profileRespository.DeleteProfile(id);
+                return NoContent();
             }
-
-            var profile = await _context.Profiles.FindAsync(id);
-
-            if (profile == null)
+            catch (ProfileNotFoundException ex)
             {
-                return NotFound();
+                return NotFound(ex.Message);
             }
-
-            if (id != profile.Id)
+            catch (Exception)
             {
-                return Unauthorized();
+                throw;
             }
-
-
-            _context.Profiles.Remove(profile);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool ProfileExists(Guid id)
-        {
-            return (_context.Profiles?.Any(e => e.Id == id)).GetValueOrDefault();
-        }
-
-        private bool ProfileExists(string? email)
-        {
-            return (_context.Profiles?.Any(e => e.Email == email)).GetValueOrDefault();
         }
     }
 }

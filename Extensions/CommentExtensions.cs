@@ -13,7 +13,7 @@ namespace CompanionApp.Extensions
                 PostId      = comment.PostId,
                 Text        = comment.Text,
                 DateCreated = comment.DateCreated,
-                User        = comment.User.ToProfileDTO()
+                User        = comment.User.ToProfileQuerryDTO()
             };
         }
         public static Comment ToComment(this CommentPOSTDTO comment)
