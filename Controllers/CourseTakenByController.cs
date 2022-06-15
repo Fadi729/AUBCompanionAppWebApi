@@ -10,7 +10,7 @@ namespace CompanionApp.Controllers
     [ApiController]
     public class CourseTakenByController : ControllerBase
     {
-        private readonly CompanionAppDBContext _context;
+         readonly CompanionAppDBContext _context;
 
         public CourseTakenByController(CompanionAppDBContext context)
         {
@@ -167,19 +167,19 @@ namespace CompanionApp.Controllers
             return NoContent();
         }
 
-        private bool ProfileExists(Guid id)
+         bool ProfileExists(Guid id)
         {
             return _context.Profiles.Any(e => e.Id == id);
         }
-        private bool CourseExists(int crn)
+         bool CourseExists(int crn)
         {
             return _context.Courses.Any(e => e.Crn == crn);
         }
-        private bool SemesterExists(string id)
+         bool SemesterExists(string id)
         {
             return _context.Semesters.Any(e => e.Id == id);
         }
-        private bool ProfileTookCourse(Guid userID, int crn, string semesterID)
+         bool ProfileTookCourse(Guid userID, int crn, string semesterID)
         {
             return _context.CourseTakenBy.Any(e => e.UserId == userID && e.CCrn == crn && e.SemesterId == semesterID);
         }

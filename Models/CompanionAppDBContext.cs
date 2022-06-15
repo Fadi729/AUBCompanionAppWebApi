@@ -7,7 +7,7 @@ namespace CompanionApp.Models
 {
     public partial class CompanionAppDBContext : DbContext
     {
-        private readonly string _connectionString;
+        readonly string _connectionString;
 
         public CompanionAppDBContext() { }
 

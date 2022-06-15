@@ -10,7 +10,7 @@ namespace CompanionApp.Controllers
     [ApiController]
     public class PostsController : ControllerBase
     {
-        private readonly CompanionAppDBContext _context;
+         readonly CompanionAppDBContext _context;
 
         public PostsController(CompanionAppDBContext context)
         {
@@ -182,7 +182,7 @@ namespace CompanionApp.Controllers
             return NoContent();
         }
 
-        private bool PostExists(Guid id)
+         bool PostExists(Guid id)
         {
             return (_context.Posts?.Any(e => e.Id == id)).GetValueOrDefault();
         }

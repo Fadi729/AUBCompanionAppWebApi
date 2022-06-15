@@ -10,7 +10,7 @@ namespace CompanionApp.Controllers
     [ApiController]
     public class LikesController : ControllerBase
     {
-        private readonly CompanionAppDBContext _context;
+         readonly CompanionAppDBContext _context;
 
         public LikesController(CompanionAppDBContext context)
         {
@@ -144,15 +144,15 @@ namespace CompanionApp.Controllers
             return NoContent();
         }
 
-        private bool PostExists(Guid id)
+         bool PostExists(Guid id)
         {
             return _context.Posts.Any(e => e.Id == id);
         }
-        private bool ProfileExists(Guid id)
+         bool ProfileExists(Guid id)
         {
             return _context.Profiles.Any(e => e.Id == id);
         }
-        private bool LikeExists(Like newlike)
+         bool LikeExists(Like newlike)
         {
             return _context.Likes.Any(e => e.PostId == newlike.PostId && e.UserId == newlike.UserId);
         }

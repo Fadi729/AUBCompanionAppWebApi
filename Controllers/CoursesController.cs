@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using CompanionApp.Models;
 using CompanionApp.ModelsDTO;
-using CompanionApp.Extensions;
+using CompanionApp.Repositories.Contracts;
+using CompanionApp.Exceptions.CourseExceptions;
+using CompanionApp.Models;
 
 namespace CompanionApp.Controllers
 {
@@ -10,155 +10,142 @@ namespace CompanionApp.Controllers
     [ApiController]
     public class CoursesController : ControllerBase
     {
-        private readonly CompanionAppDBContext _context;
+        ICourseRepository CourseRepo { get; init; }
 
-        public CoursesController(CompanionAppDBContext context)
+        public CoursesController(ICourseRepository repository)
         {
-            _context = context;
+            CourseRepo = repository;
         }
 
-        // GET: api/Courses
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CourseDTO>>> GetCourses()
         {
-            if (_context.Courses == null)
+            try
             {
-                return NotFound();
+                IEnumerable<CourseDTO> courses = await CourseRepo.GetAllCoursesAsync();
+                return Ok(courses);
             }
-            return await _context.Courses.Select(c => c.ToCourseDTO()).ToListAsync();
+            catch (NoCoursesFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
         }
 
-        // GET: api/Courses/5
         [HttpGet("{id}")]
         public async Task<ActionResult<CourseDTO>> GetCourse(int id)
         {
-            if (_context.Courses == null)
+            try
             {
-                return NotFound();
+                return await CourseRepo.GetCourseAsync(id);    
             }
-            var course = await _context.Courses.FindAsync(id);
-
-            if (course == null)
+            catch (CourseNotFoundException ex)
             {
-                return NotFound();
+                return NotFound(ex.Message);
             }
-
-            return course.ToCourseDTO();
         }
 
-        // PUT: api/Courses/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCourse(int id, CourseDTO course)
         {
-            if (id != course.Crn)
-            {
-                return BadRequest("id and crn must match");
-            }
-
-            _context.Entry(course.ToCourse()).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                await CourseRepo.EditCourseAsync(id, course);
+                return NoContent();
             }
-            catch (DbUpdateConcurrencyException)
+            catch (ArgumentException ex)
             {
-                if (!CourseExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return BadRequest(ex.Message);
+            }
+            catch (CourseCommandException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (CourseNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception)
+            {
+                throw;
             }
 
-            return NoContent();
         }
 
-        // POST: api/Courses
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost("single")]
         public async Task<ActionResult<CourseDTO>> PostCourse(CourseDTO course)
         {
-            if (_context.Courses == null)
-            {
-                return Problem("Entity set 'MyDatabaseContext.Courses'  is null.");
-            }
-            _context.Courses.Add(course.ToCourse());
             try
             {
-                await _context.SaveChangesAsync();
+                return await CourseRepo.AddCourseAsync(course);
             }
-            catch (DbUpdateException)
+            catch (CourseAlreadyExistsException ex)
             {
-                if (CourseExists(course.Crn))
-                {
-                    return Conflict("Course Already Exists");
-                }
-                else
-                {
-                    throw;
-                }
+                return BadRequest(ex.Message);
             }
-            return CreatedAtAction("GetCourse", new { id = course.Crn }, course);
-        }
-
-        // POST: api/Courses/5
-        [HttpPost("many")]
-        public async Task<ActionResult<CourseDTO>> PostCourses(List<CourseDTO> courses)
-        {
-            if (_context.Courses == null)
+            catch (CourseCommandException ex)
             {
-                return Problem("Entity set 'MyDatabaseContext.Courses'  is null.");
+                return BadRequest(ex.Message);
             }
-
-            courses.ForEach(course =>
+            catch (Exception)
             {
-                if(CourseExists(course.Crn))
-                {
-                    _context.Entry(course.ToCourse()).State = EntityState.Modified;    
-                }else
-                     _context.Courses.Add(course.ToCourse());
-            });
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-
                 throw;
-
             }
-            return Ok();
         }
 
-        // DELETE: api/Courses/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCourse(int id)
-        {
-            if (_context.Courses == null)
-            {
-                return NotFound();
-            }
-            var course = await _context.Courses.FindAsync(id);
-            if (course == null)
-            {
-                return NotFound();
-            }
+        //// POST: api/Courses/5
+        //[HttpPost("many")]
+        //public async Task<ActionResult<CourseDTO>> PostCourses(List<CourseDTO> courses)
+        //{
+        //    if (_context.Courses == null)
+        //    {
+        //        return Problem("Entity set 'MyDatabaseContext.Courses'  is null.");
+        //    }
 
-            _context.Courses.Remove(course);
-            await _context.SaveChangesAsync();
+        //    courses.ForEach(course =>
+        //    {
+        //        if (CourseExists(course.Crn))
+        //        {
+        //            _context.Entry(course.ToCourse()).State = EntityState.Modified;
+        //        }
+        //        else
+        //            _context.Courses.Add(course.ToCourse());
+        //    });
 
-            return NoContent();
-        }
+        //    try
+        //    {
+        //        await _context.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateException)
+        //    {
+        //        throw;
+        //    }
+        //    return Ok();
+        //}
 
-        private bool CourseExists(int id)
-        {
-            return (_context.Courses?.Any(e => e.Crn == id)).GetValueOrDefault();
-        }
+        //// DELETE: api/Courses/5
+        //[HttpDelete("{id}")]
+        //public async Task<IActionResult> DeleteCourse(int id)
+        //{
+        //    if (_context.Courses == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    var course = await _context.Courses.FindAsync(id);
+        //    if (course == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    _context.Courses.Remove(course);
+        //    await _context.SaveChangesAsync();
+
+        //    return NoContent();
+        //}
+
     }
 }

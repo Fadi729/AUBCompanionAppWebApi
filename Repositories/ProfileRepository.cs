@@ -9,31 +9,33 @@ using FluentValidation;
 
 namespace CompanionApp.Repositories
 {
-    public class ProfileRepository : IProfileRespository
+    public class ProfileRepository : IProfileRepository
     {
-        private readonly CompanionAppDBContext _context;
-        private readonly ProfileValidation     validationRules = new();
+        readonly CompanionAppDBContext _context;
+        readonly ProfileValidation     validationRules;
 
-        public ProfileRepository(CompanionAppDBContext DBcontext)
+        public ProfileRepository(CompanionAppDBContext DBcontext, ProfileValidation validation)
         {
             _context = DBcontext;
+            validationRules = validation;
         }
-        public async Task<ProfileQuerryDTO> GetProfile   (Guid id)
+        
+        public async Task<ProfileQuerryDTO> GetProfileAsync   (Guid id)
         {
             Profile? profile = await _context.Profiles.FindAsync(id);
             if (profile is null)
             {
-                throw new ProfileNotFoundException("Profile Does Not Exist");
+                throw new ProfileNotFoundException();
             }
 
             return profile.ToProfileQuerryDTO();
         }
-        public async Task<ProfileQuerryDTO> CreateProfile(ProfileCommandDTO profile)
+        public async Task<ProfileQuerryDTO> CreateProfileAsync(ProfileCommandDTO profile)
         {
             #region try block
             try
             {
-                validationRules.ValidateAndThrow(profile);
+                await validationRules.ValidateAndThrowAsync(profile);
                 if (ProfileExists(profile.Email))
                 {
                     throw new ProfileAlreadyExistsException("Email Already In Use");
@@ -53,17 +55,17 @@ namespace CompanionApp.Repositories
             }
             #endregion
         }
-        public async Task                   EditProfile  (Guid id, ProfileCommandDTO profile)
+        public async Task                   EditProfileAsync  (Guid id, ProfileCommandDTO profile)
         {
             #region try block
             try
             {
                 if (!ProfileExists(id))
                 {
-                    throw new ProfileNotFoundException("Profile Does Not Exist");
+                    throw new ProfileNotFoundException();
                 }
 
-                validationRules.ValidateAndThrow(profile);
+                await validationRules.ValidateAndThrowAsync(profile);
                 _context.Entry(profile.ToProfile(id)).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
             }
@@ -75,11 +77,11 @@ namespace CompanionApp.Repositories
             }
             #endregion
         }
-        public async Task                   DeleteProfile(Guid id)
+        public async Task                   DeleteProfileAsync(Guid id)
         {
             if (!ProfileExists(id))
             {
-                throw new ProfileNotFoundException("Profile Does Not Exist");
+                throw new ProfileNotFoundException();
             }
 
             Profile profile = new() { Id = id };
@@ -87,11 +89,11 @@ namespace CompanionApp.Repositories
             await _context.SaveChangesAsync();
         }
 
-        private bool ProfileExists(Guid id)
+        bool ProfileExists(Guid id)
         {
             return (_context.Profiles?.Any(e => e.Id == id)).GetValueOrDefault();
         }
-        private bool ProfileExists(string? email)
+        bool ProfileExists(string? email)
         {
             return (_context.Profiles?.Any(e => e.Email == email)).GetValueOrDefault();
         }

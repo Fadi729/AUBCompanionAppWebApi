@@ -10,7 +10,7 @@ namespace CompanionApp.Controllers
     [ApiController]    
     public class CommentsController : ControllerBase
     {
-        private readonly CompanionAppDBContext _context;
+         readonly CompanionAppDBContext _context;
 
         public CommentsController(CompanionAppDBContext context)
         {
@@ -166,15 +166,15 @@ namespace CompanionApp.Controllers
             return NoContent();
         }
 
-        private bool PostExists(Guid id)
+         bool PostExists(Guid id)
         {
             return _context.Posts.Any(e => e.Id == id);
         }
-        private bool ProfileExists(Guid id)
+         bool ProfileExists(Guid id)
         {
             return _context.Profiles.Any(e => e.Id == id);
         }
-        private bool CommentExists(Guid id)
+         bool CommentExists(Guid id)
         {
             return _context.Comments.Any(c => c.Id == id);
         }

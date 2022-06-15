@@ -12,10 +12,10 @@ namespace CompanionApp.Controllers
     [ApiController]
     public class ProfilesController : ControllerBase
     {
-        public IProfileRespository profileRespository { get; }
-        public ProfilesController(IProfileRespository ProfileRespository)
+        IProfileRepository ProfileRespository { get; init;  }
+        public ProfilesController(IProfileRepository ProfileRespository)
         {
-            profileRespository = ProfileRespository;
+            this.ProfileRespository = ProfileRespository;
         }
 
         [HttpGet("{id}")]
@@ -23,7 +23,7 @@ namespace CompanionApp.Controllers
         {
             try
             {
-                ProfileQuerryDTO profile = await profileRespository.GetProfile(id);
+                ProfileQuerryDTO profile = await ProfileRespository.GetProfileAsync(id);
                 return profile;
             }
             catch (ProfileNotFoundException ex)
@@ -41,7 +41,7 @@ namespace CompanionApp.Controllers
         {
             try
             {
-                await profileRespository.EditProfile(id, profile);
+                await ProfileRespository.EditProfileAsync(id, profile);
                 return NoContent();
             }
             catch (ProfileNotFoundException ex)
@@ -63,7 +63,7 @@ namespace CompanionApp.Controllers
         {
             try
             {
-                return await profileRespository.CreateProfile(profile);
+                return await ProfileRespository.CreateProfileAsync(profile);
             }
             catch (ProfileAlreadyExistsException ex)
             {
@@ -84,7 +84,7 @@ namespace CompanionApp.Controllers
         {
             try
             {
-                await profileRespository.DeleteProfile(id);
+                await ProfileRespository.DeleteProfileAsync(id);
                 return NoContent();
             }
             catch (ProfileNotFoundException ex)

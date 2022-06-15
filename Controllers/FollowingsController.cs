@@ -10,7 +10,7 @@ namespace CompanionApp.Controllers
     [ApiController]
     public class FollowingsController : ControllerBase
     {
-        private readonly CompanionAppDBContext _context;
+         readonly CompanionAppDBContext _context;
 
         public FollowingsController(CompanionAppDBContext context)
         {
@@ -116,7 +116,7 @@ namespace CompanionApp.Controllers
             return NoContent();
         }
 
-        private bool FollowingExists(Guid id)
+         bool FollowingExists(Guid id)
         {
             return (_context.Followings?.Any(e => e.UserId == id)).GetValueOrDefault();
         }

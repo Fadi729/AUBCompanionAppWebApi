@@ -1,8 +1,7 @@
-//using CompanionApp.Models;
-//using CompanionApp.Models;
 using CompanionApp.Models;
 using CompanionApp.Repositories;
 using CompanionApp.Repositories.Contracts;
+using CompanionApp.Validation;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
@@ -10,11 +9,13 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddControllers().AddJsonOptions(x =>
-                x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+builder.Services
+    .AddControllers()
+    .AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
 builder.Configuration
     .AddJsonFile("appsettings.json")
@@ -24,15 +25,18 @@ builder.Configuration
     .Build();
 
 #if DEBUG
-builder.Services.AddDbContext<CompanionAppDBContext>(options =>
-        options.UseSqlServer(builder.Configuration["ConnectionStrings:DevDB"]));
-
+builder.Services.AddDbContext<CompanionAppDBContext>(
+    options => options.UseSqlServer(builder.Configuration["ConnectionStrings:DevDB"]));
 #else
-    builder.Services.AddDbContext<CompanionAppDBContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("CompanionAppDB")));
+builder.Services.AddDbContext<CompanionAppDBContext>(
+    options => options.UseSqlServer(builder.Configuration.GetConnectionString("CompanionAppDB")));
 #endif
 
-builder.Services.AddScoped<IProfileRespository, ProfileRepository>();
+builder.Services
+    .AddScoped<IProfileRepository, ProfileRepository>()
+    .AddScoped<ICourseRepository, CourseRepository>();
+
+builder.Services.AddScoped<ProfileValidation>().AddScoped<CourseValidation>();
 
 var app = builder.Build();
 
@@ -50,4 +54,3 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-

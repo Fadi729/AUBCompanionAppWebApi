@@ -2,7 +2,8 @@
 {
     public class ProfileCommandException : Exception
     {
-        public ProfileCommandException() { }
+        static readonly string _dafualtErrorMessage = "Profile command failed.";
+        public ProfileCommandException() : base(_dafualtErrorMessage) { }
         public ProfileCommandException(string message) : base(message) { }
         public ProfileCommandException(string message, Exception inner) : base(message, inner) { }
     }

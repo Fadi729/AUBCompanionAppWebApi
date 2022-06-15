@@ -10,7 +10,7 @@ namespace CompanionApp.Controllers
     [ApiController]    
     public class SemestersController : ControllerBase
     {
-        private readonly CompanionAppDBContext _context;
+         readonly CompanionAppDBContext _context;
 
         public SemestersController(CompanionAppDBContext context)
         {
@@ -122,7 +122,7 @@ namespace CompanionApp.Controllers
             return NoContent();
         }
 
-        private bool SemesterExists(string id)
+         bool SemesterExists(string id)
         {
             return _context.Semesters.Any(e => e.Id == id);
         }
