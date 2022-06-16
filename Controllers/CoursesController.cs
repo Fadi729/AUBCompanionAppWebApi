@@ -97,55 +97,42 @@ namespace CompanionApp.Controllers
             }
         }
 
-        //// POST: api/Courses/5
-        //[HttpPost("many")]
-        //public async Task<ActionResult<CourseDTO>> PostCourses(List<CourseDTO> courses)
-        //{
-        //    if (_context.Courses == null)
-        //    {
-        //        return Problem("Entity set 'MyDatabaseContext.Courses'  is null.");
-        //    }
+        /// <summary>
+        /// Adds A List of Courses
+        /// </summary>
+        /// <param name="courses">Courses to Add</param>
+        /// <response code="200">A List of courses that were not added</response>
+        [HttpPost("many")]
+        public async Task<ActionResult<IList<CourseDTO>>> PostCourses(List<CourseDTO> courses)
+        {
+            try
+            {
+                return (await CourseRepo.AddCoursesAsync(courses)).ToList();
+            }
+            catch (CourseCommandException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
 
-        //    courses.ForEach(course =>
-        //    {
-        //        if (CourseExists(course.Crn))
-        //        {
-        //            _context.Entry(course.ToCourse()).State = EntityState.Modified;
-        //        }
-        //        else
-        //            _context.Courses.Add(course.ToCourse());
-        //    });
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteCourse(int id)
+        {
+            try
+            {
+                await CourseRepo.DeleteCourseAsync(id);
+                return NoContent();
+            }
+            catch (CourseNotFoundException ex)
+            {
 
-        //    try
-        //    {
-        //        await _context.SaveChangesAsync();
-        //    }
-        //    catch (DbUpdateException)
-        //    {
-        //        throw;
-        //    }
-        //    return Ok();
-        //}
-
-        //// DELETE: api/Courses/5
-        //[HttpDelete("{id}")]
-        //public async Task<IActionResult> DeleteCourse(int id)
-        //{
-        //    if (_context.Courses == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    var course = await _context.Courses.FindAsync(id);
-        //    if (course == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    _context.Courses.Remove(course);
-        //    await _context.SaveChangesAsync();
-
-        //    return NoContent();
-        //}
+                return NotFound(ex.Message);
+            }
+        }
 
     }
 }

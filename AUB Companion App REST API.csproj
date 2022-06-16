@@ -6,7 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>CompanionApp</RootNamespace>
     <UserSecretsId>1e23a9ef-bf04-4784-be7c-2b29cb0c4abe</UserSecretsId>
-    <GenerateDocumentationFile>False</GenerateDocumentationFile>
+	<GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
     <DocumentationFile>API Documentation</DocumentationFile>
     <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
   </PropertyGroup>
@@ -34,6 +35,12 @@
 
   <ItemGroup>
     <Folder Include="Models\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="API Documentation">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
