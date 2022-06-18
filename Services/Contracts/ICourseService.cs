@@ -10,6 +10,5 @@ namespace CompanionApp.Services.Contracts
         public Task<IList<CourseDTO>>       AddCoursesAsync   (IEnumerable<CourseDTO> courses);
         public Task                         EditCourseAsync   (int crn, CourseDTO course);
         public Task                         DeleteCourseAsync (int crn);
-
     }
 }

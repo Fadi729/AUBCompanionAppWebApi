@@ -10,11 +10,11 @@ namespace CompanionApp.Controllers
     [ApiController]
     public class CoursesController : ControllerBase
     {
-        ICourseService CourseRepo { get; init; }
+        readonly ICourseService _courseService;
 
         public CoursesController(ICourseService repository)
         {
-            CourseRepo = repository;
+            _courseService = repository;
         }
 
         [HttpGet]
@@ -22,7 +22,7 @@ namespace CompanionApp.Controllers
         {
             try
             {
-                IEnumerable<CourseDTO> courses = await CourseRepo.GetAllCoursesAsync();
+                IEnumerable<CourseDTO> courses = await _courseService.GetAllCoursesAsync();
                 return Ok(courses);
             }
             catch (NoCoursesFoundException ex)
@@ -37,11 +37,11 @@ namespace CompanionApp.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<CourseDTO>> GetCourse(int id)
+        public async Task<ActionResult<CourseDTO>>              GetCourse   (int id)
         {
             try
             {
-                return await CourseRepo.GetCourseAsync(id);    
+                return Ok(await _courseService.GetCourseAsync(id));    
             }
             catch (CourseNotFoundException ex)
             {
@@ -49,12 +49,13 @@ namespace CompanionApp.Controllers
             }
         }
 
+        
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCourse(int id, CourseDTO course)
+        public async Task<IActionResult>                        PutCourse   (int id, CourseDTO course)
         {
             try
             {
-                await CourseRepo.EditCourseAsync(id, course);
+                await _courseService.EditCourseAsync(id, course);
                 return NoContent();
             }
             catch (ArgumentException ex)
@@ -75,13 +76,15 @@ namespace CompanionApp.Controllers
             }
 
         }
+        
 
         [HttpPost("single")]
-        public async Task<ActionResult<CourseDTO>> PostCourse(CourseDTO course)
+        public async Task<ActionResult<CourseDTO>>              PostCourse  (CourseDTO course)
         {
             try
             {
-                return await CourseRepo.AddCourseAsync(course);
+                CourseDTO newCourse = await _courseService.AddCourseAsync(course);
+                return CreatedAtAction("GetCourse", new { id = newCourse.Crn }, newCourse);
             }
             catch (CourseAlreadyExistsException ex)
             {
@@ -96,18 +99,18 @@ namespace CompanionApp.Controllers
                 throw;
             }
         }
-
+        
         /// <summary>
         /// Adds A List of Courses
         /// </summary>
         /// <param name="courses">Courses to Add</param>
         /// <response code="200">A List of courses that were not added</response>
         [HttpPost("many")]
-        public async Task<ActionResult<IList<CourseDTO>>> PostCourses(List<CourseDTO> courses)
+        public async Task<ActionResult<IList<CourseDTO>>>       PostCourses (List<CourseDTO> courses)
         {
             try
             {
-                return (await CourseRepo.AddCoursesAsync(courses)).ToList();
+                return Ok((await _courseService.AddCoursesAsync(courses)).ToList());
             }
             catch (CourseCommandException ex)
             {
@@ -119,12 +122,13 @@ namespace CompanionApp.Controllers
             }
         }
 
+        
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCourse(int id)
+        public async Task<IActionResult>                        DeleteCourse(int id)
         {
             try
             {
-                await CourseRepo.DeleteCourseAsync(id);
+                await _courseService.DeleteCourseAsync(id);
                 return NoContent();
             }
             catch (CourseNotFoundException ex)
@@ -133,6 +137,5 @@ namespace CompanionApp.Controllers
                 return NotFound(ex.Message);
             }
         }
-
     }
 }

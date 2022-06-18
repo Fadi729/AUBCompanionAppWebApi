@@ -45,7 +45,7 @@ namespace CompanionApp.Services
             try
             {
                 await _courseValidation.ValidateAndThrowAsync(course);
-                if (CourseExists(course.Crn))
+                if (_dbSet.CourseExists(course.Crn))
                 {
                     throw new CourseAlreadyExistsException();
                 }
@@ -74,7 +74,7 @@ namespace CompanionApp.Services
                     {
                         failedToAddCourses.Add(course);
                     }
-                    else if (CourseExists(course.Crn))
+                    else if (_dbSet.CourseExists(course.Crn))
                     {
                         _dbSet.Update(course.ToCourse());
                     }
@@ -104,7 +104,7 @@ namespace CompanionApp.Services
                     throw new ArgumentException("crn and course.crn must match");
                 }
 
-                if (!CourseExists(crn))
+                if (!_dbSet.CourseExists(crn))
                 {
                     throw new CourseNotFoundException();
                 }
@@ -125,12 +125,11 @@ namespace CompanionApp.Services
         {
             try
             {
-                if (!CourseExists(crn))
+                if (!_dbSet.CourseExists(crn))
                 {
                     throw new CourseNotFoundException();
                 }
-                Course course = new() { Crn = crn };
-                _dbSet.Remove(course);
+                _dbSet.Remove(new Course() { Crn = crn });
                 await _context.SaveChangesAsync();
             }
             catch (Exception)
@@ -138,10 +137,6 @@ namespace CompanionApp.Services
                 throw;
             }
         }
-
-        bool CourseExists(int crn)
-        {
-            return _dbSet.Any(e => e.Crn == crn);
-        }
     }
 }
+

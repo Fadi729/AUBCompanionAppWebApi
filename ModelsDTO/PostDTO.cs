@@ -1,6 +1,6 @@
 ﻿namespace CompanionApp.ModelsDTO
 {
-    public class PostDTO
+    public class PostQueryDTO
     {
         public Guid                Id          { get; set; }
         public string?             Text        { get; set; }
@@ -9,13 +9,7 @@
 
         public virtual ProfileQueryDTO? User        { get; set; } = null!;
     }
-    public class PostPOSTDTO
-    {
-        public Guid    UserId     { get; set; }
-        public string? Text       { get; set; }
-        public byte[]? Attachment { get; set; }
-    }
-    public class PostPUTDTO
+    public class PostCommandDTO
     {
         public string? Text       { get; set; }
         public byte[]? Attachment { get; set; }

@@ -5,9 +5,31 @@ namespace CompanionApp.Extensions
 {
     public static class PostExtensions
     {
-        public static PostDTO ToPostDTO(this Post post)
+        public static Post           ToPost          (this PostCommandDTO post, Guid userId)
         {
-            return new PostDTO
+            return new Post
+            {
+                Id          = Guid.NewGuid(),
+                UserId      = userId,
+                Text        = post.Text,
+                Attachment  = post.Attachment,
+                DateCreated = DateTime.Now
+            };
+        }
+        public static Post           ToPost          (this PostCommandDTO post, Guid Id, Guid userID)
+        {
+            return new Post
+            {
+                Id          = Id,
+                UserId      = userID,
+                Text        = post.Text,
+                Attachment  = post.Attachment,
+                DateCreated = DateTime.Now
+            };
+        }
+        public static PostQueryDTO   ToPostQueryDTO  (this Post post)
+        {
+            return new PostQueryDTO
             {
                 Id          = post.Id,
                 Text        = post.Text,
@@ -27,17 +49,5 @@ namespace CompanionApp.Extensions
                 DateCreated = post.DateCreated,
             };
         }
-        public static Post ToPost(this PostPOSTDTO post)
-        {
-            return new Post
-            {
-                Id          = Guid.NewGuid(),
-                UserId      = post.UserId,
-                Text        = post.Text,
-                Attachment  = post.Attachment,
-                DateCreated = DateTime.Now
-            };
-        }
-        
     }
 }

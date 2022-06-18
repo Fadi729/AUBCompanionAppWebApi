@@ -38,7 +38,7 @@ namespace CompanionApp.Services
             try
             {
                 await _validationRules.ValidateAndThrowAsync(profile);
-                if (ProfileExists(profile.Email))
+                if (_dbSet.ProfileExists(profile.Email))
                 {
                     throw new ProfileAlreadyExistsException("Email Already In Use");
                 }
@@ -57,12 +57,12 @@ namespace CompanionApp.Services
             }
             #endregion
         }
-        public async Task                   EditProfileAsync  (Guid id, ProfileCommandDTO profile)
+        public async Task                  EditProfileAsync  (Guid id, ProfileCommandDTO profile)
         {
             #region try block
             try
             {
-                if (!ProfileExists(id))
+                if (!_dbSet.ProfileExists(id))
                 {
                     throw new ProfileNotFoundException();
                 }
@@ -79,25 +79,14 @@ namespace CompanionApp.Services
             }
             #endregion
         }
-        public async Task                   DeleteProfileAsync(Guid id)
+        public async Task                  DeleteProfileAsync(Guid id)
         {
-            if (!ProfileExists(id))
+            if (!_dbSet.ProfileExists(id))
             {
                 throw new ProfileNotFoundException();
             }
-
-            Profile profile = new() { Id = id };
-            _dbSet.Remove(profile);
+            _dbSet.Remove(new Profile() { Id = id });
             await _context.SaveChangesAsync();
-        }
-
-        bool ProfileExists(Guid id)
-        {
-            return _dbSet.Any(e => e.Id == id);
-        }
-        bool ProfileExists(string? email)
-        {
-            return _dbSet.Any(e => e.Email == email);
         }
     }
 }

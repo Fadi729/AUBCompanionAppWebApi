@@ -5,7 +5,7 @@ using CompanionApp.Validation;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers()
@@ -37,13 +37,14 @@ builder.Services.AddDbContext<CompanionAppDBContext>(
 
 builder.Services
     .AddScoped<IProfileService, ProfileService>()
-    .AddScoped<ICourseService , CourseService >();
+    .AddScoped<ICourseService , CourseService >()
+    .AddScoped<IPostService   , PostService   >();
 
 builder.Services
     .AddScoped<ProfileValidation>()
     .AddScoped<CourseValidation >();
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

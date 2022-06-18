@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using CompanionApp.Models;
+﻿using CompanionApp.Models;
 using CompanionApp.ModelsDTO;
-using CompanionApp.Extensions;
+using Microsoft.AspNetCore.Mvc;
+using CompanionApp.Services.Contracts;
+using CompanionApp.Exceptions.PostExceptions;
 
 namespace CompanionApp.Controllers
 {
@@ -10,162 +10,107 @@ namespace CompanionApp.Controllers
     [ApiController]
     public class PostsController : ControllerBase
     {
-         readonly CompanionAppDBContext _context;
+        readonly CompanionAppDBContext _context;
+        readonly IPostService          _postService;
 
-        public PostsController(CompanionAppDBContext context)
+        public PostsController(CompanionAppDBContext context, IPostService postService)
         {
             _context = context;
+            _postService = postService;
         }
 
-        // GET: api/Posts
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<PostDTO>>> GetPosts()
-        {
-            if (_context.Posts == null)
-            {
-                return NotFound();
-            }
-            return await _context.Posts.Include(p => p.User).Select(p => p.ToPostDTO()).ToListAsync();
-        }
-
-        // GET: api/Posts/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<PostDTO>> GetPostById(Guid id)
+        public async Task<ActionResult<PostQueryDTO>>                GetPostById             (Guid id)
         {
-            if (_context.Posts == null)
+            try
             {
-                return NotFound();
+                return await _postService.GetPostById(id);
             }
-            var post = await _context.Posts.Include(p => p.User).FirstOrDefaultAsync(p => p.Id == id);
-
-            if (post == null)
+            catch (PostNotFoundException ex)
             {
-                return NotFound();
+                return NotFound(ex.Message);
             }
-
-            return post.ToPostDTO();
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        // GET: api/Posts/5
-        //[Route("api/[controller]/getpostbyuserId/")]
         [HttpGet("user/{userID}")]
-        public async Task<ActionResult<IEnumerable<PostsByUserDTO>>> GetPostsByUserID(Guid userID)
+        public async Task<ActionResult<IEnumerable<PostsByUserDTO>>> GetPostsByUserID        (Guid userID)
         {
-            if (_context.Posts == null)
+            try
             {
-                return NotFound();
+                return Ok(await _postService.GetPostsByUserID(userID));
             }
-            List<PostsByUserDTO> posts = await _context.Posts.FromSqlRaw("SELECT * FROM CompanionApp.POST WHERE userID = {0}", userID).Select(p => p.ToPostsByUserDTO()).ToListAsync();
-
-            if (posts == null)
+            catch (NoPostsFoundException ex)
             {
-                return NotFound();
+                return NotFound(ex.Message);
             }
-
-            return posts;
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         [HttpGet("user/followings/{userID}")]
-        public async Task<ActionResult<IEnumerable<PostDTO>>> GetPostsByUserFollowings(Guid userID)
+        public async Task<ActionResult<IEnumerable<PostQueryDTO>>>   GetPostsByUserFollowings(Guid userID)
         {
-            if (_context.Posts == null)
+            try
             {
-                return NotFound();
+                return Ok(await _postService.GetPostsByUserFollowings(userID));
             }
-            List<PostDTO> posts = await _context.Posts.FromSqlRaw("SELECT * FROM CompanionApp.POST WHERE userID IN (SELECT Is_Following FROM CompanionApp.FOLLOWING WHERE userID = {0})", userID).Include(p => p.User).Select(p => p.ToPostDTO()).ToListAsync();
-
-            if (posts == null)
+            catch (NoPostsFoundException ex)
             {
-                return NotFound();
+                return NotFound(ex.Message);
             }
-
-            return posts;
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        // PUT: api/Posts/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost("{userID}")]
+        public async Task<ActionResult<Post>>                        PostPost                (PostCommandDTO post, Guid userID)
+        {
+            try
+            {
+                PostQueryDTO newpost = await _postService.CreatePost(post, userID);
+                return CreatedAtAction("GetPostById", new { id = newpost.Id }, newpost);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         [HttpPut("{userID}/{id}")]
-        public async Task<IActionResult> PutPost(Guid id, Guid userID, PostPUTDTO post)
+        public async Task<IActionResult>                             PutPost                 (Guid id, Guid userID, PostCommandDTO post)
         {
-            
-            var postToUpdate = await _context.Posts.FindAsync(id);
-            
-            if (postToUpdate == null)
-            {
-                return NotFound();
-            }
-            
-            if (userID != postToUpdate.UserId)
-            {
-                return Unauthorized();
-            }
-            
-            postToUpdate.Text       = post.Text;
-            postToUpdate.Attachment = post.Attachment;
-            
-            _context.Entry(postToUpdate).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                await _postService.EditPost(id, userID, post);
+                return NoContent();
             }
-            catch (DbUpdateConcurrencyException)
+            catch (PostNotFoundException ex)
             {
-                if (!PostExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return NotFound(ex.Message);
             }
-
-            return NoContent();
+            catch (Exception)
+            {
+                throw;
+            }
         }
-
-        // POST: api/Posts
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Post>> PostPost(PostPOSTDTO post)
-        {
-            if (_context.Posts == null)
-            {
-                return Problem("Entity set 'CompanionAppDBContext.Posts'  is null.");
-            }
-
-            Post newpost = post.ToPost();
-            _context.Posts.Add(newpost);
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (PostExists(newpost.Id))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return CreatedAtAction("GetPostById", new { id = newpost.Id }, newpost.ToPostDTO());
-        }
-
-        // DELETE: api/Posts/5
+        
         [HttpDelete("{userID}/{id}")]
-        public async Task<IActionResult> DeletePost(Guid id, Guid userID)
+        public async Task<IActionResult>                             DeletePost              (Guid id, Guid userID)
         {
             if (_context.Posts == null)
             {
                 return NotFound();
             }
             var post = await _context.Posts.FindAsync(id);
-            
+
             if (post == null)
             {
                 return NotFound();
@@ -180,11 +125,6 @@ namespace CompanionApp.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
-        }
-
-         bool PostExists(Guid id)
-        {
-            return (_context.Posts?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

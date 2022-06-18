@@ -12,19 +12,18 @@ namespace CompanionApp.Controllers
     [ApiController]
     public class ProfilesController : ControllerBase
     {
-        IProfileService ProfileRespository { get; init;  }
-        public ProfilesController(IProfileService ProfileRespository)
+        readonly IProfileService _profileService;
+        public ProfilesController(IProfileService _profileService)
         {
-            this.ProfileRespository = ProfileRespository;
+            this._profileService = _profileService;
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<ProfileQueryDTO>> GetProfile(Guid id)
+        public async Task<ActionResult<ProfileQueryDTO>> GetProfile   (Guid id)
         {
             try
             {
-                ProfileQueryDTO profile = await ProfileRespository.GetProfileAsync(id);
-                return profile;
+                return Ok(await _profileService.GetProfileAsync(id));
             }
             catch (ProfileNotFoundException ex)
             {
@@ -35,13 +34,35 @@ namespace CompanionApp.Controllers
                 throw;
             }
         }
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutProfile(Guid id, ProfileCommandDTO profile)
+        
+        [HttpPost]
+        public async Task<ActionResult<ProfileQueryDTO>> PostProfile  (ProfileCommandDTO profile)
         {
             try
             {
-                await ProfileRespository.EditProfileAsync(id, profile);
+                ProfileQueryDTO profileDTO = await _profileService.CreateProfileAsync(profile);
+                return CreatedAtAction("GetProfile", new { id = profileDTO.Id }, profileDTO);
+            }
+            catch (ProfileAlreadyExistsException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (ProfileCommandException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+        
+        [HttpPut("{id}")]
+        public async Task<IActionResult>                 PutProfile   (Guid id, ProfileCommandDTO profile)
+        {
+            try
+            {
+                await _profileService.EditProfileAsync(id, profile);
                 return NoContent();
             }
             catch (ProfileNotFoundException ex)
@@ -58,33 +79,12 @@ namespace CompanionApp.Controllers
             }
         }
 
-        [HttpPost]
-        public async Task<ActionResult<ProfileQueryDTO>> PostProfile(ProfileCommandDTO profile)
-        {
-            try
-            {
-                return await ProfileRespository.CreateProfileAsync(profile);
-            }
-            catch (ProfileAlreadyExistsException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (ProfileCommandException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteProfile(Guid id)
+        public async Task<IActionResult>                 DeleteProfile(Guid id)
         {
             try
             {
-                await ProfileRespository.DeleteProfileAsync(id);
+                await _profileService.DeleteProfileAsync(id);
                 return NoContent();
             }
             catch (ProfileNotFoundException ex)
