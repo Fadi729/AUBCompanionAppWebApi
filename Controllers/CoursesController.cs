@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using CompanionApp.ModelsDTO;
-using CompanionApp.Repositories.Contracts;
+using CompanionApp.Services.Contracts;
 using CompanionApp.Exceptions.CourseExceptions;
 using CompanionApp.Models;
 
@@ -10,9 +10,9 @@ namespace CompanionApp.Controllers
     [ApiController]
     public class CoursesController : ControllerBase
     {
-        ICourseRepository CourseRepo { get; init; }
+        ICourseService CourseRepo { get; init; }
 
-        public CoursesController(ICourseRepository repository)
+        public CoursesController(ICourseService repository)
         {
             CourseRepo = repository;
         }

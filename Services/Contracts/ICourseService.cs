@@ -1,8 +1,8 @@
 ﻿using CompanionApp.ModelsDTO;
 
-namespace CompanionApp.Repositories.Contracts
+namespace CompanionApp.Services.Contracts
 {
-    public interface ICourseRepository
+    public interface ICourseService
     {
         public Task<IEnumerable<CourseDTO>> GetAllCoursesAsync();
         public Task<CourseDTO>              GetCourseAsync    (int crn);

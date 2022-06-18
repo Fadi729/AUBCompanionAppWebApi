@@ -1,15 +1,15 @@
 using CompanionApp.Models;
-using CompanionApp.Repositories;
-using CompanionApp.Repositories.Contracts;
+using CompanionApp.Services;
+using CompanionApp.Services.Contracts;
 using CompanionApp.Validation;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);;
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -19,16 +19,13 @@ builder.Services.AddSwaggerGen(options =>
     Console.WriteLine(xmlFilename);
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 });
-builder.Services
-    .AddControllers()
-    .AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
 builder.Configuration
-    .AddJsonFile("appsettings.json")
+    .AddJsonFile            ("appsettings.json")
     .AddUserSecrets<Program>(true)
     .AddEnvironmentVariables()
-    .AddCommandLine(args)
-    .Build();
+    .AddCommandLine         (args)
+    .Build                  ();
 
 #if DEBUG
 builder.Services.AddDbContext<CompanionAppDBContext>(
@@ -39,10 +36,12 @@ builder.Services.AddDbContext<CompanionAppDBContext>(
 #endif
 
 builder.Services
-    .AddScoped<IProfileRepository, ProfileRepository>()
-    .AddScoped<ICourseRepository, CourseRepository>();
+    .AddScoped<IProfileService, ProfileService>()
+    .AddScoped<ICourseService , CourseService >();
 
-builder.Services.AddScoped<ProfileValidation>().AddScoped<CourseValidation>();
+builder.Services
+    .AddScoped<ProfileValidation>()
+    .AddScoped<CourseValidation >();
 
 var app = builder.Build();
 

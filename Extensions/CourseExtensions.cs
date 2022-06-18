@@ -39,7 +39,7 @@ namespace CompanionApp.Extensions
                 Prerequisites   = course.Prerequisites,
             };
         }
-        public static Course ToCourse(this CourseDTO courseDTO)
+        public static Course    ToCourse   (this CourseDTO courseDTO)
         {
             return new Course
             {

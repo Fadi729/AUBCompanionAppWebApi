@@ -1,8 +1,8 @@
 ﻿using CompanionApp.ModelsDTO;
 
-namespace CompanionApp.Repositories.Contracts
+namespace CompanionApp.Services.Contracts
 {
-    public interface IProfileRepository
+    public interface IProfileService
     {
         Task<ProfileQuerryDTO> GetProfileAsync   (Guid id);
         Task<ProfileQuerryDTO> CreateProfileAsync(ProfileCommandDTO profile);

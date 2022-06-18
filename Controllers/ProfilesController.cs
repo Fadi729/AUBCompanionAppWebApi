@@ -2,7 +2,7 @@
 using CompanionApp.Extensions;
 using CompanionApp.Models;
 using CompanionApp.ModelsDTO;
-using CompanionApp.Repositories.Contracts;
+using CompanionApp.Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,8 +12,8 @@ namespace CompanionApp.Controllers
     [ApiController]
     public class ProfilesController : ControllerBase
     {
-        IProfileRepository ProfileRespository { get; init;  }
-        public ProfilesController(IProfileRepository ProfileRespository)
+        IProfileService ProfileRespository { get; init;  }
+        public ProfilesController(IProfileService ProfileRespository)
         {
             this.ProfileRespository = ProfileRespository;
         }

@@ -1,5 +1,5 @@
-﻿using CompanionApp.ModelsDTO;
-using FluentValidation;
+﻿using FluentValidation;
+using CompanionApp.ModelsDTO;
 
 namespace CompanionApp.Validation
 {
@@ -55,22 +55,22 @@ namespace CompanionApp.Validation
                 .WithMessage("Course Days2 is invalid.");
 
             RuleFor(course => course.StartTime1)
-                .Matches(@"^[0-9]{1,2}:[0-9]{2}$")
+                .Matches(@"^([01]*[0-9]|2[0-3]):([0-5][0-9])$")
                 .When(x => x.StartTime1 is not null && x.StartTime1 != string.Empty)
                 .WithMessage("Course StartTime1 is invalid.");
 
             RuleFor(course => course.StartTime2)
-                .Matches(@"^[0-9]{1,2}:[0-9]{2}$")
+                .Matches(@"^([01]*[0-9]|2[0-3]):([0-5][0-9])$")
                 .When(x => x.StartTime2 is not null && x.StartTime2 != string.Empty)
                 .WithMessage("Course StartTime2 is invalid.");
 
             RuleFor(course => course.EndTime1)
-                .Matches(@"^[0-9]{1,2}:[0-9]{2}$")
+                .Matches(@"^([01]*[0-9]|2[0-3]):([0-5][0-9])$")
                 .When(x => x.EndTime1 is not null && x.EndTime1 != string.Empty)
                 .WithMessage("Course EndTime1 is invalid.");
 
             RuleFor(course => course.EndTime2)
-                .Matches(@"^[0-9]{1,2}:[0-9]{2}$")
+                .Matches(@"^([01]*[0-9]|2[0-3]):([0-5][0-9])$")
                 .When(x => x.EndTime2 is not null && x.EndTime2 != string.Empty)
                 .WithMessage("Course EndTime2 is invalid.");
             

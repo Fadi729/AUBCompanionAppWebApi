@@ -1,27 +1,29 @@
-﻿using CompanionApp.Exceptions.CourseExceptions;
-using CompanionApp.Extensions;
+﻿using FluentValidation;
 using CompanionApp.Models;
-using CompanionApp.ModelsDTO;
-using CompanionApp.Repositories.Contracts;
 using CompanionApp.Validation;
-using FluentValidation;
+using CompanionApp.ModelsDTO;
+using CompanionApp.Extensions;
 using Microsoft.EntityFrameworkCore;
+using CompanionApp.Services.Contracts;
+using CompanionApp.Exceptions.CourseExceptions;
 
-namespace CompanionApp.Repositories
+namespace CompanionApp.Services
 {
-    public class CourseRepository : ICourseRepository
+    public class CourseService : ICourseService
     {
         readonly CompanionAppDBContext _context;
+        readonly DbSet<Course>         _dbSet;
         readonly CourseValidation      _courseValidation;
-        public CourseRepository(CompanionAppDBContext DBcontext, CourseValidation validation)
+        public CourseService(CompanionAppDBContext DBcontext, CourseValidation validation)
         {
-            _context = DBcontext;
+            _context          = DBcontext;
+            _dbSet            = DBcontext.Courses;
             _courseValidation = validation;
         }
 
         public async Task<IEnumerable<CourseDTO>> GetAllCoursesAsync()
         {
-            IEnumerable<CourseDTO> courseDTOs = await _context.Courses.Select(c => c.ToCourseDTO()).ToListAsync();
+            IEnumerable<CourseDTO> courseDTOs = await _dbSet.Select(c => c.ToCourseDTO()).ToListAsync();
             if (courseDTOs is null)
             {
                 throw new NoCoursesFoundException();
@@ -30,7 +32,7 @@ namespace CompanionApp.Repositories
         }
         public async Task<CourseDTO>              GetCourseAsync    (int crn)
         {
-            Course? course = await _context.Courses.FindAsync(crn);
+            Course? course = await _dbSet.FindAsync(crn);
             if (course is null)
             {
                 throw new CourseNotFoundException();
@@ -48,7 +50,7 @@ namespace CompanionApp.Repositories
                     throw new CourseAlreadyExistsException();
                 }
                 Course newCourse = course.ToCourse();
-                _context.Entry(newCourse).State = EntityState.Added;
+                _dbSet.Add(newCourse);
                 await _context.SaveChangesAsync();
                 return newCourse.ToCourseDTO();
             }
@@ -63,6 +65,7 @@ namespace CompanionApp.Repositories
         public async Task<IList<CourseDTO>>       AddCoursesAsync   (IEnumerable<CourseDTO> courses)
         {
             IList<CourseDTO> failedToAddCourses = new List<CourseDTO>();
+            #region try   block
             try
             {
                 foreach (CourseDTO course in courses)
@@ -73,20 +76,23 @@ namespace CompanionApp.Repositories
                     }
                     else if (CourseExists(course.Crn))
                     {
-                        _context.Entry(course.ToCourse()).State = EntityState.Modified;
+                        _dbSet.Update(course.ToCourse());
                     }
                     else
-                        _context.Courses.Add(course.ToCourse());
+                        _dbSet.Add(course.ToCourse());
                 }
 
                 await _context.SaveChangesAsync();
 
                 return failedToAddCourses;
             }
+            #endregion
+            #region catch block
             catch (Exception ex)
             {
                 throw new CourseCommandException(ex.Message);
-            }
+            } 
+            #endregion
         }
         public async Task                         EditCourseAsync   (int crn, CourseDTO course)
         {
@@ -104,7 +110,7 @@ namespace CompanionApp.Repositories
                 }
 
                 await _courseValidation.ValidateAndThrowAsync(course);
-                _context.Entry(course.ToCourse()).State = EntityState.Modified;
+                _dbSet.Update(course.ToCourse());
                 await _context.SaveChangesAsync();
             }
             #endregion
@@ -124,7 +130,7 @@ namespace CompanionApp.Repositories
                     throw new CourseNotFoundException();
                 }
                 Course course = new() { Crn = crn };
-                _context.Entry(course).State = EntityState.Deleted;
+                _dbSet.Remove(course);
                 await _context.SaveChangesAsync();
             }
             catch (Exception)
@@ -135,7 +141,7 @@ namespace CompanionApp.Repositories
 
         bool CourseExists(int crn)
         {
-            return (_context.Courses?.Any(e => e.Crn == crn)).GetValueOrDefault();
+            return _dbSet.Any(e => e.Crn == crn);
         }
     }
 }

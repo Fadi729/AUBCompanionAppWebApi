@@ -1,30 +1,32 @@
-﻿using CompanionApp.Extensions;
+﻿using FluentValidation;
 using CompanionApp.Models;
 using CompanionApp.ModelsDTO;
-using CompanionApp.Repositories.Contracts;
-using CompanionApp.Exceptions.ProfileExceptions;
-using Microsoft.EntityFrameworkCore;
+using CompanionApp.Extensions;
 using CompanionApp.Validation;
-using FluentValidation;
+using Microsoft.EntityFrameworkCore;
+using CompanionApp.Services.Contracts;
+using CompanionApp.Exceptions.ProfileExceptions;
 
-namespace CompanionApp.Repositories
+namespace CompanionApp.Services
 {
-    public class ProfileRepository : IProfileRepository
+    public class ProfileService : IProfileService
     {
         readonly CompanionAppDBContext _context;
-        readonly ProfileValidation     validationRules;
+        readonly DbSet<Profile>        _dbSet;
+        readonly ProfileValidation     _validationRules;
 
-        public ProfileRepository(CompanionAppDBContext DBcontext, ProfileValidation validation)
+        public ProfileService(CompanionAppDBContext DBcontext, ProfileValidation validation)
         {
-            _context = DBcontext;
-            validationRules = validation;
+            _context         = DBcontext;
+            _dbSet           = DBcontext.Profiles;
+            _validationRules = validation;
         }
         
         public async Task<ProfileQuerryDTO> GetProfileAsync   (Guid id)
         {
-            Profile? profile = await _context.Profiles.FindAsync(id);
+            Profile? profile = await _dbSet.FindAsync(id);
             if (profile is null)
-            {
+            {   
                 throw new ProfileNotFoundException();
             }
 
@@ -35,16 +37,16 @@ namespace CompanionApp.Repositories
             #region try block
             try
             {
-                await validationRules.ValidateAndThrowAsync(profile);
+                await _validationRules.ValidateAndThrowAsync(profile);
                 if (ProfileExists(profile.Email))
                 {
                     throw new ProfileAlreadyExistsException("Email Already In Use");
                 }
                 Profile newProfile = profile.ToProfile();
-                newProfile.Id = Guid.NewGuid();
 
-                _context.Entry(profile.ToProfile(newProfile.Id)).State = EntityState.Added;
+                _dbSet.Add(newProfile);
                 await _context.SaveChangesAsync();
+                
                 return newProfile.ToProfileQuerryDTO();
             }
             #endregion
@@ -65,8 +67,8 @@ namespace CompanionApp.Repositories
                     throw new ProfileNotFoundException();
                 }
 
-                await validationRules.ValidateAndThrowAsync(profile);
-                _context.Entry(profile.ToProfile(id)).State = EntityState.Modified;
+                await _validationRules.ValidateAndThrowAsync(profile);
+                _dbSet.Attach(profile.ToProfile(id)).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
             }
             #endregion
@@ -85,17 +87,17 @@ namespace CompanionApp.Repositories
             }
 
             Profile profile = new() { Id = id };
-            _context.Entry(profile).State = EntityState.Deleted;
+            _dbSet.Remove(profile);
             await _context.SaveChangesAsync();
         }
 
         bool ProfileExists(Guid id)
         {
-            return (_context.Profiles?.Any(e => e.Id == id)).GetValueOrDefault();
+            return _dbSet.Any(e => e.Id == id);
         }
         bool ProfileExists(string? email)
         {
-            return (_context.Profiles?.Any(e => e.Email == email)).GetValueOrDefault();
+            return _dbSet.Any(e => e.Email == email);
         }
     }
 }

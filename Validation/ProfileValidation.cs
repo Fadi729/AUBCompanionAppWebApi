@@ -1,5 +1,5 @@
-﻿using CompanionApp.ModelsDTO;
-using FluentValidation;
+﻿using FluentValidation;
+using CompanionApp.ModelsDTO;
 
 namespace CompanionApp.Validation
 {
