@@ -1,6 +1,6 @@
 ﻿namespace CompanionApp.ModelsDTO
 {
-    public class ProfileQuerryDTO
+    public class ProfileQueryDTO
     {
         public Guid    Id        { get; set; }
         public string  FirstName { get; set; } = null!;

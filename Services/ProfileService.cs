@@ -22,7 +22,7 @@ namespace CompanionApp.Services
             _validationRules = validation;
         }
         
-        public async Task<ProfileQuerryDTO> GetProfileAsync   (Guid id)
+        public async Task<ProfileQueryDTO> GetProfileAsync   (Guid id)
         {
             Profile? profile = await _dbSet.FindAsync(id);
             if (profile is null)
@@ -32,7 +32,7 @@ namespace CompanionApp.Services
 
             return profile.ToProfileQuerryDTO();
         }
-        public async Task<ProfileQuerryDTO> CreateProfileAsync(ProfileCommandDTO profile)
+        public async Task<ProfileQueryDTO> CreateProfileAsync(ProfileCommandDTO profile)
         {
             #region try block
             try

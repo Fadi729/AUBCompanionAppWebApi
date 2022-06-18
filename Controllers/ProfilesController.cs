@@ -19,11 +19,11 @@ namespace CompanionApp.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<ProfileQuerryDTO>> GetProfile(Guid id)
+        public async Task<ActionResult<ProfileQueryDTO>> GetProfile(Guid id)
         {
             try
             {
-                ProfileQuerryDTO profile = await ProfileRespository.GetProfileAsync(id);
+                ProfileQueryDTO profile = await ProfileRespository.GetProfileAsync(id);
                 return profile;
             }
             catch (ProfileNotFoundException ex)
@@ -59,7 +59,7 @@ namespace CompanionApp.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ProfileQuerryDTO>> PostProfile(ProfileCommandDTO profile)
+        public async Task<ActionResult<ProfileQueryDTO>> PostProfile(ProfileCommandDTO profile)
         {
             try
             {

@@ -7,7 +7,7 @@
         public byte[]?             Attachment  { get; set; }
         public DateTime            DateCreated { get; set; }
 
-        public virtual ProfileQuerryDTO? User        { get; set; } = null!;
+        public virtual ProfileQueryDTO? User        { get; set; } = null!;
     }
     public class PostPOSTDTO
     {

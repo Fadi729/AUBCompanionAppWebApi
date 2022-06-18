@@ -3,7 +3,7 @@
     public class FollowingDTO
     {
         public DateTime?          DateFollowed          { get; set; }
-        public virtual ProfileQuerryDTO IsFollowingNavigation { get; set; } = null!;
+        public virtual ProfileQueryDTO IsFollowingNavigation { get; set; } = null!;
     }
     public class FollowingPOSTDTO
     {
