@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using CompanionApp.ModelsDTO;
+﻿using CompanionApp.ModelsDTO;
+using Microsoft.AspNetCore.Mvc;
 using CompanionApp.Services.Contracts;
 using CompanionApp.Exceptions.CourseExceptions;
-using CompanionApp.Models;
+
 
 namespace CompanionApp.Controllers
 {
@@ -18,7 +18,7 @@ namespace CompanionApp.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CourseDTO>>> GetCourses()
+        public async Task<ActionResult<IEnumerable<CourseDTO>>> GetCourses  ()
         {
             try
             {
@@ -37,7 +37,7 @@ namespace CompanionApp.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<CourseDTO>> GetCourse(int id)
+        public async Task<ActionResult<CourseDTO>>              GetCourse   (int id)
         {
             try
             {
@@ -51,7 +51,7 @@ namespace CompanionApp.Controllers
 
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCourse(int id, CourseDTO course)
+        public async Task<IActionResult>                        PutCourse   (int id, CourseDTO course)
         {
             try
             {
@@ -73,9 +73,9 @@ namespace CompanionApp.Controllers
 
         }
 
-
+        
         [HttpPost("single")]
-        public async Task<ActionResult<CourseDTO>> PostCourse(CourseDTO course)
+        public async Task<ActionResult<CourseDTO>>              PostCourse  (CourseDTO course)
         {
             try
             {
@@ -98,7 +98,7 @@ namespace CompanionApp.Controllers
         /// <param name="courses">Courses to Add</param>
         /// <response code="200">A List of courses that were not added</response>
         [HttpPost("many")]
-        public async Task<ActionResult<IList<CourseDTO>>> PostCourses(IEnumerable<CourseDTO> courses)
+        public async Task<ActionResult<IEnumerable<CourseDTO>>> PostCourses (IEnumerable<CourseDTO> courses)
         {
             try
             {
@@ -112,7 +112,7 @@ namespace CompanionApp.Controllers
 
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCourse(int id)
+        public async Task<IActionResult>                        DeleteCourse(int id)
         {
             try
             {

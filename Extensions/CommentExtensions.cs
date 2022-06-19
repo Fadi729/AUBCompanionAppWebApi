@@ -5,24 +5,24 @@ namespace CompanionApp.Extensions
 {
     public static class CommentExtensions
     {
-        public static CommentDTO ToCommentDTO (this Comment comment)
+        public static CommentQueryDTO ToCommentQueryDTO (this Comment comment)
         {
-            return new CommentDTO
+            return new CommentQueryDTO
             {
                 Id          = comment.Id,
                 PostId      = comment.PostId,
                 Text        = comment.Text,
                 DateCreated = comment.DateCreated,
-                User        = comment.User.ToProfileQuerryDTO()
+                User        = comment.User is not null ? comment.User.ToProfileQuerryDTO() : null
             };
         }
-        public static Comment ToComment(this CommentPOSTDTO comment)
+        public static Comment         ToComment         (this CommentCommandDTO comment, Guid postID, Guid userID)
         {
             return new Comment
             {
                 Id          = Guid.NewGuid(),
-                PostId      = comment.PostId,
-                UserId      = comment.UserId,
+                PostId      = postID,
+                UserId      = userID,
                 Text        = comment.Text,
                 DateCreated = DateTime.Now
             };

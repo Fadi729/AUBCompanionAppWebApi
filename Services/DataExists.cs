@@ -25,5 +25,9 @@ namespace CompanionApp.Services
         {
             return await _dbset.AnyAsync(e => e.Id == id);
         }
+        public static async Task<bool> CommentExists (this DbSet<Comment> _dbset, Guid id)
+        {
+            return await _dbset.AnyAsync(c => c.Id == id);
+        }
     }
 }

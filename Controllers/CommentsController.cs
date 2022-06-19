@@ -1,182 +1,139 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using CompanionApp.Models;
+﻿using CompanionApp.Models;
 using CompanionApp.ModelsDTO;
-using CompanionApp.Extensions;
+using Microsoft.AspNetCore.Mvc;
+using CompanionApp.Services.Contracts;
+using CompanionApp.Exceptions.CommentExceptions;
+using CompanionApp.Exceptions.PostExceptions;
+using CompanionApp.Exceptions.ProfileExceptions;
 
 namespace CompanionApp.Controllers
 {
     [Route("api/[controller]")]
-    [ApiController]    
+    [ApiController]
     public class CommentsController : ControllerBase
     {
-         readonly CompanionAppDBContext _context;
+        readonly ICommentsService _commentsService;
 
-        public CommentsController(CompanionAppDBContext context)
+        public CommentsController(ICommentsService CommentsService)
         {
-            _context = context;
+            _commentsService = CommentsService;
         }
 
-        // GET: api/Comments/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<CommentDTO>> GetComment(Guid id)
+        [HttpGet("{commentID}")]
+        public async Task<ActionResult<CommentQueryDTO>>              GetComment          (Guid commentID)
         {
-            var comment = await _context.Comments.Include(c => c.User).Where(c => c.Id == id).FirstOrDefaultAsync();
-
-            if (comment == null)
-            {
-                return NotFound("Comment not found");
-            }
-
-            return comment.ToCommentDTO();
-        }
-
-        // GET: api/Comments/post/5
-        [HttpGet("post/{postID}")]
-        public async Task<ActionResult<IEnumerable<CommentDTO>>> GetPostComments(Guid postID)
-        {
-            if (_context.Comments == null)
-            {
-                return Problem("Entity set 'CompanionAppDBContext.Comments'  is null.");
-            }
-
-            if (!PostExists(postID))
-            {
-                return NotFound("Post with id " + postID + " does not exist.");
-            }
-
-            return await _context.Comments.Include(l => l.User).Where(l => l.PostId == postID).Select(l => l.ToCommentDTO()).ToListAsync();
-        }
-
-        // POST api/Comments
-        [HttpPost]
-        public async Task<ActionResult<CommentDTO>> PostComment(CommentPOSTDTO comment)
-        {
-            if (_context.Comments == null)
-            {
-                return Problem("Entity set 'CompanionAppDBContext.Likes'  is null.");
-            }
-
-            if (!PostExists(comment.PostId))
-            {
-                return NotFound("Post with id " + comment.PostId + " does not exist.");
-            }
-
-            if (!ProfileExists(comment.UserId))
-            {
-                return NotFound("Profile with id " + comment.UserId + " does not exist.");
-            }
-
-            Comment newComment = comment.ToComment();
-            
-            _context.Comments.Add(newComment);
             try
             {
-                await _context.SaveChangesAsync();
+                return Ok(await _commentsService.GetComment(commentID));
             }
-            catch (DbUpdateException)
+            catch (CommentNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception)
             {
                 throw;
             }
-
-            return CreatedAtAction("GetComment", new { id = newComment.Id }, comment);
         }
 
-        // PUT: api/Comments/5
-        [HttpPut("{id}/{userID}")]
-        public async Task<IActionResult> PutComment(Guid id, Guid userID,CommentPUTDTO comment)
+        
+        [HttpGet("post/{postID}")]
+        public async Task<ActionResult<IEnumerable<CommentQueryDTO>>> GetPostComments     (Guid postID)
         {
-            if (_context.Comments == null)
-            {
-                return Problem("Entity set 'CompanionAppDBContext.Comments'  is null.");
-            }
-
-            if (!CommentExists(id))
-            {
-                return NotFound("Comment with id " + id + " does not exist.");
-            }
-            
-            var commentToUpdate = await _context.Comments.Where(c => c.Id == id).FirstOrDefaultAsync();
-            
-            if (commentToUpdate == null)
-            {
-                return NotFound("Comment with id " + id + " does not exist.");
-            }
-
-            if (!ProfileExists(userID))
-            {
-                return NotFound("Profile with id " + userID + " does not exist.");
-            }
-
-            if (commentToUpdate.UserId != userID)
-            {
-                return Unauthorized();
-            }
-
-            commentToUpdate.Text = comment.Text;
-
             try
             {
-                await _context.SaveChangesAsync();
+                return Ok(await _commentsService.GetPostComments(postID));
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception ex)
+                when (ex is PostNotFoundException || ex is NoCommentsFoundException)
             {
-                if (!CommentExists(id))
-                {
-                    return NotFound("Comment with id " + id + " does not exist.");
-                }
-                else
-                {
-                    throw;
-                }
+                return BadRequest(ex.Message);
             }
-
-            return NoContent();
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        // DELETE: api/Comments/5
-        [HttpDelete("{id}/{userID}")]
-        public async Task<IActionResult> DeleteComment(Guid id, Guid userID)
+        
+        [HttpGet("post/{postID}/count")]
+        public async Task<ActionResult<int>>                          GetPostCommentsCount(Guid postID)
         {
-            if (_context.Likes == null)
+            try
             {
-                return Problem("Entity set 'CompanionAppDBContext.Likes'  is null.");
+                return Ok(await _commentsService.GetPostCommentsCount(postID));
             }
-
-            if (!CommentExists(id))
+            catch (Exception ex)
+                when (ex is PostNotFoundException || ex is NoCommentsFoundException)
             {
-                return NotFound("Comment with id " + id + " does not exist.");
+                return BadRequest(ex.Message);
             }
-
-            var comment = await _context.Comments.FindAsync(id);
-
-            if (comment == null)
+            catch (Exception)
             {
-                return NotFound("Comment with id " + id + " does not exist.");
+                throw;
             }
-
-            if (comment.UserId != userID)
-            {
-                return Unauthorized();
-            }
-
-            _context.Comments.Remove(comment);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
         }
 
-         bool PostExists(Guid id)
+        
+        [HttpPost("{postID}/{userID}")]
+        public async Task<ActionResult<CommentQueryDTO>>              PostComment         (Guid postID, Guid userID, CommentCommandDTO comment)
         {
-            return _context.Posts.Any(e => e.Id == id);
+            try
+            {
+                CommentQueryDTO newComment = await _commentsService.AddComment(postID, userID, comment);
+                return CreatedAtAction("GetComment", new { commentID = newComment.Id }, newComment);
+            }
+            catch (Exception ex)
+                when (ex is PostNotFoundException || ex is ProfileNotFoundException)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
-         bool ProfileExists(Guid id)
+
+        
+        [HttpPut("{postID}/{commentID}/{userID}")]
+        public async Task<IActionResult>                              PutComment          (Guid commentID, Guid postID, Guid userID, CommentCommandDTO comment)
         {
-            return _context.Profiles.Any(e => e.Id == id);
+            try
+            {
+                await _commentsService.EditComment(commentID, postID, userID, comment);
+                return NoContent();
+            }
+            catch (Exception ex)
+                when (ex is CommentNotFoundException
+                    || ex is PostNotFoundException
+                    || ex is ProfileNotFoundException
+                )
+            {
+                return BadRequest();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
-         bool CommentExists(Guid id)
+
+        
+        [HttpDelete("{commentID}")]
+        public async Task<IActionResult>                              DeleteComment       (Guid commentID)
         {
-            return _context.Comments.Any(c => c.Id == id);
+            try
+            {
+                await _commentsService.DeleteComment(commentID);
+                return NoContent();
+            }
+            catch (CommentNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 }
