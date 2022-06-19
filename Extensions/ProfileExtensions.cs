@@ -18,7 +18,7 @@ namespace CompanionApp.Extensions
                 Class     = profile.Class
             };
         }
-        public static Profile          ToProfile         (this ProfileCommandDTO profile)
+        public static Profile         ToProfile         (this ProfileCommandDTO profile)
         {
             return new Profile
             {
@@ -30,7 +30,7 @@ namespace CompanionApp.Extensions
                 Class     = profile.Class,
             };
         }
-        public static Profile          ToProfile         (this ProfileCommandDTO profile, Guid id)
+        public static Profile         ToProfile         (this ProfileCommandDTO profile, Guid id)
         {
             return new Profile
             {

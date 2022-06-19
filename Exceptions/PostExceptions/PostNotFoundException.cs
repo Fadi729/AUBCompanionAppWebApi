@@ -1,10 +1,8 @@
-﻿using System.Runtime.Serialization;
-
-namespace CompanionApp.Exceptions.PostExceptions
+﻿namespace CompanionApp.Exceptions.PostExceptions
 {
     public class PostNotFoundException : Exception
     {
-        readonly static string defaultErrorMessage = "Post Not Found";
+        readonly static string defaultErrorMessage = "Post Not Found.";
 
         public PostNotFoundException() : base(defaultErrorMessage) { }
 

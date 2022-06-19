@@ -1,10 +1,8 @@
-﻿using System.Runtime.Serialization;
-
-namespace CompanionApp.Exceptions.CommentExceptions
+﻿namespace CompanionApp.Exceptions.CommentExceptions
 {
     public class CommentNotFoundException : Exception
     {
-        readonly static string defaultErrorMessage = "Comment Not Found";
+        readonly static string defaultErrorMessage = "Comment Not Found.";
 
         public CommentNotFoundException() : base(defaultErrorMessage) { }
         public CommentNotFoundException(string? message) : base(message) { }

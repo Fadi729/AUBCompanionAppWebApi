@@ -9,8 +9,8 @@
         #endregion
 
         #region Navigation Properties
-        public virtual Profile IsFollowingNavigation { get; set; } = null!;
         public virtual Profile User                  { get; set; } = null!;
+        public virtual Profile IsFollowingNavigation { get; set; } = null!;
         #endregion
     }
 }

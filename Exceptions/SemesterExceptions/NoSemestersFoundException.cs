@@ -1,6 +1,4 @@
-﻿using System.Runtime.Serialization;
-
-namespace CompanionApp.Exceptions.SemesterExceptions
+﻿namespace CompanionApp.Exceptions.SemesterExceptions
 {
     public class NoSemestersFoundException : Exception
     {

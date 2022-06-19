@@ -1,6 +1,4 @@
-﻿using System.Runtime.Serialization;
-
-namespace CompanionApp.Exceptions.ProfileExceptions
+﻿namespace CompanionApp.Exceptions.ProfileExceptions
 {
     [Serializable]
     public class ProfileNotFoundException : Exception

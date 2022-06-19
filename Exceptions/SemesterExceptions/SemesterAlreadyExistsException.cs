@@ -1,10 +1,8 @@
-﻿using System.Runtime.Serialization;
-
-namespace CompanionApp.Exceptions.SemesterExceptions
+﻿namespace CompanionApp.Exceptions.SemesterExceptions
 {
     public class SemesterAlreadyExistsException : Exception
     {
-        readonly static string defaultErrorMessage = "Semester Already Exists";
+        readonly static string defaultErrorMessage = "Semester Already Exists.";
 
         public SemesterAlreadyExistsException() : base(defaultErrorMessage) { }
         public SemesterAlreadyExistsException(string? message) : base(message) { }

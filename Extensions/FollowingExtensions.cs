@@ -5,15 +5,25 @@ namespace CompanionApp.Extensions
 {
     public static class FollowingExtensions
     {
-        public static FollowingDTO ToFollowingDTO(this Following following)
+        public static IsFollowingDTO ToIsFollowingDTO(this Following following)
         {
-            return new FollowingDTO
+            return new IsFollowingDTO
             {
-                DateFollowed          = following.DateFollowed,
-                IsFollowingNavigation = following.IsFollowingNavigation.ToProfileQuerryDTO()
+                DateFollowed            = following.DateFollowed,
+                IsFollowingNavigation   = following.IsFollowingNavigation is not null ? following.IsFollowingNavigation.ToProfileQuerryDTO() : null
             };
         } 
-        public static Following ToFollowing(this FollowingPOSTDTO following)
+        
+        public static FollowersDTO   ToFollowersDTO  (this Following following)
+        {
+            return new FollowersDTO
+            {
+                DateFollowed          = following.DateFollowed,
+                User                  = following.User.ToProfileQuerryDTO()
+            };
+        } 
+
+        public static Following      ToFollowing     (this FollowingPOSTDTO following)
         {
             return new Following
             {

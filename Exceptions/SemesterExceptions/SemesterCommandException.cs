@@ -1,10 +1,8 @@
-﻿using System.Runtime.Serialization;
-
-namespace CompanionApp.Exceptions.SemesterExceptions
+﻿namespace CompanionApp.Exceptions.SemesterExceptions
 {
     public class SemesterCommandException : Exception
     {
-        readonly static string defaultErrorMessage = "Semester command failed";
+        readonly static string defaultErrorMessage = "Semester Command Failed.";
 
         public SemesterCommandException() : base(defaultErrorMessage) { }
         public SemesterCommandException(string? message) : base(message) { }

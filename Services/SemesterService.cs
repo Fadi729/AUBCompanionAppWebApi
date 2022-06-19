@@ -1,12 +1,12 @@
-﻿using CompanionApp.Models;
-using CompanionApp.Extensions;
+﻿using FluentValidation;
+using CompanionApp.Models;
 using CompanionApp.ModelsDTO;
 using CompanionApp.Validation;
+using CompanionApp.Extensions;
 using Microsoft.EntityFrameworkCore;
 using CompanionApp.Services.Contracts;
-using CompanionApp.Exceptions.SemesterExceptions;
-using FluentValidation;
 using EntityFramework.Exceptions.Common;
+using CompanionApp.Exceptions.SemesterExceptions;
 
 namespace CompanionApp.Services
 {

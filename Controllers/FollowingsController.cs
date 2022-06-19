@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using CompanionApp.Models;
-using CompanionApp.ModelsDTO;
-using CompanionApp.Extensions;
+﻿using CompanionApp.ModelsDTO;
+using Microsoft.AspNetCore.Mvc;
+using CompanionApp.Services.Contracts;
+using CompanionApp.Exceptions.ProfileExceptions;
+using CompanionApp.Exceptions.FollowingsExceptions;
 
 namespace CompanionApp.Controllers
 {
@@ -10,115 +10,88 @@ namespace CompanionApp.Controllers
     [ApiController]
     public class FollowingsController : ControllerBase
     {
-         readonly CompanionAppDBContext _context;
+        readonly IFollowingsService _followingsService;
 
-        public FollowingsController(CompanionAppDBContext context)
+        public FollowingsController(IFollowingsService FollowingsService)
         {
-            _context = context;
+            _followingsService = FollowingsService;
         }
 
-        // GET: api/Followings/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<IEnumerable<FollowingDTO>>> GetFollowing(Guid id)
+        [HttpGet("isfollowing/{userID}")]
+        public async Task<ActionResult<IEnumerable<IsFollowingDTO>>> GetFollowing   (Guid userID)
         {
-          if (_context.Followings == null)
-          {
-              return NotFound();
-          }
-            var following = await _context.Followings.Include(f => f.IsFollowingNavigation).Where(f => f.UserId == id).ToListAsync();
-
-            if (following == null)
-            {
-                return NotFound();
-            }
-
-            return following.Select(f => f.ToFollowingDTO()).ToList();
-        }
-
-        // PUT: api/Followings/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> PutFollowing(Guid id, Following following)
-        //{
-        //    if (id != following.UserId)
-        //    {
-        //        return BadRequest();
-        //    }
-
-        //    _context.Entry(following).State = EntityState.Modified;
-
-        //    try
-        //    {
-        //        await _context.SaveChangesAsync();
-        //    }
-        //    catch (DbUpdateConcurrencyException)
-        //    {
-        //        if (!FollowingExists(id))
-        //        {
-        //            return NotFound();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
-
-        //    return NoContent();
-        //}
-        
-        // POST: api/Followings
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Following>> PostFollowing(FollowingPOSTDTO following)
-        {
-          if (_context.Followings == null)
-          {
-              return Problem("Entity set 'CompanionAppDBContext.Followings'  is null.");
-          }
-            Following newfollowing = following.ToFollowing();
-            _context.Followings.Add(newfollowing);
             try
             {
-                await _context.SaveChangesAsync();
+                return Ok(await _followingsService.GetIsFollowing(userID));
             }
-            catch (DbUpdateException)
+            catch (Exception ex) when (ex is NoFollowingsFoundException || ex is ProfileNotFoundException)
             {
-                if (FollowingExists(following.UserId))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
+                return NotFound(ex.Message);
             }
-
-            return CreatedAtAction("GetFollowing", new { id = following.UserId }, following);
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        // DELETE: api/Followings/
+
+        [HttpGet("followers/{userID}")]
+        public async Task<ActionResult<IEnumerable<FollowersDTO>>>   GetFollowers   (Guid userID)
+        {
+            try
+            {
+                return Ok(await _followingsService.GetFollowers(userID));
+            }
+            catch (Exception ex) when (ex is NoFollowingsFoundException || ex is ProfileNotFoundException)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+        
+
+        [HttpPost]
+        public async Task<ActionResult<FollowingPOSTDTO>>            PostFollowing  (FollowingPOSTDTO following)
+        {
+            try
+            {
+                await _followingsService.Follow(following);
+                return following;
+            }
+            catch (ProfileNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (FollowingAlreadyExistsException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        
         [HttpDelete]
-        public async Task<IActionResult> DeleteFollowing(FollowingPOSTDTO following)
+        public async Task<IActionResult>                             DeleteFollowing(FollowingPOSTDTO following)
         {
-            if (_context.Followings == null)
+            try
             {
-                return NotFound();
+                await _followingsService.Unfollow(following);
+                return NoContent();
             }
-            var deletefollowing = await _context.Followings.FindAsync(following.UserId, following.IsFollowing);
-            if (deletefollowing == null)
+            catch (Exception ex) when (ex is ProfileNotFoundException || ex is FollowingNotFoundException)
             {
-                return NotFound();
+                return NotFound(ex.Message);
             }
-
-            _context.Followings.Remove(deletefollowing);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-         bool FollowingExists(Guid id)
-        {
-            return (_context.Followings?.Any(e => e.UserId == id)).GetValueOrDefault();
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 }

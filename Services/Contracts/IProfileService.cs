@@ -6,7 +6,7 @@ namespace CompanionApp.Services.Contracts
     {
         Task<ProfileQueryDTO> GetProfileAsync   (Guid id);
         Task<ProfileQueryDTO> CreateProfileAsync(ProfileCommandDTO profile);
-        Task                   EditProfileAsync  (Guid id, ProfileCommandDTO profile);
-        Task                   DeleteProfileAsync(Guid id);
+        Task                  EditProfileAsync  (Guid id, ProfileCommandDTO profile);
+        Task                  DeleteProfileAsync(Guid id);
     }
 }

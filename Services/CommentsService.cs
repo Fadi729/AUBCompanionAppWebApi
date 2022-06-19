@@ -64,7 +64,6 @@ namespace CompanionApp.Services
             {
                 throw new PostNotFoundException();
             }
-
             if (!await _dbSetProfile.ProfileExists(userID))
             {
                 throw new ProfileNotFoundException();
