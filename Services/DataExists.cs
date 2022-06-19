@@ -5,21 +5,25 @@ namespace CompanionApp.Services
 {
     public static class DataExists
     {
-        public static bool ProfileExists(this DbSet<Profile> _dbSet, Guid id)
+        public static async Task<bool> ProfileExists (this DbSet<Profile> _dbSet, Guid id)
         {
-            return _dbSet.Any(e => e.Id == id);
+            return await _dbSet.AnyAsync(e => e.Id == id);
         }
-        public static bool ProfileExists(this DbSet<Profile> _dbSet, string? email)
+        public static async Task<bool> ProfileExists (this DbSet<Profile> _dbSet, string? email)
         {
-            return _dbSet.Any(e => e.Email == email);
+            return await _dbSet.AnyAsync(e => e.Email == email);
         }
-        public static bool CourseExists (this DbSet<Course>  _dbSet, int crn)
+        public static async Task<bool> CourseExists  (this DbSet<Course>  _dbSet, int crn)
         {
-            return _dbSet.Any(e => e.Crn == crn);
+            return await _dbSet.AnyAsync(e => e.Crn == crn);
         }
-        public static bool PostExists   (this DbSet<Post>    _dbSet, Guid id)
+        public static async Task<bool> PostExists    (this DbSet<Post>    _dbSet, Guid id)
         {
-            return _dbSet.Any(e => e.Id == id);
+            return await _dbSet.AnyAsync(e => e.Id == id);
+        }
+        public static async Task<bool> SemesterExists(this DbSet<Semester> _dbset, string id)
+        {
+            return await _dbset.AnyAsync(e => e.Id == id);
         }
     }
 }

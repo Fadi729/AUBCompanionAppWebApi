@@ -5,6 +5,7 @@ using CompanionApp.Extensions;
 using CompanionApp.Validation;
 using Microsoft.EntityFrameworkCore;
 using CompanionApp.Services.Contracts;
+using EntityFramework.Exceptions.Common;
 using CompanionApp.Exceptions.ProfileExceptions;
 
 namespace CompanionApp.Services
@@ -38,12 +39,9 @@ namespace CompanionApp.Services
             try
             {
                 await _validationRules.ValidateAndThrowAsync(profile);
-                if (_dbSet.ProfileExists(profile.Email))
-                {
-                    throw new ProfileAlreadyExistsException("Email Already In Use");
-                }
+                
                 Profile newProfile = profile.ToProfile();
-
+                
                 _dbSet.Add(newProfile);
                 await _context.SaveChangesAsync();
                 
@@ -51,6 +49,10 @@ namespace CompanionApp.Services
             }
             #endregion
             #region catch block
+            catch(UniqueConstraintException)
+            {
+                throw new ProfileAlreadyExistsException("Email Already In Use");
+            }
             catch (ValidationException ex)
             {
                 throw new ProfileCommandException(ex.Errors.FirstOrDefault()!.ErrorMessage);
@@ -62,7 +64,7 @@ namespace CompanionApp.Services
             #region try block
             try
             {
-                if (!_dbSet.ProfileExists(id))
+                if (!await _dbSet.ProfileExists(id))
                 {
                     throw new ProfileNotFoundException();
                 }
@@ -81,7 +83,7 @@ namespace CompanionApp.Services
         }
         public async Task                  DeleteProfileAsync(Guid id)
         {
-            if (!_dbSet.ProfileExists(id))
+            if (!await _dbSet.ProfileExists(id))
             {
                 throw new ProfileNotFoundException();
             }
