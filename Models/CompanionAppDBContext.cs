@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using EntityFramework.Exceptions.SqlServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
@@ -7,7 +8,7 @@ namespace CompanionApp.Models
 {
     public partial class CompanionAppDBContext : DbContext
     {
-        readonly string _connectionString;
+        readonly string _connectionString = null!;
 
         public CompanionAppDBContext() { }
 
@@ -32,6 +33,7 @@ namespace CompanionApp.Models
             {
                 optionsBuilder.UseSqlServer(_connectionString);
             }
+            optionsBuilder.UseExceptionProcessor();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

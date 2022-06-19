@@ -36,13 +36,15 @@ builder.Services.AddDbContext<CompanionAppDBContext>(
 #endif
 
 builder.Services
-    .AddScoped<IProfileService, ProfileService>()
-    .AddScoped<ICourseService , CourseService >()
-    .AddScoped<IPostService   , PostService   >();
+    .AddScoped<IProfileService , ProfileService >()
+    .AddScoped<ICourseService  , CourseService  >()
+    .AddScoped<IPostService    , PostService    >()
+    .AddScoped<ISemesterService, SemesterService>();
 
 builder.Services
-    .AddScoped<ProfileValidation>()
-    .AddScoped<CourseValidation >();
+    .AddScoped<ProfileValidation >()
+    .AddScoped<CourseValidation  >()
+    .AddScoped<SemesterValidation>();
 
 WebApplication app = builder.Build();
 

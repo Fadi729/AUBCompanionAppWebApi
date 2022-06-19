@@ -1,132 +1,105 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using CompanionApp.Models;
+﻿using CompanionApp.Models;
 using CompanionApp.ModelsDTO;
-using CompanionApp.Extensions;
+using Microsoft.AspNetCore.Mvc;
+using CompanionApp.Services.Contracts;
+using CompanionApp.Exceptions.SemesterExceptions;
 
 namespace CompanionApp.Controllers
 {
     [Route("api/[controller]")]
-    [ApiController]    
+    [ApiController]
     public class SemestersController : ControllerBase
     {
-         readonly CompanionAppDBContext _context;
+        readonly ISemesterService _semesterService;
 
-        public SemestersController(CompanionAppDBContext context)
+        public SemestersController(ISemesterService SemesterServcie)
         {
-            _context = context;
+            _semesterService = SemesterServcie;
         }
 
-        // GET: api/Semesters
+ 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<SemesterDTO>>> GetSemesters()
+        public async Task<ActionResult<IEnumerable<SemesterDTO>>> GetSemesters  ()
         {
-            return await _context.Semesters.Select(x => x.ToSemesterDTO()).ToListAsync();
+            try
+            {
+                return Ok(await _semesterService.GetSemestersAsync());
+            }
+            catch (NoSemestersFoundException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        // GET: api/Semesters/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<SemesterDTO>> GetSemester(Guid id)
+        public async Task<ActionResult<SemesterDTO>>              GetSemester   (string id)
         {
-            if (_context.Semesters == null)
+            try
             {
-                return Problem("Entity set 'CompanionAppDBContext.Semesters'  is null.");
+                return Ok(await _semesterService.GetSemesterAsync(id));
             }
-            var semester = await _context.Semesters.FindAsync(id);
-
-            if (semester == null)
+            catch (SemesterNotFoundException ex)
             {
-                return NotFound();
+                return BadRequest(ex.Message);
             }
-
-            return semester.ToSemesterDTO();
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        // POST: api/Semesters
         [HttpPost("single")]
-        public async Task<ActionResult<SemesterDTO>> PostSemester(SemesterDTO semesterDTO)
+        public async Task<ActionResult<SemesterDTO>>              PostSemester  (SemesterDTO semesterDTO)
         {
-            if (_context.Semesters == null)
-            {
-                return Problem("Entity set 'CompanionAppDBContext.Semesters'  is null.");
-            }
-
-            _context.Semesters.Add(semesterDTO.ToSemester());
             try
             {
-                await _context.SaveChangesAsync();
+                await _semesterService.AddSemesterAsync(semesterDTO);
+                return CreatedAtAction("GetSemester", new { id = semesterDTO.Id }, semesterDTO);
             }
-            catch (DbUpdateException)
+            catch (Exception ex) when (ex is SemesterAlreadyExistsException || ex is SemesterCommandException)
             {
-                if (SemesterExists(semesterDTO.Id))
-                {
-                    return Conflict("Semester already exists.");
-                }
-                else
-                {
-                    throw;
-                }
+                return BadRequest(ex.Message);
             }
-
-            return CreatedAtAction("GetSemester", new { id = semesterDTO.Id }, semesterDTO);
-        }
-        
-        // POST: api/Semesters
-        [HttpPost("many")]
-        public async Task<ActionResult<SemesterDTO>> PostSemesters(List<SemesterDTO> semesters)
-        {
-            if (_context.Semesters == null)
-            {
-                return Problem("Entity set 'CompanionAppDBContext.Semesters'  is null.");
-            }
-
-           semesters.ForEach(semester =>
-            {
-                if(SemesterExists(semester.Id))
-                {
-                    _context.Entry(semester.ToSemester()).State = EntityState.Modified;    
-                }else
-                     _context.Semesters.Add(semester.ToSemester());
-            });
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
+            catch(Exception)
             {
                 throw;
             }
 
-            return Ok();
         }
 
-        // DELETE: api/Profiles/5
+        [HttpPost("many")]
+        public async Task<ActionResult<SemesterDTO>>              PostSemesters (IEnumerable<SemesterDTO> semesters)
+        {
+            try
+            {
+                return Ok(await _semesterService.AddSemestersAsync(semesters));
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteProfile(string id)
+        public async Task<IActionResult>                          DeleteSemester(string id)
         {
-            if (_context.Semesters == null)
+            try
             {
-                return Problem("Entity set 'CompanionAppDBContext.Semesters'  is null.");
+                await _semesterService.DeleteSemesterAsync(id);
+                return NoContent();
             }
-
-            var semester = await _context.Semesters.FindAsync(id);
-
-            if (semester == null)
+            catch(SemesterNotFoundException ex)
             {
-                return NotFound();
+                return NotFound(ex);
             }
-
-            _context.Semesters.Remove(semester);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-         bool SemesterExists(string id)
-        {
-            return _context.Semesters.Any(e => e.Id == id);
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 }
-
-

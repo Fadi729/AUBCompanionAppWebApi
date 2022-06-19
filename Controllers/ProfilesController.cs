@@ -43,11 +43,7 @@ namespace CompanionApp.Controllers
                 ProfileQueryDTO profileDTO = await _profileService.CreateProfileAsync(profile);
                 return CreatedAtAction("GetProfile", new { id = profileDTO.Id }, profileDTO);
             }
-            catch (ProfileAlreadyExistsException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (ProfileCommandException ex)
+            catch (Exception ex) when (ex is ProfileAlreadyExistsException || ex is ProfileCommandException)
             {
                 return BadRequest(ex.Message);
             }

@@ -6,6 +6,7 @@ using CompanionApp.Extensions;
 using Microsoft.EntityFrameworkCore;
 using CompanionApp.Services.Contracts;
 using CompanionApp.Exceptions.CourseExceptions;
+using EntityFramework.Exceptions.Common;
 
 namespace CompanionApp.Services
 {
@@ -45,10 +46,6 @@ namespace CompanionApp.Services
             try
             {
                 await _courseValidation.ValidateAndThrowAsync(course);
-                if (_dbSet.CourseExists(course.Crn))
-                {
-                    throw new CourseAlreadyExistsException();
-                }
                 Course newCourse = course.ToCourse();
                 _dbSet.Add(newCourse);
                 await _context.SaveChangesAsync();
@@ -56,13 +53,17 @@ namespace CompanionApp.Services
             }
             #endregion
             #region catch block
+            catch(UniqueConstraintException)
+            {
+                throw new CourseAlreadyExistsException();
+            }
             catch (ValidationException ex)
             {
                 throw new CourseCommandException(ex.Errors.FirstOrDefault()!.ErrorMessage);
             }
             #endregion
         }
-        public async Task<IList<CourseDTO>>       AddCoursesAsync   (IEnumerable<CourseDTO> courses)
+        public async Task<IEnumerable<CourseDTO>> AddCoursesAsync   (IEnumerable<CourseDTO> courses)
         {
             IList<CourseDTO> failedToAddCourses = new List<CourseDTO>();
             #region try   block
@@ -74,7 +75,7 @@ namespace CompanionApp.Services
                     {
                         failedToAddCourses.Add(course);
                     }
-                    else if (_dbSet.CourseExists(course.Crn))
+                    else if (await _dbSet.CourseExists(course.Crn))
                     {
                         _dbSet.Update(course.ToCourse());
                     }
@@ -88,9 +89,9 @@ namespace CompanionApp.Services
             }
             #endregion
             #region catch block
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw new CourseCommandException(ex.Message);
+                throw;
             } 
             #endregion
         }
@@ -104,7 +105,7 @@ namespace CompanionApp.Services
                     throw new ArgumentException("crn and course.crn must match");
                 }
 
-                if (!_dbSet.CourseExists(crn))
+                if (!await _dbSet.CourseExists(crn))
                 {
                     throw new CourseNotFoundException();
                 }
@@ -125,7 +126,7 @@ namespace CompanionApp.Services
         {
             try
             {
-                if (!_dbSet.CourseExists(crn))
+                if (!await _dbSet.CourseExists(crn))
                 {
                     throw new CourseNotFoundException();
                 }

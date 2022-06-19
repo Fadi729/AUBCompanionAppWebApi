@@ -10,12 +10,10 @@ namespace CompanionApp.Controllers
     [ApiController]
     public class PostsController : ControllerBase
     {
-        readonly CompanionAppDBContext _context;
-        readonly IPostService          _postService;
+        readonly IPostService _postService;
 
-        public PostsController(CompanionAppDBContext context, IPostService postService)
+        public PostsController(IPostService postService)
         {
-            _context = context;
             _postService = postService;
         }
 
@@ -24,7 +22,7 @@ namespace CompanionApp.Controllers
         {
             try
             {
-                return await _postService.GetPostById(id);
+                return await _postService.GetPostByIdAsync(id);
             }
             catch (PostNotFoundException ex)
             {
@@ -41,7 +39,7 @@ namespace CompanionApp.Controllers
         {
             try
             {
-                return Ok(await _postService.GetPostsByUserID(userID));
+                return Ok(await _postService.GetPostsByUserIDAsync(userID));
             }
             catch (NoPostsFoundException ex)
             {
@@ -58,7 +56,7 @@ namespace CompanionApp.Controllers
         {
             try
             {
-                return Ok(await _postService.GetPostsByUserFollowings(userID));
+                return Ok(await _postService.GetPostsByUserFollowingsAsync(userID));
             }
             catch (NoPostsFoundException ex)
             {
@@ -75,7 +73,7 @@ namespace CompanionApp.Controllers
         {
             try
             {
-                PostQueryDTO newpost = await _postService.CreatePost(post, userID);
+                PostQueryDTO newpost = await _postService.CreatePostAsync(post, userID);
                 return CreatedAtAction("GetPostById", new { id = newpost.Id }, newpost);
             }
             catch (Exception)
@@ -89,7 +87,7 @@ namespace CompanionApp.Controllers
         {
             try
             {
-                await _postService.EditPost(id, userID, post);
+                await _postService.EditPostAsync(id, userID, post);
                 return NoContent();
             }
             catch (PostNotFoundException ex)
@@ -101,30 +99,23 @@ namespace CompanionApp.Controllers
                 throw;
             }
         }
-        
+
         [HttpDelete("{userID}/{id}")]
         public async Task<IActionResult>                             DeletePost              (Guid id, Guid userID)
         {
-            if (_context.Posts == null)
+            try
             {
-                return NotFound();
+                await _postService.DeletePostAsync(id, userID);
+                return NoContent();
             }
-            var post = await _context.Posts.FindAsync(id);
-
-            if (post == null)
+            catch (PostNotFoundException ex)
             {
-                return NotFound();
+                return NotFound(ex.Message);
             }
-
-            if (post.UserId != userID)
+            catch (Exception)
             {
-                return Unauthorized();
+                throw;
             }
-
-            _context.Posts.Remove(post);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
         }
     }
 }

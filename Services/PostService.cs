@@ -17,7 +17,7 @@ namespace CompanionApp.Services
             _dbSet = _context.Posts;
         }
 
-        public async Task<IEnumerable<PostsByUserDTO>> GetPostsByUserID        (Guid userID)
+        public async Task<IEnumerable<PostsByUserDTO>> GetPostsByUserIDAsync        (Guid userID)
         {
             List<PostsByUserDTO> posts = await _dbSet
                 .Where(post => post.UserId == userID)
@@ -29,7 +29,7 @@ namespace CompanionApp.Services
             }
             return posts;
         }
-        public async Task<IEnumerable<PostQueryDTO>>   GetPostsByUserFollowings(Guid userID)
+        public async Task<IEnumerable<PostQueryDTO>>   GetPostsByUserFollowingsAsync(Guid userID)
         {
             IEnumerable<PostQueryDTO> posts = await _dbSet
                 .Where(
@@ -50,7 +50,7 @@ namespace CompanionApp.Services
 
             return posts;
         }
-        public async Task<PostQueryDTO>                GetPostById             (Guid id)
+        public async Task<PostQueryDTO>                GetPostByIdAsync             (Guid id)
         {
             Post? post = await _dbSet.Include(p => p.User).FirstOrDefaultAsync(p => p.Id == id);
 
@@ -61,7 +61,7 @@ namespace CompanionApp.Services
 
             return post.ToPostQueryDTO();
         }
-        public async Task<PostQueryDTO>                CreatePost              (PostCommandDTO post, Guid userID)
+        public async Task<PostQueryDTO>                CreatePostAsync              (PostCommandDTO post, Guid userID)
         {
             try
             {
@@ -75,11 +75,11 @@ namespace CompanionApp.Services
                 throw;
             }
         }
-        public async Task                              EditPost                (Guid id, Guid userID, PostCommandDTO post)
+        public async Task                              EditPostAsync                (Guid id, Guid userID, PostCommandDTO post)
         {
             try
             {
-                if (!_dbSet.PostExists(id))
+                if (!await _dbSet.PostExists(id))
                 {
                     throw new PostNotFoundException();
                 }
@@ -91,9 +91,9 @@ namespace CompanionApp.Services
                 throw;
             }
         }
-        public async Task                              DeletePost              (Guid id, Guid userId)
+        public async Task                              DeletePostAsync              (Guid id, Guid userId)
         {
-            if (!_dbSet.PostExists(id))
+            if (!await _dbSet.PostExists(id))
             {
                 throw new PostNotFoundException();
             }

@@ -14,7 +14,7 @@ namespace CompanionApp.Extensions
                 Year  = semester.Year
             };
         }
-        public static Semester ToSemester(this SemesterDTO semesterDTO)
+        public static Semester    ToSemester   (this SemesterDTO semesterDTO)
         {
             return new Semester
             {

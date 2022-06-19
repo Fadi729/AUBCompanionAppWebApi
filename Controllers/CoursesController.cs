@@ -37,11 +37,11 @@ namespace CompanionApp.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<CourseDTO>>              GetCourse   (int id)
+        public async Task<ActionResult<CourseDTO>> GetCourse(int id)
         {
             try
             {
-                return Ok(await _courseService.GetCourseAsync(id));    
+                return Ok(await _courseService.GetCourseAsync(id));
             }
             catch (CourseNotFoundException ex)
             {
@@ -49,20 +49,16 @@ namespace CompanionApp.Controllers
             }
         }
 
-        
+
         [HttpPut("{id}")]
-        public async Task<IActionResult>                        PutCourse   (int id, CourseDTO course)
+        public async Task<IActionResult> PutCourse(int id, CourseDTO course)
         {
             try
             {
                 await _courseService.EditCourseAsync(id, course);
                 return NoContent();
             }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (CourseCommandException ex)
+            catch (Exception ex) when (ex is ArgumentException || ex is CourseCommandException)
             {
                 return BadRequest(ex.Message);
             }
@@ -76,43 +72,17 @@ namespace CompanionApp.Controllers
             }
 
         }
-        
+
 
         [HttpPost("single")]
-        public async Task<ActionResult<CourseDTO>>              PostCourse  (CourseDTO course)
+        public async Task<ActionResult<CourseDTO>> PostCourse(CourseDTO course)
         {
             try
             {
                 CourseDTO newCourse = await _courseService.AddCourseAsync(course);
                 return CreatedAtAction("GetCourse", new { id = newCourse.Crn }, newCourse);
             }
-            catch (CourseAlreadyExistsException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (CourseCommandException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-        
-        /// <summary>
-        /// Adds A List of Courses
-        /// </summary>
-        /// <param name="courses">Courses to Add</param>
-        /// <response code="200">A List of courses that were not added</response>
-        [HttpPost("many")]
-        public async Task<ActionResult<IList<CourseDTO>>>       PostCourses (List<CourseDTO> courses)
-        {
-            try
-            {
-                return Ok((await _courseService.AddCoursesAsync(courses)).ToList());
-            }
-            catch (CourseCommandException ex)
+            catch (Exception ex) when (ex is CourseAlreadyExistsException || ex is CourseCommandException)
             {
                 return BadRequest(ex.Message);
             }
@@ -122,9 +92,27 @@ namespace CompanionApp.Controllers
             }
         }
 
-        
+        /// <summary>
+        /// Adds A List of Courses
+        /// </summary>
+        /// <param name="courses">Courses to Add</param>
+        /// <response code="200">A List of courses that were not added</response>
+        [HttpPost("many")]
+        public async Task<ActionResult<IList<CourseDTO>>> PostCourses(IEnumerable<CourseDTO> courses)
+        {
+            try
+            {
+                return Ok((await _courseService.AddCoursesAsync(courses)).ToList());
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+
         [HttpDelete("{id}")]
-        public async Task<IActionResult>                        DeleteCourse(int id)
+        public async Task<IActionResult> DeleteCourse(int id)
         {
             try
             {
@@ -136,6 +124,10 @@ namespace CompanionApp.Controllers
 
                 return NotFound(ex.Message);
             }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
         }
     }
-}
