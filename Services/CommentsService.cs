@@ -27,7 +27,7 @@ namespace CompanionApp.Services
         public async Task<CommentQueryDTO>              GetComment          (Guid commentID)
         {
             Comment? comment = await _dbSetComment
-                .Include(comment => comment.User)
+                .Include            (comment => comment.User)
                 .FirstOrDefaultAsync(comment => comment.Id == commentID);
             if (comment == null)
             {
@@ -44,11 +44,11 @@ namespace CompanionApp.Services
 
             IEnumerable<CommentQueryDTO> comments = await _dbSetComment
                 .Include(comment => comment.User)
-                .Where(comment => comment.PostId == postID)
-                .Select(comment => comment.ToCommentQueryDTO())
+                .Where  (comment => comment.PostId == postID)
+                .Select (comment => comment.ToCommentQueryDTO())
                 .ToListAsync();
 
-            if (comments is null)
+            if (!comments.Any())
             {
                 throw new NoCommentsFoundException();
             }

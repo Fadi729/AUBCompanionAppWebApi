@@ -1,4 +1,4 @@
-﻿using CompanionApp.Models;
+﻿using FluentValidation;
 using CompanionApp.ModelsDTO;
 using Microsoft.AspNetCore.Mvc;
 using CompanionApp.Services.Contracts;
@@ -60,9 +60,13 @@ namespace CompanionApp.Controllers
                 await _semesterService.AddSemesterAsync(semesterDTO);
                 return CreatedAtAction("GetSemester", new { id = semesterDTO.Id }, semesterDTO);
             }
-            catch (Exception ex) when (ex is SemesterAlreadyExistsException || ex is SemesterCommandException)
+            catch (ValidationException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(ex.Errors.Select(x => x.ErrorMessage));
+            }
+            catch (SemesterAlreadyExistsException ex)
+            {
+                return Conflict(ex.Message);
             }
             catch(Exception)
             {

@@ -1,5 +1,4 @@
-﻿using CompanionApp.Models;
-using CompanionApp.ModelsDTO;
+﻿using CompanionApp.ModelsDTO;
 using Microsoft.AspNetCore.Mvc;
 using CompanionApp.Services.Contracts;
 using CompanionApp.Exceptions.CommentExceptions;

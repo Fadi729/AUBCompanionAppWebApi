@@ -7,7 +7,7 @@ namespace CompanionApp.Validation
     {
         public SemesterValidation()
         {
-            RuleLevelCascadeMode = CascadeMode.Stop;
+            RuleLevelCascadeMode = CascadeMode.Continue;
 
             #region Rules
             #region Id Rule

@@ -20,10 +20,10 @@ namespace CompanionApp.Services
         public async Task<IEnumerable<PostsByUserDTO>> GetPostsByUserIDAsync        (Guid userID)
         {
             List<PostsByUserDTO> posts = await _dbSet
-                .Where(post => post.UserId == userID)
+                .Where (post => post.UserId == userID)
                 .Select(p => p.ToPostsByUserDTO())
                 .ToListAsync();
-            if (posts == null)
+            if (!posts.Any())
             {
                 throw new NoPostsFoundException();
             }
@@ -35,15 +35,15 @@ namespace CompanionApp.Services
                 .Where(
                     post =>
                         _context.Followings
-                            .Where(following => following.UserId == userID)
-                            .Select(following => following.IsFollowing)
+                            .Where   (following => following.UserId == userID)
+                            .Select  (following => following.IsFollowing)
                             .Contains(post.UserId)
                 )
                 .Include(post => post.User)
-                .Select(post => post.ToPostQueryDTO())
+                .Select (post => post.ToPostQueryDTO())
                 .ToListAsync();
 
-            if (posts == null)
+            if (!posts.Any())
             {
                 throw new NoPostsFoundException();
             }

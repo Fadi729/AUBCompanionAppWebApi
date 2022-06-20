@@ -26,7 +26,7 @@ namespace CompanionApp.Services
         public async Task<IEnumerable<SemesterDTO>> GetSemestersAsync  ()
         {
             IEnumerable<SemesterDTO> semesters = await _dbSet.Select(x => x.ToSemesterDTO()).ToListAsync();
-            if (semesters is null)
+            if (!semesters.Any())
             {
                 throw new NoSemestersFoundException();
             }
@@ -52,14 +52,6 @@ namespace CompanionApp.Services
             catch (UniqueConstraintException)
             {
                 throw new SemesterAlreadyExistsException();
-            }
-            catch (ValidationException ex)
-            {
-                throw new SemesterCommandException(ex.Errors.FirstOrDefault()!.ErrorMessage);
-            }
-            catch (Exception)
-            {
-                throw;
             }
         }
         public async Task<IEnumerable<SemesterDTO>> AddSemestersAsync  (IEnumerable<SemesterDTO> semesters)

@@ -1,9 +1,9 @@
 using CompanionApp.Models;
 using CompanionApp.Services;
-using CompanionApp.Services.Contracts;
 using CompanionApp.Validation;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
+using CompanionApp.Services.Contracts;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -24,7 +24,7 @@ builder.Services
 
 builder.Configuration
 #region Configurations
-            .AddJsonFile("appsettings.json")
+    .AddJsonFile("appsettings.json")
     .AddUserSecrets<Program>(true)
     .AddEnvironmentVariables()
     .AddCommandLine(args)
@@ -55,7 +55,8 @@ builder.Services
 #region Validations
     .AddScoped<ProfileValidation>()
     .AddScoped<CourseValidation>()
-    .AddScoped<SemesterValidation>();
+    .AddScoped<SemesterValidation>()
+    .AddScoped<CourseTakenByValidation>();
 #endregion
 
 WebApplication app = builder.Build();

@@ -67,7 +67,7 @@ namespace CompanionApp.Controllers
             }
             catch (FollowingAlreadyExistsException ex)
             {
-                return BadRequest(ex.Message);
+                return Conflict(ex.Message);
             }
             catch (Exception)
             {

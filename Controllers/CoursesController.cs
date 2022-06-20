@@ -1,8 +1,8 @@
-﻿using CompanionApp.ModelsDTO;
+﻿using FluentValidation;
+using CompanionApp.ModelsDTO;
 using Microsoft.AspNetCore.Mvc;
 using CompanionApp.Services.Contracts;
 using CompanionApp.Exceptions.CourseExceptions;
-
 
 namespace CompanionApp.Controllers
 {
@@ -58,7 +58,7 @@ namespace CompanionApp.Controllers
                 await _courseService.EditCourseAsync(id, course);
                 return NoContent();
             }
-            catch (Exception ex) when (ex is ArgumentException || ex is CourseCommandException)
+            catch (Exception ex) when (ex is ArgumentException || ex is ValidationException)
             {
                 return BadRequest(ex.Message);
             }
@@ -72,7 +72,6 @@ namespace CompanionApp.Controllers
             }
 
         }
-
         
         [HttpPost("single")]
         public async Task<ActionResult<CourseDTO>>              PostCourse  (CourseDTO course)
@@ -82,9 +81,13 @@ namespace CompanionApp.Controllers
                 CourseDTO newCourse = await _courseService.AddCourseAsync(course);
                 return CreatedAtAction("GetCourse", new { id = newCourse.Crn }, newCourse);
             }
-            catch (Exception ex) when (ex is CourseAlreadyExistsException || ex is CourseCommandException)
+            catch (ValidationException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(ex.Errors.Select(x => x.ErrorMessage));
+            }
+            catch(CourseAlreadyExistsException ex)
+            {
+                return Conflict(ex.Message);
             }
             catch (Exception)
             {

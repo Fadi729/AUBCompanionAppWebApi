@@ -1,10 +1,8 @@
-﻿using CompanionApp.Exceptions.ProfileExceptions;
-using CompanionApp.Extensions;
-using CompanionApp.Models;
+﻿using FluentValidation;
 using CompanionApp.ModelsDTO;
-using CompanionApp.Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using CompanionApp.Services.Contracts;
+using CompanionApp.Exceptions.ProfileExceptions;
 
 namespace CompanionApp.Controllers
 {
@@ -43,9 +41,13 @@ namespace CompanionApp.Controllers
                 ProfileQueryDTO profileDTO = await _profileService.CreateProfileAsync(profile);
                 return CreatedAtAction("GetProfile", new { id = profileDTO.Id }, profileDTO);
             }
-            catch (Exception ex) when (ex is ProfileAlreadyExistsException || ex is ProfileCommandException)
+            catch (ValidationException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(ex.Errors.Select(x => x.ErrorMessage));
+            }
+            catch(ProfileAlreadyExistsException ex)
+            {
+                return Conflict(ex.Message);
             }
             catch (Exception)
             {
@@ -65,7 +67,7 @@ namespace CompanionApp.Controllers
             {
                 return NotFound(ex.Message);
             }
-            catch (ProfileCommandException ex)
+            catch (ValidationException ex)
             {
                 return BadRequest(ex.Message);
             }

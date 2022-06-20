@@ -9,13 +9,7 @@
     public class LikeDTOUsers
     {
         public virtual ProfileQueryDTO User      { get; set; }
-        public DateTime           DateLiked { get; set; }
-    }
-    public class LikeDTOwObjects
-    {
-        public virtual PostQueryDTO    Post      { get; set; } = null!;
-        public virtual ProfileQueryDTO User      { get; set; } = null!;
-        public DateTime           DateLiked { get; set; }
+        public DateTime                DateLiked { get; set; }
     }
     public class LikePOSTDTO
     {

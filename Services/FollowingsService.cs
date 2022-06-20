@@ -30,17 +30,16 @@ namespace CompanionApp.Services
             }
             IEnumerable<IsFollowingDTO>? isfollowing = await _dbSetFollowing
                 .Include(followings => followings.IsFollowingNavigation)
-                .Where(followings => followings.UserId == userID)
-                .Select(followings => followings.ToIsFollowingDTO())
+                .Where  (followings => followings.UserId == userID)
+                .Select (followings => followings.ToIsFollowingDTO())
                 .ToListAsync();
 
-            if (isfollowing is null)
+            if (!isfollowing.Any())
             {
                 throw new NoFollowingsFoundException();
             }
             return isfollowing;
         }
-
         public async Task<IEnumerable<FollowersDTO>>   GetFollowers  (Guid userID)
         {
             if (!await _dbSetProfile.ProfileExists(userID))
@@ -49,17 +48,16 @@ namespace CompanionApp.Services
             }
             IEnumerable<FollowersDTO>? followers = await _dbSetFollowing
                 .Include(followings => followings.User)
-                .Where(followings => followings.IsFollowing == userID)
-                .Select(followings => followings.ToFollowersDTO())
+                .Where  (followings => followings.IsFollowing == userID)
+                .Select (followings => followings.ToFollowersDTO())
                 .ToListAsync();
 
-            if (followers is null)
+            if (!followers.Any())
             {
                 throw new NoFollowingsFoundException();
             }
             return followers;
         }
-
         public async Task                              Follow        (FollowingPOSTDTO following)
         {
             if (!await _dbSetProfile.ProfileExists(following.UserId))
@@ -85,7 +83,6 @@ namespace CompanionApp.Services
                 throw;
             }
         }
-        
         public async Task                              Unfollow      (FollowingPOSTDTO following)
         {
             if (!await _dbSetProfile.ProfileExists(following.UserId))

@@ -7,7 +7,7 @@ namespace CompanionApp.Validation
     {
         public ProfileValidation()
         {
-            RuleLevelCascadeMode = CascadeMode.Stop;
+            RuleLevelCascadeMode = CascadeMode.Continue;
 
             #region Rules
             #region FirstName Rule

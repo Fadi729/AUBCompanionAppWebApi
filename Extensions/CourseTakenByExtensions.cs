@@ -5,7 +5,7 @@ namespace CompanionApp.Extensions
 {
     public static class CourseTakenByExtensions
     {
-        public static CourseTakenByDTO ToCourseTakenByDTO(this CourseTakenBy courseTakenBy)
+        public static CourseTakenByDTO         ToCourseTakenByDTO        (this CourseTakenBy courseTakenBy)
         {
             return new CourseTakenByDTO
             {
@@ -16,7 +16,7 @@ namespace CompanionApp.Extensions
 
             };
         }
-        public static CourseTakenBy_User_DTO ToCourseTakenBy_User_DTO(this CourseTakenBy courseTakenBy)
+        public static CourseTakenBy_User_DTO   ToCourseTakenBy_User_DTO  (this CourseTakenBy courseTakenBy)
         {
             return new CourseTakenBy_User_DTO
             {
@@ -34,7 +34,7 @@ namespace CompanionApp.Extensions
                 Semester = courseTakenBy.Semester.ToSemesterDTO()
             };
         } 
-        public static CourseTakenBy ToCourseTakenBy(this CourseTakenBy_POST_DTO courseTakenBy)
+        public static CourseTakenBy            ToCourseTakenBy           (this CourseTakenBy_POST_DTO courseTakenBy)
         {
             return new CourseTakenBy
             {

@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using CompanionApp.Models;
-using CompanionApp.ModelsDTO;
-using CompanionApp.Extensions;
+﻿using CompanionApp.ModelsDTO;
+using Microsoft.AspNetCore.Mvc;
+using CompanionApp.Services.Contracts;
+using CompanionApp.Exceptions.PostExceptions;
+using CompanionApp.Exceptions.LikesExceptions;
+using CompanionApp.Exceptions.ProfileExceptions;
 
 namespace CompanionApp.Controllers
 {
@@ -10,151 +11,89 @@ namespace CompanionApp.Controllers
     [ApiController]
     public class LikesController : ControllerBase
     {
-         readonly CompanionAppDBContext _context;
+        readonly ILikesService _likeService;
 
-        public LikesController(CompanionAppDBContext context)
+        public LikesController(ILikesService likeService)
         {
-            _context = context;
+            _likeService = likeService;
         }
+        
 
-        // GET: api/Likes/5
-        [HttpGet("{postID}/{userID}")]
-        public async Task<ActionResult<LikeDTOwObjects>> GetLike(Guid postID, Guid userID)
-        {
-            var like = await _context.Likes.Include(l => l.Post).Include(l => l.User).Where(l => l.PostId == postID && l.UserId == userID).FirstOrDefaultAsync();
-
-            if (like == null)
-            {
-                return NotFound();
-            }
-
-            return like.ToLikeDTOwObjects();
-        }
-
-        // GET: api/Likes/5
         [HttpGet("{postID}")]
-        public async Task<ActionResult<IEnumerable<LikeDTOUsers>>> GetPostLikes(Guid postID)
+        public async Task<ActionResult<IEnumerable<LikeDTOUsers>>> GetPostLikes       (Guid postID)
         {
-            if (_context.Likes == null)
-            {
-                return Problem("Entity set 'CompanionAppDBContext.Likes'  is null.");
-            }
-
-            if (!PostExists(postID))
-            {
-                return NotFound("Post with id " + postID + " does not exist.");
-            }
-
-            return await _context.Likes.Include(l => l.User).Where(l => l.PostId == postID).Select(l => l.ToLikeDTOUsers()).ToListAsync();
-        }
-
-        // GET: api/Likes/counter/5
-        [HttpGet("counter/{postID}")]
-        public async Task<ActionResult<int>> GetPostLikesCounter(Guid postID)
-        {
-            if (_context.Likes == null)
-            {
-                return Problem("Entity set 'CompanionAppDBContext.Likes'  is null.");
-            }
-
-            if (!PostExists(postID))
-            {
-                return NotFound("Post with id " + postID + " does not exist.");
-            }
-
-            var likes = await _context.Likes.Where(l => l.PostId == postID).Select(l => l.ToLikeDTO()).CountAsync();
-           
-            return likes;
-        }
-
-        // POST api/Likes
-        [HttpPost]
-        public async Task<ActionResult<LikeDTO>> PostLike(LikePOSTDTO like)
-        {
-            if (_context.Likes == null)
-            {
-                return Problem("Entity set 'CompanionAppDBContext.Likes'  is null.");
-            }
-
-            if (!PostExists(like.PostId))
-            {
-                return NotFound("Post with id " + like.PostId + " does not exist.");
-            }
-
-            if (!ProfileExists(like.UserId))
-            {
-                return NotFound("Profile with id " + like.UserId + " does not exist.");
-            }
-
-            Like newlike = like.ToLike();
-            _context.Likes.Add(newlike);
             try
             {
-                await _context.SaveChangesAsync();
+                return Ok(await _likeService.GetPostLikes(postID));
             }
-            catch (DbUpdateException)
+            catch (Exception ex) when (ex is NoLikesFoundException || ex is PostNotFoundException)
             {
-                if (LikeExists(newlike))
-                {
-                    return Conflict("Post already liked.");
-                }
-                else
-                {
-                    throw;
-                }
+                return NotFound(ex.Message);
             }
-
-            return CreatedAtAction("GetLike", new { postID = newlike.PostId, userID = newlike  }, newlike.ToLikeDTO());
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        // DELETE: api/Likes/5
+
+        [HttpGet("counter/{postID}")]
+        public async Task<ActionResult<int>>                       GetPostLikesCounter(Guid postID)
+        {
+            try
+            {
+                return Ok(await _likeService.GetPostLikesCount(postID));
+            }
+            catch (Exception ex) when (ex is NoLikesFoundException || ex is PostNotFoundException)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+
+        [HttpPost]
+        public async Task<ActionResult<LikeDTO>>                   PostLike           (LikePOSTDTO like)
+        {
+            try
+            {
+                LikeDTO newlike = await _likeService.LikePost(like);
+                return newlike;
+            }
+            catch (Exception ex) when (ex is ProfileNotFoundException || ex is PostNotFoundException)
+            {
+                return NotFound(ex.Message);
+            }
+            catch(ProfileAlreadyLikedPostException ex)
+            {
+                return Conflict(ex.Message);
+            }
+            catch(Exception)
+            {
+                throw;
+            }
+        }
+
+
         [HttpDelete("{postID}/{userID}")]
-        public async Task<IActionResult> DeleteLike(Guid postID, Guid userID)
+        public async Task<IActionResult>                           DeleteLike         (Guid postID, Guid userID)
         {
-            if (_context.Likes == null)
+            try
             {
-                return Problem("Entity set 'CompanionAppDBContext.Likes'  is null.");
+                await _likeService.UnlikePost(postID, userID);
+                return NoContent();
             }
-
-            if (!PostExists(postID))
+            catch (Exception ex) when (ex is ProfileNotFoundException || ex is PostNotFoundException || ex is LikeNotFoundException)
             {
-                return NotFound("Post with id " + postID + " does not exist.");
+                return NotFound(ex.Message);
             }
-
-            if (!ProfileExists(userID))
+            catch (Exception)
             {
-                return NotFound("Profile with id " + userID + " does not exist.");
+                throw;
             }
-
-            var like = await _context.Likes.FirstOrDefaultAsync(l => l.PostId == postID && l.UserId == userID);
-
-            if (like == null)
-            {
-                return NotFound("Like with postID " + postID + " and userID " + userID + " does not exist.");
-            }
-
-            if (like.UserId != userID)
-            {
-                return Unauthorized();
-            }
-
-            _context.Likes.Remove(like);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-         bool PostExists(Guid id)
-        {
-            return _context.Posts.Any(e => e.Id == id);
-        }
-         bool ProfileExists(Guid id)
-        {
-            return _context.Profiles.Any(e => e.Id == id);
-        }
-         bool LikeExists(Like newlike)
-        {
-            return _context.Likes.Any(e => e.PostId == newlike.PostId && e.UserId == newlike.UserId);
         }
     }
 }

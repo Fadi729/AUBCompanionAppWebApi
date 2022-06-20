@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using CompanionApp.Models;
+﻿using FluentValidation;
 using CompanionApp.ModelsDTO;
-using CompanionApp.Extensions;
+using Microsoft.AspNetCore.Mvc;
+using CompanionApp.Services.Contracts;
+using CompanionApp.Exceptions.CourseExceptions;
+using CompanionApp.Exceptions.ProfileExceptions;
+using CompanionApp.Exceptions.SemesterExceptions;
+using CompanionApp.Exceptions.CourseTakenByExceptions;
 
 namespace CompanionApp.Controllers
 {
@@ -10,179 +13,131 @@ namespace CompanionApp.Controllers
     [ApiController]
     public class CourseTakenByController : ControllerBase
     {
-         readonly CompanionAppDBContext _context;
+        readonly ICourseTakenByService _courseTakenByService;
 
-        public CourseTakenByController(CompanionAppDBContext context)
+        public CourseTakenByController(ICourseTakenByService CourseTakenByService)
         {
-            _context = context;
+            _courseTakenByService = CourseTakenByService;
         }
 
-        // GET: api/CourseTakenBy
-        [HttpGet("{userID}/{crn}/{semesterID}")]
-        public async Task<ActionResult<CourseTakenByDTO>> GetCoursesTakenBy(Guid userID, int crn, string semesterID)
-        {
-            if (_context.CourseTakenBy == null)
-            {
-                return Problem("Entity set 'CompanionAppDBContext.CourseTakenBy'  is null.");
-            }
-
-            if (!ProfileExists(userID))
-            {
-                return NotFound("Profile Not Found");
-            }
-
-            if (!CourseExists(crn))
-            {
-                return NotFound("Course Not Found");
-            }
-
-            if (!SemesterExists(semesterID))
-            {
-                return NotFound("Semester Not Found");
-            }
-
-            return await _context.CourseTakenBy.Include(c => c.CCrnNavigation).Include(y => y.Semester).Include(w => w.User)
-                .Where(x => x.UserId == userID && x.CCrn == crn && x.SemesterId == semesterID).Select(x => x.ToCourseTakenByDTO()).FirstOrDefaultAsync();
-        }
-
-        // GET: api/CourseTakenBy/user/5
+        
         [HttpGet("user/{userID}")]
-        public async Task<ActionResult<IEnumerable<CourseTakenBy_User_DTO>>> GetCoursesTakenByUser(Guid userID)
+        public async Task<ActionResult<IEnumerable<CourseTakenBy_User_DTO>>>   GetCoursesTakenByUser          (Guid userID)
         {
-            if (_context.CourseTakenBy == null)
-            {
-                return Problem("Entity set 'CompanionAppDBContext.CourseTakenBy'  is null.");
-            }
-
-            if (!ProfileExists(userID))
-            {
-                return NotFound("Profile with id " + userID + " does not exist.");
-            }
-
-            return await _context.CourseTakenBy.Include(c => c.CCrnNavigation).Include(y => y.Semester).Where(x => x.UserId == userID).Select(x => x.ToCourseTakenBy_User_DTO()).ToListAsync();
-        }
-
-        // GET: api/CourseTakenBy/course/
-        [HttpGet("course/{crn}")]
-        public async Task<ActionResult<IEnumerable<CourseTakenBy_Course_DTO>>> GetUserTakingCourse(int crn)
-        {
-            if (_context.CourseTakenBy == null)
-            {
-                return Problem("Entity set 'CompanionAppDBContext.CourseTakenBy'  is null.");
-            }
-
-            if (!CourseExists(crn))
-            {
-                return NotFound("Course with id " + crn + " does not exist.");
-            }
-
-            return await _context.CourseTakenBy.Include(c => c.User).Include(y => y.Semester).Where(x => x.CCrn == crn).Select(x => x.ToCourseTakenBy_Course_DTO()).ToListAsync();
-        }
-
-        //POST: api/CoursesTakenBy/user
-        [HttpPost]
-        public async Task<ActionResult<CourseTakenBy_User_DTO>> PostUserTakingCourse(CourseTakenBy_POST_DTO courseTakenBy)
-        {
-            if (_context.CourseTakenBy == null)
-            {
-                return Problem("Entity set 'CompanionAppDBContext.CourseTakenBy'  is null.");
-            }
-
-            if (!ProfileExists(courseTakenBy.UserId))
-            {
-                return NotFound("Profile Not Found");
-            }
-
-            if (!CourseExists(courseTakenBy.CCrn))
-            {
-                return NotFound("Course Not Found");
-            }
-
-            if (!SemesterExists(courseTakenBy.SemesterId))
-            {
-                return NotFound("Semester Not Found");
-            }
-
-            CourseTakenBy newCourseTakenBy = courseTakenBy.ToCourseTakenBy();
-
-            _context.CourseTakenBy.Add(newCourseTakenBy);
-
             try
             {
-                await _context.SaveChangesAsync();
+                return Ok(await _courseTakenByService.GetCoursesTakenByUser(userID));
             }
-            catch (DbUpdateException)
+            catch (NoCoursesTakenByUserException ex)
             {
-                if (ProfileTookCourse(newCourseTakenBy.UserId, newCourseTakenBy.CCrn, newCourseTakenBy.SemesterId))
-                {
-                    return Conflict("Profile Already Took The Course");
-                }
-                else
-                {
-                    throw;
-                }
+                return NotFound(ex);
             }
-
-            return CreatedAtAction("GetCoursesTakenBy", new { userID = courseTakenBy.UserId, crn = courseTakenBy.CCrn, semesterID = courseTakenBy.SemesterId }, courseTakenBy);
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+        
+        
+        [HttpGet("user/{userID}/semester/{semesterID}")]
+        public async Task<ActionResult<IEnumerable<CourseTakenBy_User_DTO>>>   GetCoursesTakenByUserInSemester(Guid userID, string semesterID)
+        {
+            try
+            {
+                return Ok(
+                    await _courseTakenByService.GetCoursesTakenByUserInSemester(userID, semesterID)
+                );
+            }
+            catch (Exception ex)
+                when (ex is NoCoursesTakenByUserException
+                    || ex is ProfileNotFoundException
+                    || ex is SemesterNotFoundException
+                )
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        // DELETE: api/CoursesTakenBy/5/6/7
+        
+        [HttpGet("course/{crn}")]
+        public async Task<ActionResult<IEnumerable<CourseTakenBy_Course_DTO>>> GetUsersTakingCourse           (int crn)
+        {
+            try
+            {
+                return Ok(await _courseTakenByService.GetUsersTakingCourse(crn));
+            }
+            catch (Exception ex)
+                when (ex is CourseNotTakenByAnyUserException || ex is CourseNotFoundException)
+            {
+                return NotFound(ex);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        
+        [HttpPost]
+        public async Task<ActionResult<CourseTakenBy_POST_DTO>>                PostUserTakingCourse           (CourseTakenBy_POST_DTO courseTakenBy)
+        {
+            try
+            {
+                CourseTakenBy_POST_DTO courseTakenBy_Post_DTO =
+                    await _courseTakenByService.AddCourseToUser(courseTakenBy);
+
+                return courseTakenBy_Post_DTO;
+                
+            }
+            catch (Exception ex)
+                when (ex is ProfileNotFoundException
+                    || ex is CourseNotFoundException
+                    || ex is SemesterNotFoundException
+                    || ex is CourseNotGivenInSemesterException
+                )
+            {
+                return NotFound(ex.Message);
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(ex.Errors.Select(x => x.ErrorMessage));
+            }
+            catch(CourseAlreadyTakenByUserException ex)
+            {
+                return Conflict(ex.Message);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        
         [HttpDelete("{userID}/{crn}/{semesterID}")]
-        public async Task<ActionResult<CourseTakenByDTO>> DeleteCoursesTakenBy(Guid userID, int crn, string semesterID)
+        public async Task<ActionResult<CourseTakenByDTO>>                      DeleteCoursesTakenBy           (Guid userID,int crn, string semesterID)
         {
-            if (_context.CourseTakenBy == null)
+            try
             {
-                return Problem("Entity set 'CompanionAppDBContext.CourseTakenBy'  is null.");
+                await _courseTakenByService.DeleteCoursesTakenByUser(userID, crn, semesterID);
+                return NoContent();
             }
-
-            if (!ProfileExists(userID))
+            catch (Exception ex)
+                when (ex is ProfileNotFoundException
+                   || ex is CourseNotFoundException
+                   || ex is SemesterNotFoundException
+                   || ex is CourseNotTakenByUserException
+                )
             {
-                return NotFound("Profile Not Found");
+                return NotFound(ex);
             }
-
-            if (!CourseExists(crn))
+            catch (Exception)
             {
-                return NotFound("Course Not Found");
+                throw;
             }
-
-            if (!SemesterExists(semesterID))
-            {
-                return NotFound("Semester Not Found");
-            }
-
-            var courseTakenBy = await _context.CourseTakenBy.FindAsync(userID, crn, semesterID);
-
-            if (courseTakenBy == null)
-            {
-                return NotFound("Profile Did Not Take The Course");
-            }
-
-            if (courseTakenBy.UserId != userID)
-            {
-                return Unauthorized();
-            }
-
-            _context.CourseTakenBy.Remove(courseTakenBy);
-            await _context.SaveChangesAsync();
-            return NoContent();
         }
-
-         bool ProfileExists(Guid id)
-        {
-            return _context.Profiles.Any(e => e.Id == id);
-        }
-         bool CourseExists(int crn)
-        {
-            return _context.Courses.Any(e => e.Crn == crn);
-        }
-         bool SemesterExists(string id)
-        {
-            return _context.Semesters.Any(e => e.Id == id);
-        }
-         bool ProfileTookCourse(Guid userID, int crn, string semesterID)
-        {
-            return _context.CourseTakenBy.Any(e => e.UserId == userID && e.CCrn == crn && e.SemesterId == semesterID);
-        }
-
     }
 }

@@ -7,7 +7,7 @@ namespace CompanionApp.Validation
     {
         public CourseValidation()
         {
-            RuleLevelCascadeMode = CascadeMode.Stop;
+            RuleLevelCascadeMode = CascadeMode.Continue;
 
             #region Rules
             #region CRN Rule

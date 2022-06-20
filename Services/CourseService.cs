@@ -24,12 +24,12 @@ namespace CompanionApp.Services
 
         public async Task<IEnumerable<CourseDTO>> GetAllCoursesAsync()
         {
-            IEnumerable<CourseDTO> courseDTOs = await _dbSet.Select(c => c.ToCourseDTO()).ToListAsync();
-            if (courseDTOs is null)
+            IEnumerable<CourseDTO> coursesDTOs = await _dbSet.Select(c => c.ToCourseDTO()).ToListAsync();
+            if (!coursesDTOs.Any())
             {
                 throw new NoCoursesFoundException();
             }
-            return courseDTOs;
+            return coursesDTOs;
         }
         public async Task<CourseDTO>              GetCourseAsync    (int crn)
         {
@@ -56,10 +56,6 @@ namespace CompanionApp.Services
             catch(UniqueConstraintException)
             {
                 throw new CourseAlreadyExistsException();
-            }
-            catch (ValidationException ex)
-            {
-                throw new CourseCommandException(ex.Errors.FirstOrDefault()!.ErrorMessage);
             }
             #endregion
         }
@@ -97,30 +93,20 @@ namespace CompanionApp.Services
         }
         public async Task                         EditCourseAsync   (int crn, CourseDTO course)
         {
-            #region try   block
-            try
-            {
-                if (crn != course.Crn)
+            
+            if (crn != course.Crn)
                 {
                     throw new ArgumentException("crn and course.crn must match");
                 }
-
-                if (!await _dbSet.CourseExists(crn))
+            if (!await _dbSet.CourseExists(crn))
                 {
                     throw new CourseNotFoundException();
                 }
 
-                await _courseValidation.ValidateAndThrowAsync(course);
-                _dbSet.Update(course.ToCourse());
-                await _context.SaveChangesAsync();
-            }
-            #endregion
-            #region catch block
-            catch (ValidationException ex)
-            {
-                throw new CourseCommandException(ex.Errors.FirstOrDefault()!.ErrorMessage);
-            }
-            #endregion
+            await _courseValidation.ValidateAndThrowAsync(course);
+            _dbSet.Update(course.ToCourse());
+            await _context.SaveChangesAsync();
+            
         }
         public async Task                         DeleteCourseAsync (int crn)
         {
