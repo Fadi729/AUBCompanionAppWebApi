@@ -93,12 +93,11 @@ namespace CompanionApp.Services
         }
         public async Task                         EditCourseAsync   (int crn, CourseDTO course)
         {
-            
-            if (crn != course.Crn)
-                {
-                    throw new ArgumentException("crn and course.crn must match");
-                }
-            if (!await _dbSet.CourseExists(crn))
+            if (crn != int.Parse(course.Crn))
+            {
+                throw new ArgumentException("crn and course.crn must match");
+            }
+            if (!await _dbSet.CourseExists(crn.ToString()))
                 {
                     throw new CourseNotFoundException();
                 }
@@ -112,7 +111,7 @@ namespace CompanionApp.Services
         {
             try
             {
-                if (!await _dbSet.CourseExists(crn))
+                if (!await _dbSet.CourseExists(crn.ToString()))
                 {
                     throw new CourseNotFoundException();
                 }

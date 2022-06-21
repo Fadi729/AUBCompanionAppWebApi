@@ -2,6 +2,8 @@
 {
     public class FollowingNotFoundException : Exception
     {
+        public int ErrorCode { get; } = 404;
+        
         readonly static string defaultErrorMessage = "Following Not Found.";
 
         public FollowingNotFoundException() : base(defaultErrorMessage) { }

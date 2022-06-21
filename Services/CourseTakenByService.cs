@@ -34,7 +34,7 @@ namespace CompanionApp.Services
 
         public async Task<IEnumerable<CourseTakenBy_Course_DTO>> GetUsersTakingCourse           (int crn)
         {
-            if (!await _dbSetCourse.CourseExists(crn))
+            if (!await _dbSetCourse.CourseExists(crn.ToString()))
             {
                 throw new CourseNotFoundException();
             }
@@ -139,7 +139,7 @@ namespace CompanionApp.Services
             {
                 throw new ProfileNotFoundException();
             }
-            if (!await _dbSetCourse.CourseExists(crn))
+            if (!await _dbSetCourse.CourseExists(crn.ToString()))
             {
                 throw new CourseNotFoundException();
             }

@@ -2,6 +2,8 @@
 {
     public class CourseNotFoundException : Exception
     {
+        public int ErrorCode { get; } = 404;
+        
         readonly static string defaultErrorMessage = "Course Not Found.";
         public CourseNotFoundException() : base(defaultErrorMessage) { }
         public CourseNotFoundException(string message) : base(message) { }

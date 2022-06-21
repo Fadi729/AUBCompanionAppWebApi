@@ -2,6 +2,8 @@
 {
     public class CommentNotFoundException : Exception
     {
+        public int ErrorCode { get; } = 404;
+
         readonly static string defaultErrorMessage = "Comment Not Found.";
 
         public CommentNotFoundException() : base(defaultErrorMessage) { }

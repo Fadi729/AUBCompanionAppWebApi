@@ -2,6 +2,8 @@
 {
     public class ProfileAlreadyLikedPostException : Exception
     {
+        public int ErrorCode { get; } = 409;
+        
         readonly static string defaultErrorMessage = "Profile Already Liked This Post.";
 
         public ProfileAlreadyLikedPostException() : base(defaultErrorMessage) { }

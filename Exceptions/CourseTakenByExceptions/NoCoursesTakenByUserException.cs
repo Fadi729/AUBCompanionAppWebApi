@@ -2,16 +2,12 @@
 {
     public class NoCoursesTakenByUserException : Exception
     {
-        public NoCoursesTakenByUserException()
-        {
-        }
+        public int ErrorCode { get; } = 404;
 
-        public NoCoursesTakenByUserException(string? message) : base(message)
-        {
-        }
-
-        public NoCoursesTakenByUserException(string? message, Exception? innerException) : base(message, innerException)
-        {
-        }
+        readonly static string _defaultErrorMessage = "No Courses Taken By User";
+        public NoCoursesTakenByUserException() : base(_defaultErrorMessage) { }
+        public NoCoursesTakenByUserException(string? message) : base(message) { }
+        public NoCoursesTakenByUserException(string? message, Exception? innerException)
+            : base(message, innerException) { }
     }
 }

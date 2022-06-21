@@ -2,11 +2,11 @@
 {
     public class CourseDTO
     {
-        public int     Crn             { get; set; }
+        public string  Crn             { get; set; } = null!;
         public string  Title           { get; set; } = null!;
         public string  Subject         { get; set; } = null!;
         public string  Code            { get; set; } = null!;
-        public byte    Credits         { get; set; }
+        public string? Credits         { get; set; }
         public string? Section         { get; set; }
         public string? Attribute       { get; set; }
         public string? Levels          { get; set; }

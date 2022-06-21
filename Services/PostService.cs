@@ -79,7 +79,7 @@ namespace CompanionApp.Services
         {
             try
             {
-                if (!await _dbSet.PostExists(id))
+                if (!await _dbSet.PostExists(id.ToString()))
                 {
                     throw new PostNotFoundException();
                 }
@@ -93,7 +93,7 @@ namespace CompanionApp.Services
         }
         public async Task                              DeletePostAsync              (Guid id, Guid userId)
         {
-            if (!await _dbSet.PostExists(id))
+            if (!await _dbSet.PostExists(id.ToString()))
             {
                 throw new PostNotFoundException();
             }

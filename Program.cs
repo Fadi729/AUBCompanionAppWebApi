@@ -4,8 +4,12 @@ using CompanionApp.Validation;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using CompanionApp.Services.Contracts;
+using CompanionApp.Exceptions.ExceptionMiddlewareNS;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+
+
 
 // Add services to the container.
 builder.Services
@@ -67,6 +71,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseHttpsRedirection();
 

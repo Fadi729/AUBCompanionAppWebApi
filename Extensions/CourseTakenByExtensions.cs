@@ -38,8 +38,8 @@ namespace CompanionApp.Extensions
         {
             return new CourseTakenBy
             {
-                UserId     = courseTakenBy.UserId,
-                CCrn       = courseTakenBy.CCrn,
+                UserId     = Guid.Parse(courseTakenBy.UserId.Trim()),
+                CCrn       = int.Parse(courseTakenBy.CCrn.Trim()),
                 SemesterId = courseTakenBy.SemesterId,
                 Grade      = courseTakenBy.Grade
             };

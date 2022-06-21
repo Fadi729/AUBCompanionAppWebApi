@@ -2,6 +2,8 @@
 {
     public class CourseNotTakenByUserException : Exception
     {
+        public int ErrorCode { get; } = 404;
+        
         readonly static string defaultErrorMessage = "Course Is Not Taken By User.";
 
         public CourseNotTakenByUserException() : base(defaultErrorMessage) { }

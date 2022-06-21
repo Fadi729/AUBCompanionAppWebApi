@@ -21,8 +21,8 @@
     }
     public class CourseTakenBy_POST_DTO
     {
-        public Guid    UserId     { get; set; }
-        public int     CCrn       { get; set; }
+        public string  UserId     { get; set; } = null!;
+        public string  CCrn       { get; set; } = null!;
         public string  SemesterId { get; set; } = null!;
         public string? Grade      { get; set; }
     }

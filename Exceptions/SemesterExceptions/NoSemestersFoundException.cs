@@ -2,6 +2,8 @@
 {
     public class NoSemestersFoundException : Exception
     {
+        public int ErrorCode { get; } = 404;
+        
         readonly static string defaultErrorMessage = "No Semesters Found.";
 
         public NoSemestersFoundException() : base(defaultErrorMessage) { }

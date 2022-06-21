@@ -2,6 +2,8 @@
 {
     public class LikeNotFoundException : Exception
     {
+        public int ErrorCode { get; } = 404;        
+        
         readonly static string defaultErrorMessage = "Like Not Found.";
 
         public LikeNotFoundException() : base(defaultErrorMessage) { }

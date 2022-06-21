@@ -2,6 +2,8 @@
 {
     public class PostNotFoundException : Exception
     {
+        public int ErrorCode { get; } = 404;
+        
         readonly static string defaultErrorMessage = "Post Not Found.";
 
         public PostNotFoundException() : base(defaultErrorMessage) { }

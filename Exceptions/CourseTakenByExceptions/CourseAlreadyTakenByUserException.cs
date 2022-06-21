@@ -2,6 +2,8 @@
 {
     public class CourseAlreadyTakenByUserException : Exception
     {
+        public int ErrorCode { get; } = 409;
+        
         readonly static string defaultErrorMessage = "Course Is Already Taken By User.";
 
         public CourseAlreadyTakenByUserException() : base(defaultErrorMessage) { }

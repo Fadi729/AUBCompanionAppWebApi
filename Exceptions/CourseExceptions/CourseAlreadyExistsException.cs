@@ -2,6 +2,8 @@
 {
     public class CourseAlreadyExistsException : Exception
     {
+        public int ErrorCode { get; } = 409;
+
         readonly static string defaultErrorMessage = "Course Already Exists.";
 
         public CourseAlreadyExistsException() : base(defaultErrorMessage) { }

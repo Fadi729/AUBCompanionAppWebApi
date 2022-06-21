@@ -13,7 +13,7 @@
     }
     public class LikePOSTDTO
     {
-        public Guid PostId { get; set; }
-        public Guid UserId { get; set; }
+        public string PostId { get; set; } = null!;
+        public string UserId { get; set; } = null!;
     }
 }

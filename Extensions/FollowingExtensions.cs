@@ -27,8 +27,8 @@ namespace CompanionApp.Extensions
         {
             return new Following
             {
-                UserId       = following.UserId,
-                IsFollowing  = following.IsFollowing,
+                UserId       = Guid.Parse(following.UserId),
+                IsFollowing  = Guid.Parse(following.IsFollowing),
                 DateFollowed = DateTime.Now,
             };
         }

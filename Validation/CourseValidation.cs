@@ -7,12 +7,12 @@ namespace CompanionApp.Validation
     {
         public CourseValidation()
         {
-            RuleLevelCascadeMode = CascadeMode.Continue;
+            RuleLevelCascadeMode = CascadeMode.Stop;
 
             #region Rules
             #region CRN Rule
             RuleFor(course => course.Crn)
-                    .Must       (Crn => Crn != 0)
+                    .NotEmpty()
                     .WithMessage("CRN is invalid.")
                     .NotEmpty   ()
                     .WithMessage("CRN is required.")

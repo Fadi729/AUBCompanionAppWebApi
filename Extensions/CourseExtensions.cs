@@ -9,11 +9,11 @@ namespace CompanionApp.Extensions
         {
             return new CourseDTO
             {
-                Crn             = course.Crn,
+                Crn             = course.Crn.ToString(),
                 Title           = course.Title,
                 Subject         = course.Subject,
                 Code            = course.Code,
-                Credits         = course.Credits,
+                Credits         = course.Credits.ToString(),
                 Attribute       = course.Attribute,
                 Levels          = course.Levels,
                 SemesterId      = course.SemesterId,
@@ -43,11 +43,11 @@ namespace CompanionApp.Extensions
         {
             return new Course
             {
-                Crn             = courseDTO.Crn,
+                Crn             = int.Parse(courseDTO.Crn),
                 Title           = courseDTO.Title,
                 Subject         = courseDTO.Subject,
                 Code            = courseDTO.Code,
-                Credits         = courseDTO.Credits,
+                Credits         = courseDTO.Credits.Equals(string.Empty) ? byte.MinValue : byte.Parse(courseDTO.Credits),
                 Attribute       = courseDTO.Attribute,
                 Levels          = courseDTO.Levels,
                 Section         = courseDTO.Section,

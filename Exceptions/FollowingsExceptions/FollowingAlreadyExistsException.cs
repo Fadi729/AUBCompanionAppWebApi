@@ -2,6 +2,8 @@
 {
     public class FollowingAlreadyExistsException : Exception
     {
+        public int ErrorCode { get; } = 409;
+        
         readonly static string _defaultErrorMessage = "Following Already Exists";
 
         public FollowingAlreadyExistsException() : base(_defaultErrorMessage) { }

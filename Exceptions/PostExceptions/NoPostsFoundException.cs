@@ -2,6 +2,8 @@
 {
     public class NoPostsFoundException : Exception
     {
+        public int ErrorCode { get; } = 404;
+        
         readonly static string defuautErrorMessage = "No Posts Found.";
 
         public NoPostsFoundException() : base(defuautErrorMessage) { }

@@ -27,7 +27,7 @@ namespace CompanionApp.Services
 
         public async Task<IEnumerable<LikeDTOUsers>> GetPostLikes     (Guid postID)
         {
-            if (!await _dbSetPost.PostExists(postID))
+            if (!await _dbSetPost.PostExists(postID.ToString()))
             {
                 throw new PostNotFoundException();
             }
@@ -46,7 +46,7 @@ namespace CompanionApp.Services
         }
         public async Task<int>                       GetPostLikesCount(Guid postID)
         {
-            if (!await _dbSetPost.PostExists(postID))
+            if (!await _dbSetPost.PostExists(postID.ToString()))
             {
                 throw new PostNotFoundException();
             }
@@ -87,7 +87,7 @@ namespace CompanionApp.Services
         }
         public async Task                            UnlikePost       (Guid postID, Guid userID)
         {
-            if (!await _dbSetPost.PostExists(postID))
+            if (!await _dbSetPost.PostExists(postID.ToString()))
             {
                 throw new PostNotFoundException();
             }

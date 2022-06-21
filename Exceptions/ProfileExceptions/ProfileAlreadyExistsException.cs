@@ -2,6 +2,8 @@
 {
     public class ProfileAlreadyExistsException : Exception
     {
+        public static int ErrorCode { get; } = 409;
+        
         readonly static string defaultErrorMessage = "Profile Already Exists.";
         public ProfileAlreadyExistsException() : base(defaultErrorMessage) { }
         public ProfileAlreadyExistsException(string message) : base(message) { }

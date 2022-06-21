@@ -37,7 +37,7 @@ namespace CompanionApp.Services
         }
         public async Task<IEnumerable<CommentQueryDTO>> GetPostComments     (Guid postID)
         {
-            if (!await _dbSetPost.PostExists(postID))
+            if (!await _dbSetPost.PostExists(postID.ToString()))
             {
                 throw new PostNotFoundException();
             }
@@ -60,7 +60,7 @@ namespace CompanionApp.Services
         }
         public async Task<CommentQueryDTO>              AddComment          (Guid postID, Guid userID, CommentCommandDTO comment)
         {
-            if (!await _dbSetPost.PostExists(postID))
+            if (!await _dbSetPost.PostExists(postID.ToString()))
             {
                 throw new PostNotFoundException();
             }
@@ -80,7 +80,7 @@ namespace CompanionApp.Services
             {
                 throw new CommentNotFoundException();
             }
-            if (!await _dbSetPost.PostExists(postID))
+            if (!await _dbSetPost.PostExists(postID.ToString()))
             {
                 throw new PostNotFoundException();
             }

@@ -2,7 +2,9 @@
 {
     public class CourseNotTakenByAnyUserException : Exception
     {
-        readonly static string? defaultErrorMessage = "Course Is Not Taken By Any User.";
+        public int ErrorCode { get; } = 404;
+        
+        readonly static string defaultErrorMessage = "Course Is Not Taken By Any User.";
 
         public CourseNotTakenByAnyUserException() : base(defaultErrorMessage) { }
         public CourseNotTakenByAnyUserException(string? message) : base(message) { }

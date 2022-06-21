@@ -2,6 +2,8 @@
 {
     public class SemesterAlreadyExistsException : Exception
     {
+        public int ErrorCode { get; } = 409;
+
         readonly static string defaultErrorMessage = "Semester Already Exists.";
 
         public SemesterAlreadyExistsException() : base(defaultErrorMessage) { }

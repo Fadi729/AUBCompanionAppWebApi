@@ -2,6 +2,8 @@
 {
     public class CourseNotGivenInSemesterException : Exception
     {
+        public int ErrorCode { get; } = 404;
+        
         readonly static string defaultErrorMessage = "Course Not Given In Semester.";
 
         public CourseNotGivenInSemesterException() : base(defaultErrorMessage) { }

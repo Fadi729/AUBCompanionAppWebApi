@@ -5,7 +5,6 @@ namespace CompanionApp.Extensions
 {
     public static class ProfileExtensions
     {
-        
         public static ProfileQueryDTO ToProfileQuerryDTO(this Profile profile)
         {
             return new ProfileQueryDTO

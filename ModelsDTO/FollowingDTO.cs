@@ -14,7 +14,7 @@
     
     public class FollowingPOSTDTO
     {
-        public Guid UserId      { get; set; }
-        public Guid IsFollowing { get; set; }
+        public string UserId      { get; set; } = null!;
+        public string IsFollowing { get; set; } = null!;
     }
 }

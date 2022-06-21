@@ -1,8 +1,6 @@
-﻿using FluentValidation;
-using CompanionApp.ModelsDTO;
+﻿using CompanionApp.ModelsDTO;
 using Microsoft.AspNetCore.Mvc;
 using CompanionApp.Services.Contracts;
-using CompanionApp.Exceptions.SemesterExceptions;
 
 namespace CompanionApp.Controllers
 {
@@ -17,93 +15,36 @@ namespace CompanionApp.Controllers
             _semesterService = SemesterServcie;
         }
 
- 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<SemesterDTO>>> GetSemesters  ()
         {
-            try
-            {
-                return Ok(await _semesterService.GetSemestersAsync());
-            }
-            catch (NoSemestersFoundException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            return Ok(await _semesterService.GetSemestersAsync());
         }
-
+        
         [HttpGet("{id}")]
         public async Task<ActionResult<SemesterDTO>>              GetSemester   (string id)
         {
-            try
-            {
-                return Ok(await _semesterService.GetSemesterAsync(id));
-            }
-            catch (SemesterNotFoundException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            return Ok(await _semesterService.GetSemesterAsync(id));
         }
-
+        
         [HttpPost("single")]
         public async Task<ActionResult<SemesterDTO>>              PostSemester  (SemesterDTO semesterDTO)
         {
-            try
-            {
-                await _semesterService.AddSemesterAsync(semesterDTO);
-                return CreatedAtAction("GetSemester", new { id = semesterDTO.Id }, semesterDTO);
-            }
-            catch (ValidationException ex)
-            {
-                return BadRequest(ex.Errors.Select(x => x.ErrorMessage));
-            }
-            catch (SemesterAlreadyExistsException ex)
-            {
-                return Conflict(ex.Message);
-            }
-            catch(Exception)
-            {
-                throw;
-            }
-
+            await _semesterService.AddSemesterAsync(semesterDTO);
+            return CreatedAtAction("GetSemester", new { id = semesterDTO.Id }, semesterDTO);
         }
-
+        
         [HttpPost("many")]
         public async Task<ActionResult<SemesterDTO>>              PostSemesters (IEnumerable<SemesterDTO> semesters)
         {
-            try
-            {
-                return Ok(await _semesterService.AddSemestersAsync(semesters));
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            return Ok(await _semesterService.AddSemestersAsync(semesters));
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult>                          DeleteSemester(string id)
         {
-            try
-            {
-                await _semesterService.DeleteSemesterAsync(id);
-                return NoContent();
-            }
-            catch(SemesterNotFoundException ex)
-            {
-                return NotFound(ex);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            await _semesterService.DeleteSemesterAsync(id);
+            return NoContent();
         }
     }
 }

@@ -34,8 +34,8 @@ namespace CompanionApp.Extensions
         {
             return new Like
             {
-                UserId    = like.UserId,
-                PostId    = like.PostId,
+                UserId    = Guid.Parse(like.UserId),
+                PostId    = Guid.Parse(like.PostId),
                 DateLiked = DateTime.Now
             };
         }
