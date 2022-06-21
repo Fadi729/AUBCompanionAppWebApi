@@ -33,13 +33,13 @@ namespace CompanionApp.Services
         {
             return await _dbSet.AnyAsync(post => post.Id.ToString().Equals(postID));
         }
-        public static async Task<bool> CommentExists        (this DbSet<Comment>       _dbset, Guid commentID)
+        public static async Task<bool> CommentExists        (this DbSet<Comment>       _dbset, string commentID)
         {
-            return await _dbset.AnyAsync(comment => comment.Id == commentID);
+            return await _dbset.AnyAsync(comment => comment.Id.ToString().Equals(commentID));
         }
-        public static async Task<bool> LikeExists           (this DbSet<Like>          _dbset, Guid postID, Guid userID)
+        public static async Task<bool> LikeExists           (this DbSet<Like>          _dbset, string postID, string userID)
         {
-            return await _dbset.AnyAsync(e => e.PostId == postID && e.UserId == userID);
+            return await _dbset.AnyAsync(like => like.PostId.ToString().Equals(postID) && like.UserId.ToString().Equals(userID));
         }
         public static async Task<bool> FollowingExists      (this DbSet<Following>     _dbset, string userID, string followingID)
         {

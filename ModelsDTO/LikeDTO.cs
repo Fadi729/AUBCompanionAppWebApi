@@ -8,8 +8,8 @@
     }
     public class LikeDTOUsers
     {
-        public virtual ProfileQueryDTO User      { get; set; }
-        public DateTime                DateLiked { get; set; }
+        public virtual ProfileQueryDTO? User      { get; set; }
+        public DateTime                 DateLiked { get; set; }
     }
     public class LikePOSTDTO
     {

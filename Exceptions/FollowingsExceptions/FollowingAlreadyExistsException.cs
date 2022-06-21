@@ -4,9 +4,9 @@
     {
         public int ErrorCode { get; } = 409;
         
-        readonly static string _defaultErrorMessage = "Following Already Exists";
+        readonly static string __defaultErrorMessage = "Following Already Exists";
 
-        public FollowingAlreadyExistsException() : base(_defaultErrorMessage) { }
+        public FollowingAlreadyExistsException() : base(__defaultErrorMessage) { }
         public FollowingAlreadyExistsException(string? message) : base(message) { }
         public FollowingAlreadyExistsException(string? message, Exception? innerException)
             : base(message, innerException) { }

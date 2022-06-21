@@ -1,20 +1,26 @@
-﻿using CompanionApp.Models;
+﻿using FluentValidation;
+using CompanionApp.Models;
 using CompanionApp.ModelsDTO;
 using CompanionApp.Extensions;
 using Microsoft.EntityFrameworkCore;
 using CompanionApp.Services.Contracts;
 using CompanionApp.Exceptions.PostExceptions;
+using CompanionApp.Validation.PostValidation;
 
 namespace CompanionApp.Services
 {
     public class PostService : IPostService
     {
         readonly CompanionAppDBContext _context;
-        readonly DbSet<Post> _dbSet;
-        public PostService(CompanionAppDBContext dbContext)
+        readonly DbSet<Post>           _dbSet;
+        readonly AddPostValidation     _addPostValidator;
+        readonly EditPostValidation    _editPostValidator;
+        public PostService(CompanionAppDBContext dbContext, AddPostValidation PostValidator, EditPostValidation EditPostValidator)
         {
-            _context = dbContext;
-            _dbSet = _context.Posts;
+            _context           = dbContext;
+            _dbSet             = _context.Posts;
+            _addPostValidator  = PostValidator;
+            _editPostValidator = EditPostValidator;
         }
 
         public async Task<IEnumerable<PostsByUserDTO>> GetPostsByUserIDAsync        (Guid userID)
@@ -61,11 +67,12 @@ namespace CompanionApp.Services
 
             return post.ToPostQueryDTO();
         }
-        public async Task<PostQueryDTO>                CreatePostAsync              (PostCommandDTO post, Guid userID)
+        public async Task<PostQueryDTO>                CreatePostAsync              (PostPOSTCommandDTO post)
         {
             try
             {
-                Post newpost = post.ToPost(userID);
+                await _addPostValidator.ValidateAndThrowAsync(post);
+                Post newpost = post.ToPost();
                 _dbSet.Add(newpost);
                 await _context.SaveChangesAsync();
                 return newpost.ToPostQueryDTO();
@@ -75,15 +82,16 @@ namespace CompanionApp.Services
                 throw;
             }
         }
-        public async Task                              EditPostAsync                (Guid id, Guid userID, PostCommandDTO post)
+        public async Task                              EditPostAsync                (PostPUTCommandDTO post)
         {
             try
             {
-                if (!await _dbSet.PostExists(id.ToString()))
+                await _editPostValidator.ValidateAndThrowAsync(post);
+                if (!await _dbSet.PostExists(post.Id))
                 {
                     throw new PostNotFoundException();
                 }
-                _dbSet.Update(post.ToPost(id, userID));
+                _dbSet.Update(post.ToPost());
                 await _context.SaveChangesAsync();
             }
             catch (Exception)

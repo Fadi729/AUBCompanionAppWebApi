@@ -34,20 +34,20 @@ namespace CompanionApp.Controllers
             return Ok(await _postService.GetPostsByUserFollowingsAsync(userID));
         }
 
-        [HttpPost("{userID}")]
-        public async Task<ActionResult<Post>>                        PostPost                (PostCommandDTO post, Guid userID)
+        [HttpPost]
+        public async Task<ActionResult<Post>>                        PostPost                (PostPOSTCommandDTO post)
         {
-            PostQueryDTO newpost = await _postService.CreatePostAsync(post, userID);
+            PostQueryDTO newpost = await _postService.CreatePostAsync(post);
             return CreatedAtAction("GetPostById", new { id = newpost.Id }, newpost);
         }
 
-        [HttpPut("{userID}/{id}")]
-        public async Task<IActionResult>                             PutPost                 (Guid id, Guid userID, PostCommandDTO post)
+        [HttpPut]
+        public async Task<IActionResult>                             PutPost                 (PostPUTCommandDTO post)
         {
-            await _postService.EditPostAsync(id, userID, post);
+            await _postService.EditPostAsync(post);
             return NoContent();
         }
-
+        
         [HttpDelete("{userID}/{id}")]
         public async Task<IActionResult>                             DeletePost              (Guid id, Guid userID)
         {

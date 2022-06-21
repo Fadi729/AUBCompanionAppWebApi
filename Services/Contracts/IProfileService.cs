@@ -4,9 +4,9 @@ namespace CompanionApp.Services.Contracts
 {
     public interface IProfileService
     {
-        Task<ProfileQueryDTO> GetProfileAsync   (Guid id);
-        Task<ProfileQueryDTO> CreateProfileAsync(ProfileCommandDTO profile);
-        Task                  EditProfileAsync  (Guid id, ProfileCommandDTO profile);
-        Task                  DeleteProfileAsync(Guid id);
+        public Task<ProfileQueryDTO> GetProfileAsync   (Guid id);
+        public Task<ProfileQueryDTO> CreateProfileAsync(ProfileCommandDTO profile);
+        public Task                  EditProfileAsync  (Guid id, ProfileCommandDTO profile);
+        public Task                  DeleteProfileAsync(Guid id);
     }
 }

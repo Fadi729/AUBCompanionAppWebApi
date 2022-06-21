@@ -91,21 +91,15 @@ namespace CompanionApp.Services
             } 
             #endregion
         }
-        public async Task                         EditCourseAsync   (int crn, CourseDTO course)
+        public async Task                         EditCourseAsync   (CourseDTO course)
         {
-            if (crn != int.Parse(course.Crn))
-            {
-                throw new ArgumentException("crn and course.crn must match");
-            }
-            if (!await _dbSet.CourseExists(crn.ToString()))
-                {
-                    throw new CourseNotFoundException();
-                }
-
             await _courseValidation.ValidateAndThrowAsync(course);
+            if (!await _dbSet.CourseExists(course.Crn))
+            {
+                throw new CourseNotFoundException();
+            }
             _dbSet.Update(course.ToCourse());
             await _context.SaveChangesAsync();
-            
         }
         public async Task                         DeleteCourseAsync (int crn)
         {

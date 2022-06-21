@@ -30,12 +30,13 @@ namespace CompanionApp.Controllers
         }
 
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult>                        PutCourse   (int id, CourseDTO course)
+        [HttpPut]
+        public async Task<IActionResult>                        PutCourse   (CourseDTO course)
         {
-            await _courseService.EditCourseAsync(id, course);
+            await _courseService.EditCourseAsync(course);
             return NoContent();
         }
+
         
         [HttpPost("single")]
         public async Task<ActionResult<CourseDTO>>              PostCourse  (CourseDTO course)

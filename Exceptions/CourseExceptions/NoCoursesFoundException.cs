@@ -4,9 +4,9 @@
     {
         public int ErrorCode { get; } = 404;
 
-        readonly static string defaultErrorMessage = "No Courses Found.";
+        readonly static string _defaultErrorMessage = "No Courses Found.";
 
-        public NoCoursesFoundException() : base(defaultErrorMessage) { }
+        public NoCoursesFoundException() : base(_defaultErrorMessage) { }
         public NoCoursesFoundException(string message) : base(message) { }
         public NoCoursesFoundException(string message, Exception inner) : base(message, inner) { }
     }

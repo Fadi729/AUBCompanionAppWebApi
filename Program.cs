@@ -4,7 +4,9 @@ using CompanionApp.Validation;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using CompanionApp.Services.Contracts;
+using CompanionApp.Validation.CommentValidation;
 using CompanionApp.Exceptions.ExceptionMiddlewareNS;
+using CompanionApp.Validation.PostValidation;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -57,10 +59,16 @@ builder.Services
 
 builder.Services
 #region Validations
-    .AddScoped<ProfileValidation>()
-    .AddScoped<CourseValidation>()
-    .AddScoped<SemesterValidation>()
-    .AddScoped<CourseTakenByValidation>();
+    .AddScoped<ProfileValidation      >()
+    .AddScoped<CourseValidation       >()
+    .AddScoped<SemesterValidation     >()
+    .AddScoped<CourseTakenByValidation>()
+    .AddScoped<AddCommentValidation   >()
+    .AddScoped<EditCommentValidation  >()
+    .AddScoped<FollowingsValidation   >()
+    .AddScoped<LikeValidation         >()
+    .AddScoped<AddPostValidation      >()
+    .AddScoped<EditPostValidation     >();
 #endregion
 
 WebApplication app = builder.Build();

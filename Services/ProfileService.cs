@@ -18,8 +18,8 @@ namespace CompanionApp.Services
 
         public ProfileService(CompanionAppDBContext DBcontext, ProfileValidation validation)
         {
-            _context = DBcontext;
-            _dbSet = DBcontext.Profiles;
+            _context         = DBcontext;
+            _dbSet           = DBcontext.Profiles;
             _validationRules = validation;
         }
 

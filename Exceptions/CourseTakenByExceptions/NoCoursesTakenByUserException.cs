@@ -4,8 +4,8 @@
     {
         public int ErrorCode { get; } = 404;
 
-        readonly static string _defaultErrorMessage = "No Courses Taken By User";
-        public NoCoursesTakenByUserException() : base(_defaultErrorMessage) { }
+        readonly static string __defaultErrorMessage = "No Courses Taken By User";
+        public NoCoursesTakenByUserException() : base(__defaultErrorMessage) { }
         public NoCoursesTakenByUserException(string? message) : base(message) { }
         public NoCoursesTakenByUserException(string? message, Exception? innerException)
             : base(message, innerException) { }

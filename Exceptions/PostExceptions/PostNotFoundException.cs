@@ -4,9 +4,9 @@
     {
         public int ErrorCode { get; } = 404;
         
-        readonly static string defaultErrorMessage = "Post Not Found.";
+        readonly static string _defaultErrorMessage = "Post Not Found.";
 
-        public PostNotFoundException() : base(defaultErrorMessage) { }
+        public PostNotFoundException() : base(_defaultErrorMessage) { }
 
         public PostNotFoundException(string message) : base(message) { }
 

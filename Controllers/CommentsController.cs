@@ -37,18 +37,18 @@ namespace CompanionApp.Controllers
         }
 
         
-        [HttpPost("{postID}/{userID}")]
-        public async Task<ActionResult<CommentQueryDTO>>              PostComment         (Guid postID, Guid userID, CommentCommandDTO comment)
+        [HttpPost]
+        public async Task<ActionResult<CommentQueryDTO>>              PostComment         (CommentPOSTCommandDTO comment)
         {
-            CommentQueryDTO newComment = await _commentsService.AddComment(postID, userID, comment);
+            CommentQueryDTO newComment = await _commentsService.AddComment(comment);
             return CreatedAtAction("GetComment", new { commentID = newComment.Id }, newComment);
         }
 
         
-        [HttpPut("{postID}/{commentID}/{userID}")]
-        public async Task<IActionResult>                              PutComment          (Guid commentID, Guid postID, Guid userID, CommentCommandDTO comment)
+        [HttpPut]
+        public async Task<IActionResult>                              PutComment          (CommentPUTCommandDTO comment)
         {
-            await _commentsService.EditComment(commentID, postID, userID, comment);
+            await _commentsService.EditComment(comment);
             return NoContent();
         }
 

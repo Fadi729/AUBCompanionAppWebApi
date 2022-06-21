@@ -41,7 +41,7 @@ namespace CompanionApp.Validation
             #endregion
 
             #region Credits Rule
-            RuleFor(course => course.Credits.ToString())
+            RuleFor(course => course.Credits)
                     .NotEmpty   ()
                     .WithMessage("Course Credits is required.")
                     .Matches    (@"^[0-9]+$")

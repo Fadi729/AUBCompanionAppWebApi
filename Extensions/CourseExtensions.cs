@@ -47,7 +47,7 @@ namespace CompanionApp.Extensions
                 Title           = courseDTO.Title,
                 Subject         = courseDTO.Subject,
                 Code            = courseDTO.Code,
-                Credits         = courseDTO.Credits.Equals(string.Empty) ? byte.MinValue : byte.Parse(courseDTO.Credits),
+                Credits         = courseDTO.Credits!.Equals(string.Empty) ? byte.MinValue : byte.Parse(courseDTO.Credits),
                 Attribute       = courseDTO.Attribute,
                 Levels          = courseDTO.Levels,
                 Section         = courseDTO.Section,

@@ -13,7 +13,6 @@ namespace CompanionApp.Extensions
                 IsFollowingNavigation   = following.IsFollowingNavigation is not null ? following.IsFollowingNavigation.ToProfileQuerryDTO() : null
             };
         } 
-        
         public static FollowersDTO   ToFollowersDTO  (this Following following)
         {
             return new FollowersDTO
@@ -22,7 +21,6 @@ namespace CompanionApp.Extensions
                 User                  = following.User.ToProfileQuerryDTO()
             };
         } 
-
         public static Following      ToFollowing     (this FollowingPOSTDTO following)
         {
             return new Following

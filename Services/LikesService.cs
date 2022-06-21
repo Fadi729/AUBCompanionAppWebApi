@@ -1,6 +1,8 @@
-﻿using CompanionApp.Models;
+﻿using FluentValidation;
+using CompanionApp.Models;
 using CompanionApp.ModelsDTO;
 using CompanionApp.Extensions;
+using CompanionApp.Validation;
 using Microsoft.EntityFrameworkCore;
 using CompanionApp.Services.Contracts;
 using EntityFramework.Exceptions.Common;
@@ -16,13 +18,15 @@ namespace CompanionApp.Services
         readonly DbSet<Like>           _dbSetLikes;
         readonly DbSet<Profile>        _dbSetProfile;
         readonly DbSet<Post>           _dbSetPost;
+        readonly LikeValidation        _likeValidator;    
 
-        public LikesService(CompanionAppDBContext context)
+        public LikesService(CompanionAppDBContext context, LikeValidation likeValidator)
         {
-            _context = context;
-            _dbSetLikes = _context.Likes;
-            _dbSetProfile = _context.Profiles;
-            _dbSetPost = _context.Posts;
+            _context       = context;
+            _dbSetLikes    = _context.Likes;
+            _dbSetProfile  = _context.Profiles;
+            _dbSetPost     = _context.Posts;
+            _likeValidator = likeValidator;
         }
 
         public async Task<IEnumerable<LikeDTOUsers>> GetPostLikes     (Guid postID)
@@ -66,6 +70,7 @@ namespace CompanionApp.Services
         {
             try
             {
+                await _likeValidator.ValidateAndThrowAsync(like);
                 if (!await _dbSetPost.PostExists(like.PostId))
                 {
                     throw new PostNotFoundException();
@@ -85,22 +90,23 @@ namespace CompanionApp.Services
                 throw new ProfileAlreadyLikedPostException();
             }
         }
-        public async Task                            UnlikePost       (Guid postID, Guid userID)
+        public async Task                            UnlikePost       (LikePOSTDTO like)
         {
-            if (!await _dbSetPost.PostExists(postID.ToString()))
+            await _likeValidator.ValidateAndThrowAsync(like);
+            if (!await _dbSetPost.PostExists(like.PostId))
             {
                 throw new PostNotFoundException();
             }
-            if (!await _dbSetProfile.ProfileExists(userID))
+            if (!await _dbSetProfile.ProfileExists(Guid.Parse(like.UserId)))
             {
                 throw new ProfileAlreadyExistsException();
             }
-            if (!await _dbSetLikes.LikeExists(postID, userID))
+            if (!await _dbSetLikes.LikeExists(like.PostId, like.UserId))
             {
                 throw new LikeNotFoundException();
             }
 
-            _dbSetLikes.Remove(new Like() { PostId = postID, UserId = userID });
+            _dbSetLikes.Remove(new Like() { PostId = Guid.Parse(like.PostId), UserId = Guid.Parse(like.UserId) });
             await _context.SaveChangesAsync();
         }
     }

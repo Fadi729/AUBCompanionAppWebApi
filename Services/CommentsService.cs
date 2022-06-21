@@ -1,4 +1,5 @@
-﻿using CompanionApp.Models;
+﻿using FluentValidation;
+using CompanionApp.Models;
 using CompanionApp.ModelsDTO;
 using CompanionApp.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -6,6 +7,7 @@ using CompanionApp.Services.Contracts;
 using CompanionApp.Exceptions.PostExceptions;
 using CompanionApp.Exceptions.CommentExceptions;
 using CompanionApp.Exceptions.ProfileExceptions;
+using CompanionApp.Validation.CommentValidation;
 
 namespace CompanionApp.Services
 {
@@ -15,13 +17,19 @@ namespace CompanionApp.Services
         readonly DbSet<Comment>        _dbSetComment;
         readonly DbSet<Post>           _dbSetPost;
         readonly DbSet<Profile>        _dbSetProfile;
+        readonly AddCommentValidation  _addCommentValidator;
+        readonly EditCommentValidation _editCommentValidator;
 
-        public CommentsService(CompanionAppDBContext context)
+        public CommentsService(CompanionAppDBContext context, 
+            AddCommentValidation  addValidator, 
+            EditCommentValidation editValidator)
         {
-            _context      = context;
-            _dbSetComment = context.Comments;
-            _dbSetPost    = context.Posts;
-            _dbSetProfile = context.Profiles;
+            _context              = context;
+            _dbSetComment         = context.Comments;
+            _dbSetPost            = context.Posts;
+            _dbSetProfile         = context.Profiles;
+            _addCommentValidator  = addValidator;
+            _editCommentValidator = editValidator;
         }
 
         public async Task<CommentQueryDTO>              GetComment          (Guid commentID)
@@ -58,43 +66,45 @@ namespace CompanionApp.Services
         {
             return (await GetPostComments(postID)).Count();
         }
-        public async Task<CommentQueryDTO>              AddComment          (Guid postID, Guid userID, CommentCommandDTO comment)
+        public async Task<CommentQueryDTO>              AddComment          (CommentPOSTCommandDTO comment)
         {
-            if (!await _dbSetPost.PostExists(postID.ToString()))
+            await _addCommentValidator.ValidateAndThrowAsync(comment);
+            if (!await _dbSetPost.PostExists(comment.PostID.ToString()))
             {
                 throw new PostNotFoundException();
             }
-            if (!await _dbSetProfile.ProfileExists(userID))
+            if (!await _dbSetProfile.ProfileExists(Guid.Parse(comment.UserID)))
             {
                 throw new ProfileNotFoundException();
             }
 
-            Comment newComment = comment.ToComment(postID, userID);
+            Comment newComment = comment.ToComment();
             _dbSetComment.Add(newComment);
             await _context.SaveChangesAsync();
             return newComment.ToCommentQueryDTO();
         }
-        public async Task                               EditComment         (Guid commentID, Guid postID, Guid userID, CommentCommandDTO comment)
+        public async Task                               EditComment         (CommentPUTCommandDTO comment)
         {
-            if (!await _dbSetComment.CommentExists(commentID))
+            await _editCommentValidator.ValidateAndThrowAsync(comment);
+            if (!await _dbSetComment.CommentExists(comment.Id))
             {
                 throw new CommentNotFoundException();
             }
-            if (!await _dbSetPost.PostExists(postID.ToString()))
+            if (!await _dbSetPost.PostExists(comment.PostID))
             {
                 throw new PostNotFoundException();
             }
-            if (!await _dbSetProfile.ProfileExists(userID))
+            if (!await _dbSetProfile.ProfileExists(comment.UserID))
             {
                 throw new ProfileNotFoundException();
             }
 
-            _dbSetComment.Update(comment.ToComment(postID, userID));
+            _dbSetComment.Update(comment.ToComment());
             await _context.SaveChangesAsync();
         }
         public async Task                               DeleteComment       (Guid commentID)
         {
-            if(!await _dbSetComment.CommentExists(commentID))
+            if(!await _dbSetComment.CommentExists(commentID.ToString()))
             {
                 throw new CommentNotFoundException();
             }

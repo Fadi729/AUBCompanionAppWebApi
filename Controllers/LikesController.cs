@@ -35,10 +35,10 @@ namespace CompanionApp.Controllers
             return await _likeService.LikePost(like);;
         }
 
-        [HttpDelete("{postID}/{userID}")]
-        public async Task<IActionResult>                           DeleteLike         (Guid postID, Guid userID)
+        [HttpDelete]
+        public async Task<IActionResult>                           DeleteLike         (LikePOSTDTO like)
         {
-            await _likeService.UnlikePost(postID, userID);
+            await _likeService.UnlikePost(like);
             return NoContent();
         }
     }

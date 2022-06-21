@@ -16,13 +16,24 @@ namespace CompanionApp.Extensions
                 User        = comment.User is not null ? comment.User.ToProfileQuerryDTO() : null
             };
         }
-        public static Comment         ToComment         (this CommentCommandDTO comment, Guid postID, Guid userID)
+        public static Comment         ToComment         (this CommentPOSTCommandDTO comment)
         {
             return new Comment
             {
                 Id          = Guid.NewGuid(),
-                PostId      = postID,
-                UserId      = userID,
+                PostId      = Guid.Parse(comment.PostID),
+                UserId      = Guid.Parse(comment.UserID),
+                Text        = comment.Text,
+                DateCreated = DateTime.Now
+            };
+        }
+        public static Comment         ToComment         (this CommentPUTCommandDTO comment)
+        {
+            return new Comment
+            {
+                Id          = Guid.Parse(comment.Id),
+                PostId      = Guid.Parse(comment.PostID),
+                UserId      = Guid.Parse(comment.UserID),
                 Text        = comment.Text,
                 DateCreated = DateTime.Now
             };

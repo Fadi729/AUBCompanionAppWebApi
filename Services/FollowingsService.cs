@@ -1,6 +1,8 @@
-﻿using CompanionApp.Models;
+﻿using FluentValidation;
+using CompanionApp.Models;
 using CompanionApp.ModelsDTO;
 using CompanionApp.Extensions;
+using CompanionApp.Validation;
 using Microsoft.EntityFrameworkCore;
 using CompanionApp.Services.Contracts;
 using EntityFramework.Exceptions.Common;
@@ -14,12 +16,14 @@ namespace CompanionApp.Services
         readonly CompanionAppDBContext _context;
         readonly DbSet<Following>      _dbSetFollowing;
         readonly DbSet<Profile>        _dbSetProfile;
+        readonly FollowingsValidation  _followingsValidator;
 
-        public FollowingsService(CompanionAppDBContext context)
+        public FollowingsService(CompanionAppDBContext context, FollowingsValidation  FollowingsValidator)
         {
-            _context        = context;
-            _dbSetFollowing = context.Followings;
-            _dbSetProfile   = context.Profiles;
+            _context             = context;
+            _dbSetFollowing      = context.Followings;
+            _dbSetProfile        = context.Profiles;
+            _followingsValidator = FollowingsValidator;
         }
 
         public async Task<IEnumerable<IsFollowingDTO>> GetIsFollowing(Guid userID)
@@ -60,6 +64,7 @@ namespace CompanionApp.Services
         }
         public async Task                              Follow        (FollowingPOSTDTO following)
         {
+            await _followingsValidator.ValidateAndThrowAsync(following);
             if (!await _dbSetProfile.ProfileExists(following.UserId))
             {
                 throw new ProfileNotFoundException();
@@ -78,13 +83,10 @@ namespace CompanionApp.Services
             {
                 throw new FollowingAlreadyExistsException();
             }
-            catch (Exception)
-            {
-                throw;
-            }
         }
         public async Task                              Unfollow      (FollowingPOSTDTO following)
         {
+            await _followingsValidator.ValidateAndThrowAsync(following);
             if (!await _dbSetProfile.ProfileExists(following.UserId))
             {
                 throw new ProfileNotFoundException();

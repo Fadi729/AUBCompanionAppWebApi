@@ -8,7 +8,7 @@
 
     public class FollowersDTO
     {
-        public DateTime?          DateFollowed          { get; set; }
+        public DateTime? DateFollowed          { get; set; }
         public virtual ProfileQueryDTO User { get; set; } = null!;
     }
     

@@ -24,11 +24,11 @@ namespace CompanionApp.Services
 
         public CourseTakenByService(CompanionAppDBContext context, CourseTakenByValidation validation)
         {
-            _context = context;
-            _dbSetCourseTakenBy = _context.CourseTakenBy;
-            _dbSetCourse = _context.Courses;
-            _dbSetSemester = _context.Semesters;
-            _dbSetProfile = _context.Profiles;
+            _context                 = context;
+            _dbSetCourseTakenBy      = _context.CourseTakenBy;
+            _dbSetCourse             = _context.Courses;
+            _dbSetSemester           = _context.Semesters;
+            _dbSetProfile            = _context.Profiles;
             _courseTakenByValidation = validation;
         }
 
