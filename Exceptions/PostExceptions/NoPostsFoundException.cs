@@ -2,7 +2,7 @@
 {
     public class NoPostsFoundException : Exception
     {
-        public int ErrorCode { get; } = (int)HttpStatusCode.NotFound;
+        public int ErrorCode { get; } = (int)System.Net.HttpStatusCode.NotFound;
         
         readonly static string defuautErrorMessage = "No Posts Found.";
 
