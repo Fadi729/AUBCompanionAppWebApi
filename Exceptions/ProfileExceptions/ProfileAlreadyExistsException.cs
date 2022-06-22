@@ -2,7 +2,7 @@
 {
     public class ProfileAlreadyExistsException : Exception
     {
-        public static int ErrorCode { get; } = 409;
+        public static int ErrorCode { get; } = (int)System.Net.HttpStatusCode.Conflict;
         
         readonly static string _defaultErrorMessage = "Profile Already Exists.";
         public ProfileAlreadyExistsException() : base(_defaultErrorMessage) { }

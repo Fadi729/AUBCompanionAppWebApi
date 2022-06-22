@@ -2,7 +2,7 @@
 {
     public class CourseAlreadyExistsException : Exception
     {
-        public int ErrorCode { get; } = 409;
+        public int ErrorCode { get; } = (int)System.Net.HttpStatusCode.Conflict;
 
         readonly static string _defaultErrorMessage = "Course Already Exists.";
 

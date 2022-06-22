@@ -2,7 +2,7 @@
 {
     public class FollowingAlreadyExistsException : Exception
     {
-        public int ErrorCode { get; } = 409;
+        public int ErrorCode { get; } = (int)System.Net.HttpStatusCode.Conflict;
         
         readonly static string __defaultErrorMessage = "Following Already Exists";
 

@@ -2,7 +2,7 @@
 {
     public class CourseNotFoundException : Exception
     {
-        public int ErrorCode { get; } = 404;
+        public int ErrorCode { get; } = (int)System.Net.HttpStatusCode.NotFound;
         
         readonly static string _defaultErrorMessage = "Course Not Found.";
         public CourseNotFoundException() : base(_defaultErrorMessage) { }

@@ -2,7 +2,7 @@
 {
     public class FollowingNotFoundException : Exception
     {
-        public int ErrorCode { get; } = 404;
+        public int ErrorCode { get; } = (int)System.Net.HttpStatusCode.NotFound;
         
         readonly static string _defaultErrorMessage = "Following Not Found.";
 

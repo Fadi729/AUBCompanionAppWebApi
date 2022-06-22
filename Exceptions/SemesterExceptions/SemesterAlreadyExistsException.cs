@@ -2,7 +2,7 @@
 {
     public class SemesterAlreadyExistsException : Exception
     {
-        public int ErrorCode { get; } = 409;
+        public int ErrorCode { get; } = (int)System.Net.HttpStatusCode.Conflict;
 
         readonly static string _defaultErrorMessage = "Semester Already Exists.";
 

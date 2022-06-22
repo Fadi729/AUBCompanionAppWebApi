@@ -24,7 +24,6 @@ namespace CompanionApp.Exceptions.ExceptionMiddlewareNS
                 Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.1",
                 Status = (int)HttpStatusCode.BadRequest
             };
-
             foreach (ValidationFailure validationFailure in exception.Errors)
             {
                 if (error.Errors.ContainsKey(validationFailure.PropertyName))
