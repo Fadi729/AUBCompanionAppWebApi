@@ -18,12 +18,7 @@ builder.Services
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services
     .AddEndpointsApiExplorer()
-    .AddSwaggerGen(options =>
-    {
-        var xmlFilename = "API Documentation";
-        Console.WriteLine(xmlFilename);
-        options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
-    });
+    .AddSwaggerGen();
 
 builder.Configuration
 #region Configurations
