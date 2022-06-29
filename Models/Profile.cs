@@ -14,13 +14,13 @@
 
         #region Attributes
         public Guid    Id        { get; set; }
+        public string? PasswordHash { get; set; }
         public string  FirstName { get; set; } = null!;
         public string  LastName  { get; set; } = null!;
         public string  Email     { get; set; } = null!;
         public string? Major     { get; set; }
         public string? Class     { get; set; }
         #endregion
-
         #region Navigation Properties
         public virtual ICollection<Comment      > Comments                        { get; set; }
         public virtual ICollection<CourseTakenBy> CourseTakenBy                   { get; set; }
