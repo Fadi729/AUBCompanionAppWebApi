@@ -11,11 +11,11 @@ namespace CompanionApp.Validation.PostValidation
 
             #region Rules
             #region UserID Rule
-            RuleFor(x => x.UserId)
-                    .NotEmpty()
-                    .WithMessage("UserId is required")
-                    .Matches(@"(?im)^[{(]?[0-9A-F]{8}[-]?(?:[0-9A-F]{4}[-]?){3}[0-9A-F]{12}[)}]?$")
-                    .WithMessage("UserId must be a valid GUID");
+            //RuleFor(x => x.UserId)
+            //        .NotEmpty()
+            //        .WithMessage("UserId is required")
+            //        .Matches(@"(?im)^[{(]?[0-9A-F]{8}[-]?(?:[0-9A-F]{4}[-]?){3}[0-9A-F]{12}[)}]?$")
+            //        .WithMessage("UserId must be a valid GUID");
             #endregion
             #endregion
         }

@@ -43,8 +43,8 @@ builder.Services
                         Type = ReferenceType.SecurityScheme,
                         Id   = "Bearer"
                     },
-                    Name      = "Bearer",
                     In        = ParameterLocation.Header,
+                    Name      = "Bearer",
 
                 },
                 new List<string>()
@@ -66,7 +66,6 @@ builder.Configuration
 #if DEBUG
 builder.Services.AddDbContext<CompanionAppDBContext>(
     options => options.UseSqlServer(builder.Configuration["ConnectionStrings:DevDB"]));
-
 builder.Services.AddIdentityCore<IdentityUser>().AddEntityFrameworkStores<CompanionAppDBContext>();
 #else
 builder.Services.AddDbContext<CompanionAppDBContext>(
@@ -78,7 +77,7 @@ builder.Services.AddScoped<JwtSettings>();
 
 builder.Services
 #region Services
-    .AddScoped<IAuthService         , AuthService         >()
+    .AddScoped<IUserManager         , UserManager         >()
     .AddScoped<IProfileService      , ProfileService      >()
     .AddScoped<ICourseService       , CourseService       >()
     .AddScoped<IPostService         , PostService         >()

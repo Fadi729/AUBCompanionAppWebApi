@@ -10,8 +10,8 @@
     }    
     public class CommentPOSTCommandDTO
     {
-        public string UserID { get; set; } = null!;
-        public string PostID { get; set; } = null!;
+        //public string UserID { get; set; } = null!;
+        //public string PostID { get; set; } = null!;
         public string Text   { get; set; } = null!;
     }    
     public class CommentPUTCommandDTO

@@ -8,9 +8,9 @@ namespace CompanionApp.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        readonly IAuthService _auth;
+        readonly IUserManager _auth;
 
-        public AuthController(IAuthService auth)
+        public AuthController(IUserManager auth)
         {
             _auth = auth;
         }

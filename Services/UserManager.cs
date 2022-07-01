@@ -1,29 +1,30 @@
 ﻿using System.Text;
 using CompanionApp.Jwt;
 using CompanionApp.Models;
-using CompanionApp.ModelsDTO;
 using System.Security.Claims;
+using CompanionApp.ModelsDTO;
+using CompanionApp.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using CompanionApp.Services.Contracts;
-using CompanionApp.Extensions;
+using CompanionApp.Exceptions.ProfileExceptions;
 
 namespace CompanionApp.Services
 {
-    public class AuthService : IAuthService
+    public class UserManager : IUserManager
     {
         readonly UserManager<IdentityUser> _userManager;
         readonly JwtSettings               _jwtSettings;
         readonly IProfileService           _profileService;
-        public AuthService(UserManager<IdentityUser> userManager, JwtSettings jwtSettings, IProfileService profileService)
+        public UserManager(UserManager<IdentityUser> userManager, JwtSettings jwtSettings, IProfileService profileService)
         {
             _userManager    = userManager;
             _jwtSettings    = jwtSettings;
             _profileService = profileService;
         }
 
-        public async Task<AuthResponse> RegisterAsync(ProfileRegistrationDTO user)
+        public async Task<AuthResponse> RegisterAsync               (ProfileRegistrationDTO user)
         {
             await _profileService.ValidateProfile(user.ToProfileCommandDTO());
 
@@ -39,11 +40,11 @@ namespace CompanionApp.Services
 
             ProfileCommandDTO newProfile = new()
             {
-                Email = user.Email,
+                Email     = user.Email,
                 FirstName = user.FirstName,
-                LastName = user.LastName,
-                Major = user.Major,
-                Class = user.Class
+                LastName  = user.LastName,
+                Major     = user.Major,
+                Class     = user.Class
             };
 
             ProfileQueryDTO profileDTO = await _profileService.CreateProfileAsync(newProfile);
@@ -67,9 +68,7 @@ namespace CompanionApp.Services
 
             return AuthenticationTokenGenerator(profileDTO);
         }
-
-
-        public async Task<AuthResponse> LoginAsync(ProfileLoginDTO user)
+        public async Task<AuthResponse> LoginAsync                  (ProfileLoginDTO user)
         {
             var profile = await _userManager.FindByEmailAsync(user.Email);
 
@@ -92,8 +91,25 @@ namespace CompanionApp.Services
 
             return AuthenticationTokenGenerator(await _profileService.GetProfileAsync(Guid.Parse(profile.Id)));
         }
-        
-        private AuthResponse AuthenticationTokenGenerator(ProfileQueryDTO newProfile)
+        public async Task               DeleteAsync                 (Guid userID)
+        {
+            var profile = await _userManager.FindByIdAsync(userID.ToString());
+
+            if (profile is null)
+            {
+                throw new ProfileNotFoundException();
+            }
+
+            var result = await _userManager.DeleteAsync(profile);
+            
+            if(!result.Succeeded)
+            {
+                return;
+            }
+
+            await _profileService.DeleteProfileAsync(userID);
+        }
+        private      AuthResponse       AuthenticationTokenGenerator(ProfileQueryDTO newProfile)
         {
             byte[] key = Encoding.ASCII.GetBytes(_jwtSettings.Secret);
             JwtSecurityTokenHandler tokenHandler = new();
@@ -101,12 +117,13 @@ namespace CompanionApp.Services
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-                    new Claim(JwtRegisteredClaimNames.Sub       , newProfile.Email),
-                    new Claim(JwtRegisteredClaimNames.Name      , newProfile.FirstName),
-                    new Claim(JwtRegisteredClaimNames.FamilyName, newProfile.LastName),
-                    new Claim("Major"                           , newProfile.Major is not null ? newProfile.Major : string.Empty),
-                    new Claim("Class"                           , newProfile.Class is not null ? newProfile.Class : string.Empty),
-                    new Claim(JwtRegisteredClaimNames.Jti       , Guid.NewGuid().ToString())
+                    new Claim("userID"                            , newProfile.Id.ToString()),
+                    new Claim(JwtRegisteredClaimNames.Email       , newProfile.Email),
+                    new Claim(JwtRegisteredClaimNames.Name        , newProfile.FirstName),
+                    new Claim(JwtRegisteredClaimNames.FamilyName  , newProfile.LastName),
+                    new Claim("Major"                             , newProfile.Major is not null ? newProfile.Major : string.Empty),
+                    new Claim("Class"                             , newProfile.Class is not null ? newProfile.Class : string.Empty),
+                    new Claim(JwtRegisteredClaimNames.Jti         , Guid.NewGuid().ToString())
                 }),
 
                 Expires = DateTime.UtcNow.AddDays(1),

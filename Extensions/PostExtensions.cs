@@ -5,23 +5,23 @@ namespace CompanionApp.Extensions
 {
     public static class PostExtensions
     {
-        public static Post           ToPost          (this PostPOSTCommandDTO post)
+        public static Post           ToPost          (this PostPOSTCommandDTO post, Guid userID)
         {
             return new Post
             {
                 Id          = Guid.NewGuid(),
-                UserId      = Guid.Parse(post.UserId),
+                UserId      = userID,
                 Text        = post.Text,
                 Attachment  = post.Attachment,
                 DateCreated = DateTime.Now
             };
         }
-        public static Post           ToPost          (this PostPOSTCommandDTO post, Guid Id)
+        public static Post           ToPost          (this PostPOSTCommandDTO post, Guid postID, Guid userID)
         {
             return new Post
             {
-                Id          = Id,
-                UserId      = Guid.Parse(post.UserId),
+                Id          = postID,
+                UserId      = userID,
                 Text        = post.Text,
                 Attachment  = post.Attachment,
                 DateCreated = DateTime.Now
