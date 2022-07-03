@@ -5,9 +5,9 @@ namespace CompanionApp.Extensions
 {
     public static class LikeExtensions
     {
-        public static LikeQueryDTO ToLikeDTO     (this Like like)
+        public static LikeDTO      ToLikeDTO     (this Like like)
         {
-            return new LikeQueryDTO
+            return new LikeDTO
             {
                 UserId    = like.UserId,
                 PostId    = like.PostId,
@@ -20,6 +20,23 @@ namespace CompanionApp.Extensions
             {
                 User      = like.User.ToProfileQuerryDTO(),
                 DateLiked = like.DateLiked
+            };
+        }
+        public static Like         ToLike        (this LikeDTO like)
+        {
+            return new Like
+            {
+                UserId = like.UserId,
+                PostId = like.PostId,
+            };
+        } 
+        public static Like         ToLike        (this LikePOSTDTO like)
+        {
+            return new Like
+            {
+                UserId    = Guid.Parse(like.UserId),
+                PostId    = Guid.Parse(like.PostId),
+                DateLiked = DateTime.Now
             };
         }
     }

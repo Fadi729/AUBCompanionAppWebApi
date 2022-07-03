@@ -1,14 +1,11 @@
 ﻿using CompanionApp.ModelsDTO;
 using Microsoft.AspNetCore.Mvc;
 using CompanionApp.Services.Contracts;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace CompanionApp.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class SemestersController : ControllerBase
     {
         readonly ISemesterService _semesterService;
@@ -38,7 +35,7 @@ namespace CompanionApp.Controllers
         }
         
         [HttpPost("many")]
-        public async Task<ActionResult<IEnumerable<SemesterDTO>>> PostSemesters (IEnumerable<SemesterDTO> semesters)
+        public async Task<ActionResult<SemesterDTO>>              PostSemesters (IEnumerable<SemesterDTO> semesters)
         {
             return Ok(await _semesterService.AddSemestersAsync(semesters));
         }

@@ -5,7 +5,7 @@ namespace CompanionApp.Extensions
 {
     public static class FollowingExtensions
     {
-        public static IsFollowingDTO   ToIsFollowingDTO  (this Following following)
+        public static IsFollowingDTO ToIsFollowingDTO(this Following following)
         {
             return new IsFollowingDTO
             {
@@ -13,7 +13,7 @@ namespace CompanionApp.Extensions
                 IsFollowingNavigation   = following.IsFollowingNavigation is not null ? following.IsFollowingNavigation.ToProfileQuerryDTO() : null
             };
         } 
-        public static FollowersDTO     ToFollowersDTO    (this Following following)
+        public static FollowersDTO   ToFollowersDTO  (this Following following)
         {
             return new FollowersDTO
             {
@@ -21,12 +21,13 @@ namespace CompanionApp.Extensions
                 User                  = following.User.ToProfileQuerryDTO()
             };
         } 
-        public static FollowingPOSTDTO ToFollowingPOSTDTO(this Following following)
+        public static Following      ToFollowing     (this FollowingPOSTDTO following)
         {
-            return new FollowingPOSTDTO
+            return new Following
             {
-                UserId       = following.UserId.ToString(),
-                IsFollowing  = following.IsFollowing.ToString(),
+                UserId       = Guid.Parse(following.UserId),
+                IsFollowing  = Guid.Parse(following.IsFollowing),
+                DateFollowed = DateTime.Now,
             };
         }
     }

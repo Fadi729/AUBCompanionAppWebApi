@@ -1,15 +1,11 @@
 ﻿using CompanionApp.ModelsDTO;
 using Microsoft.AspNetCore.Mvc;
 using CompanionApp.Services.Contracts;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using CompanionApp.Extensions;
 
 namespace CompanionApp.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class CourseTakenByController : ControllerBase
     {
         readonly ICourseTakenByService _courseTakenByService;
@@ -48,10 +44,10 @@ namespace CompanionApp.Controllers
         }
 
         
-        [HttpDelete("{crn}/{semesterID}")]
-        public async Task<IActionResult>                                       DeleteCoursesTakenBy           (int crn, string semesterID)
+        [HttpDelete("{userID}/{crn}/{semesterID}")]
+        public async Task<ActionResult<CourseTakenByDTO>>                      DeleteCoursesTakenBy           (Guid userID,int crn, string semesterID)
         {
-            await _courseTakenByService.DeleteCoursesTakenByUser(HttpContext.GetUserID(), crn, semesterID);
+            await _courseTakenByService.DeleteCoursesTakenByUser(userID, crn, semesterID);
             return NoContent();
         }
     }

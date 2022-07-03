@@ -5,6 +5,7 @@ using CompanionApp.Extensions;
 using Microsoft.EntityFrameworkCore;
 using CompanionApp.Services.Contracts;
 using CompanionApp.Exceptions.PostExceptions;
+using CompanionApp.Validation.PostValidation;
 
 namespace CompanionApp.Services
 {
@@ -12,10 +13,14 @@ namespace CompanionApp.Services
     {
         readonly CompanionAppDBContext _context;
         readonly DbSet<Post>           _dbSet;
-        public PostService(CompanionAppDBContext dbContext)
+        readonly AddPostValidation     _addPostValidator;
+        readonly EditPostValidation    _editPostValidator;
+        public PostService(CompanionAppDBContext dbContext, AddPostValidation PostValidator, EditPostValidation EditPostValidator)
         {
             _context           = dbContext;
             _dbSet             = _context.Posts;
+            _addPostValidator  = PostValidator;
+            _editPostValidator = EditPostValidator;
         }
 
         public async Task<IEnumerable<PostsByUserDTO>> GetPostsByUserIDAsync        (Guid userID)
@@ -62,11 +67,12 @@ namespace CompanionApp.Services
 
             return post.ToPostQueryDTO();
         }
-        public async Task<PostQueryDTO>                CreatePostAsync              (PostPOSTCommandDTO post, Guid userID)
+        public async Task<PostQueryDTO>                CreatePostAsync              (PostPOSTCommandDTO post)
         {
             try
             {
-                Post newpost = post.ToPost(userID);
+                await _addPostValidator.ValidateAndThrowAsync(post);
+                Post newpost = post.ToPost();
                 _dbSet.Add(newpost);
                 await _context.SaveChangesAsync();
                 return newpost.ToPostQueryDTO();
@@ -76,21 +82,16 @@ namespace CompanionApp.Services
                 throw;
             }
         }
-        public async Task                              EditPostAsync                (PostPOSTCommandDTO post, Guid postID, Guid userId)
+        public async Task                              EditPostAsync                (PostPUTCommandDTO post)
         {
             try
             {
-                Post? postToEdit = await _dbSet.GetPostAsync(postID);
-                
-                if (postToEdit is null)
+                await _editPostValidator.ValidateAndThrowAsync(post);
+                if (!await _dbSet.PostExists(post.Id))
                 {
                     throw new PostNotFoundException();
                 }
-                if (!DataOperations.UserOwnsPost(postToEdit.UserId, userId))
-                {
-                    throw new UserDoesNotOwnPostException();
-                }
-                _dbSet.Update(post.ToPost(postID, userId));
+                _dbSet.Update(post.ToPost());
                 await _context.SaveChangesAsync();
             }
             catch (Exception)
@@ -98,20 +99,13 @@ namespace CompanionApp.Services
                 throw;
             }
         }
-        public async Task                              DeletePostAsync              (Guid postID, Guid userID)
+        public async Task                              DeletePostAsync              (Guid id, Guid userId)
         {
-            Post? postToDelete = await _dbSet.GetPostAsync(postID);
-
-            if (postToDelete is null)
+            if (!await _dbSet.PostExists(id.ToString()))
             {
                 throw new PostNotFoundException();
-            }           
-            if (!DataOperations.UserOwnsPost(postToDelete.UserId, userID))
-            {
-                throw new UnauthorizedAccessException();
             }
-            
-            _dbSet.Remove(postToDelete);
+            _dbSet.Remove(new Post() { Id = id });
             await _context.SaveChangesAsync();
         }
     }
