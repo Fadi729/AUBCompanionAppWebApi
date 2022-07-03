@@ -33,15 +33,13 @@ namespace CompanionApp.Services
 
             return profile.ToProfileQuerryDTO();
         }
-        public async Task                  ValidateProfile   (ProfileCommandDTO profile)
-        {
-            await _validationRules.ValidateAndThrowAsync(profile);
-        }
         public async Task<ProfileQueryDTO> CreateProfileAsync(ProfileCommandDTO profile)
         {
             #region try block
             try
             {
+                await _validationRules.ValidateAndThrowAsync(profile);
+
                 Profile newProfile = profile.ToProfile();
 
                 _dbSet.Add(newProfile);

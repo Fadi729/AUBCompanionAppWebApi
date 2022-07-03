@@ -1,15 +1,11 @@
 ﻿using CompanionApp.ModelsDTO;
 using Microsoft.AspNetCore.Mvc;
 using CompanionApp.Services.Contracts;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using CompanionApp.Extensions;
 
 namespace CompanionApp.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class LikesController : ControllerBase
     {
         readonly ILikesService _likeService;
@@ -20,7 +16,7 @@ namespace CompanionApp.Controllers
         }
 
 
-        [HttpGet("post/{postID}")]
+        [HttpGet("{postID}")]
         public async Task<ActionResult<IEnumerable<LikeDTOUsers>>> GetPostLikes       (Guid postID)
         {
             return Ok(await _likeService.GetPostLikes(postID));
@@ -33,16 +29,16 @@ namespace CompanionApp.Controllers
             return Ok(await _likeService.GetPostLikesCount(postID));
         }
 
-        [HttpPost("post/{postID}")]
-        public async Task<ActionResult<LikeQueryDTO>>              PostLike           (Guid postID)
+        [HttpPost]
+        public async Task<ActionResult<LikeDTO>>                   PostLike           (LikePOSTDTO like)
         {
-            return await _likeService.LikePost(postID, HttpContext.GetUserID());
+            return await _likeService.LikePost(like);;
         }
 
-        [HttpDelete("post/{postID}")]
-        public async Task<IActionResult>                           DeleteLike         (Guid postID)
+        [HttpDelete]
+        public async Task<IActionResult>                           DeleteLike         (LikePOSTDTO like)
         {
-            await _likeService.UnlikePost(postID, HttpContext.GetUserID());
+            await _likeService.UnlikePost(like);
             return NoContent();
         }
     }

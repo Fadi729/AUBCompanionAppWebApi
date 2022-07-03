@@ -1,15 +1,12 @@
-﻿using CompanionApp.ModelsDTO;
+﻿using CompanionApp.Models;
+using CompanionApp.ModelsDTO;
 using Microsoft.AspNetCore.Mvc;
 using CompanionApp.Services.Contracts;
-using CompanionApp.Extensions;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace CompanionApp.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class PostsController : ControllerBase
     {
         readonly IPostService _postService;
@@ -25,36 +22,36 @@ namespace CompanionApp.Controllers
             return await _postService.GetPostByIdAsync(id);
         }
         
-        [HttpGet("user")]
-        public async Task<ActionResult<IEnumerable<PostsByUserDTO>>> GetPostsByUserID        ()
+        [HttpGet("user/{userID}")]
+        public async Task<ActionResult<IEnumerable<PostsByUserDTO>>> GetPostsByUserID        (Guid userID)
         {
-            return Ok(await _postService.GetPostsByUserIDAsync(HttpContext.GetUserID()));
+            return Ok(await _postService.GetPostsByUserIDAsync(userID));
         }
 
-        [HttpGet("user/followings")]
-        public async Task<ActionResult<IEnumerable<PostQueryDTO>>>   GetPostsByUserFollowings()
+        [HttpGet("user/followings/{userID}")]
+        public async Task<ActionResult<IEnumerable<PostQueryDTO>>>   GetPostsByUserFollowings(Guid userID)
         {
-            return Ok(await _postService.GetPostsByUserFollowingsAsync(HttpContext.GetUserID()));
+            return Ok(await _postService.GetPostsByUserFollowingsAsync(userID));
         }
 
         [HttpPost]
-        public async Task<ActionResult<PostPOSTCommandDTO>>          PostPost                (PostPOSTCommandDTO post)
+        public async Task<ActionResult<Post>>                        PostPost                (PostPOSTCommandDTO post)
         {
-            PostQueryDTO newpost = await _postService.CreatePostAsync(post, HttpContext.GetUserID());
+            PostQueryDTO newpost = await _postService.CreatePostAsync(post);
             return CreatedAtAction("GetPostById", new { id = newpost.Id }, newpost);
         }
 
-        [HttpPut("{postID}")]
-        public async Task<IActionResult>                             PutPost                 (PostPOSTCommandDTO post, Guid postID)
+        [HttpPut]
+        public async Task<IActionResult>                             PutPost                 (PostPUTCommandDTO post)
         {
-            await _postService.EditPostAsync(post, postID, HttpContext.GetUserID());
+            await _postService.EditPostAsync(post);
             return NoContent();
         }
         
-        [HttpDelete("{postID}")]
-        public async Task<IActionResult>                             DeletePost              (Guid postID)
+        [HttpDelete("{userID}/{id}")]
+        public async Task<IActionResult>                             DeletePost              (Guid id, Guid userID)
         {
-            await _postService.DeletePostAsync(postID, HttpContext.GetUserID());
+            await _postService.DeletePostAsync(id, userID);
             return NoContent();
         }
     }

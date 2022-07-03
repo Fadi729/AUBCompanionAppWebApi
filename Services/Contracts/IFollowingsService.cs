@@ -6,7 +6,7 @@ namespace CompanionApp.Services.Contracts
     {
         public Task<IEnumerable<IsFollowingDTO>> GetIsFollowing(Guid userId);
         public Task<IEnumerable<FollowersDTO>>   GetFollowers  (Guid userId);
-        public Task<FollowingPOSTDTO>            Follow        (Guid userID, Guid userToFollowID);
-        public Task                              Unfollow      (Guid userID, Guid userToUnfollowID);
+        public Task                              Follow        (FollowingPOSTDTO following);
+        public Task                              Unfollow      (FollowingPOSTDTO following);
     }
 }

@@ -147,19 +147,12 @@ namespace CompanionApp.Services
             {
                 throw new SemesterNotFoundException();
             }
-
-            CourseTakenBy? courseTakenBy = await _dbSetCourseTakenBy.GetCourseTakenByAsync(userID, crn, semesterID);
-
-            if(courseTakenBy is null)
+            if (!await _dbSetCourseTakenBy.ProfileTookCourse(userID, crn, semesterID))
             {
                 throw new CourseNotTakenByUserException();
             }
-            if(!DataOperations.ProfileTookCourse(courseTakenBy.UserId, userID))
-            {
-                throw new UserDoesNotOwnCourseTakenByRelation();
-            }
 
-            _dbSetCourseTakenBy.Remove(courseTakenBy);
+            _dbSetCourseTakenBy.Remove(new CourseTakenBy { UserId = userID, CCrn = crn, SemesterId = semesterID });
             await _context.SaveChangesAsync();
         }
     }

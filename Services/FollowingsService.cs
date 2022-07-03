@@ -2,6 +2,7 @@
 using CompanionApp.Models;
 using CompanionApp.ModelsDTO;
 using CompanionApp.Extensions;
+using CompanionApp.Validation;
 using Microsoft.EntityFrameworkCore;
 using CompanionApp.Services.Contracts;
 using EntityFramework.Exceptions.Common;
@@ -15,12 +16,14 @@ namespace CompanionApp.Services
         readonly CompanionAppDBContext _context;
         readonly DbSet<Following>      _dbSetFollowing;
         readonly DbSet<Profile>        _dbSetProfile;
+        readonly FollowingsValidation  _followingsValidator;
 
-        public FollowingsService(CompanionAppDBContext context)
+        public FollowingsService(CompanionAppDBContext context, FollowingsValidation  FollowingsValidator)
         {
             _context             = context;
             _dbSetFollowing      = context.Followings;
             _dbSetProfile        = context.Profiles;
+            _followingsValidator = FollowingsValidator;
         }
 
         public async Task<IEnumerable<IsFollowingDTO>> GetIsFollowing(Guid userID)
@@ -59,55 +62,45 @@ namespace CompanionApp.Services
             }
             return followers;
         }
-        public async Task<FollowingPOSTDTO>            Follow        (Guid userID, Guid userToFollowID)
+        public async Task                              Follow        (FollowingPOSTDTO following)
         {
-            if (!await _dbSetProfile.ProfileExists(userID))
+            await _followingsValidator.ValidateAndThrowAsync(following);
+            if (!await _dbSetProfile.ProfileExists(following.UserId))
             {
                 throw new ProfileNotFoundException();
             }
-            if (!await _dbSetProfile.ProfileExists(userToFollowID))
+            if (!await _dbSetProfile.ProfileExists(following.IsFollowing))
             {
                 throw new ProfileNotFoundException("Profile trying to follow is not found.");
             }
 
             try
             {
-                Following follow = new()
-                {
-                    UserId      = userID,
-                    IsFollowing = userToFollowID
-                };
-                _dbSetFollowing.Add(follow);
+                _dbSetFollowing.Add(following.ToFollowing());
                 await _context.SaveChangesAsync();
-                return follow.ToFollowingPOSTDTO();
             }
             catch (UniqueConstraintException)
             {
                 throw new FollowingAlreadyExistsException();
             }
         }
-        public async Task                              Unfollow      (Guid userID, Guid userToUnfollowID)
+        public async Task                              Unfollow      (FollowingPOSTDTO following)
         {
-            if (!await _dbSetProfile.ProfileExists(userID))
+            await _followingsValidator.ValidateAndThrowAsync(following);
+            if (!await _dbSetProfile.ProfileExists(following.UserId))
             {
                 throw new ProfileNotFoundException();
             }
-            if (!await _dbSetProfile.ProfileExists(userToUnfollowID))
+            if (!await _dbSetProfile.ProfileExists(following.IsFollowing))
             {
                 throw new ProfileNotFoundException("Profile trying to unfollow is not found.");
             }
-
-            Following? following = await _dbSetFollowing.GetFollowingAsync(userID, userToUnfollowID);
-            if (following is null)
+            if (!await _dbSetFollowing.FollowingExists(following.UserId, following.IsFollowing))
             {
                 throw new FollowingNotFoundException();
             }
-            if (following.UserId != userID)
-            {
-                throw new UserDoesNotOwnFollowingRelationException();
-            }
 
-            _dbSetFollowing.Remove(following);
+            _dbSetFollowing.Remove(following.ToFollowing());
             await _context.SaveChangesAsync();
         }
     }

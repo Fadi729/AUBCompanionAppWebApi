@@ -40,17 +40,9 @@ namespace CompanionApp.Exceptions.ExceptionMiddlewareNS
                 context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                 var error = ex.ToNotFoundExceptionDetails();
                 await context.Response.WriteAsJsonAsync(error);
-            }
+            } 
             #endregion
-            #region Unauthorized Operation Exception
-            catch(Exception ex)  when (ex.GetErrorCode() == (int)HttpStatusCode.Unauthorized)
-            {
-                context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                var error                   = ex.ToUnauthorizedRequestExceptionDetails();
-                await context.Response.WriteAsJsonAsync(error);
-            }
-            #endregion
-            catch (Exception)
+            catch(Exception)
             {
                 throw;
             }

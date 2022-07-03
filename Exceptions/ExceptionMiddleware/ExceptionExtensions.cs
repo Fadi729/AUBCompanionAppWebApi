@@ -7,7 +7,7 @@ namespace CompanionApp.Exceptions.ExceptionMiddlewareNS
 {
     public static class ExceptionExtensions
     {
-        public static int                      GetErrorCode                         (this Exception exception)
+        public static int                      GetErrorCode                (this Exception exception)
         {
             var exceptionType = exception.GetType().GetProperty("ErrorCode");
 
@@ -17,7 +17,7 @@ namespace CompanionApp.Exceptions.ExceptionMiddlewareNS
             return
                 -1;
         }
-        public static ValidationProblemDetails ToValidationExceptionDetails         (this ValidationException exception)
+        public static ValidationProblemDetails ToValidationExceptionDetails(this ValidationException exception)
         {
             ValidationProblemDetails error = new()
             {
@@ -38,7 +38,7 @@ namespace CompanionApp.Exceptions.ExceptionMiddlewareNS
             }
             return error;
         }
-        public static ValidationProblemDetails ToConflictExceptionDetails           (this Exception exception)
+        public static ValidationProblemDetails ToConflictExceptionDetails  (this Exception exception)
         {
             ValidationProblemDetails error =  new()
             {
@@ -48,7 +48,7 @@ namespace CompanionApp.Exceptions.ExceptionMiddlewareNS
             error.Errors.Add(new KeyValuePair<string, string[]>(HttpStatusCode.Conflict.ToString(),new[] { exception.Message }));
             return error;
         }
-        public static ValidationProblemDetails ToNotFoundExceptionDetails           (this Exception exception)
+        public static ValidationProblemDetails ToNotFoundExceptionDetails  (this Exception exception)
         {
             ValidationProblemDetails error =  new()
             {
@@ -56,16 +56,6 @@ namespace CompanionApp.Exceptions.ExceptionMiddlewareNS
                 Status = (int)HttpStatusCode.NotFound
             };
             error.Errors.Add(new KeyValuePair<string, string[]>(HttpStatusCode.NotFound.ToString(),new[] { exception.Message }));
-            return error;
-        }
-        public static ValidationProblemDetails ToUnauthorizedRequestExceptionDetails(this Exception exception)
-        {
-            ValidationProblemDetails error = new()
-            {
-                Type   = "https://datatracker.ietf.org/doc/html/rfc7235#section-3.1",
-                Status = (int)HttpStatusCode.Unauthorized
-            };
-            error.Errors.Add(new KeyValuePair<string, string[]>(HttpStatusCode.Unauthorized.ToString(), new[] { exception.Message }));
             return error;
         }
     }

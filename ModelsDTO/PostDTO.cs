@@ -11,7 +11,7 @@
     }
     public class PostPOSTCommandDTO
     {
-        //public string  UserId     { get; set; } = null!;
+        public string  UserId     { get; set; } = null!;
         public string? Text       { get; set; }
         public byte[]? Attachment { get; set; }
     }
