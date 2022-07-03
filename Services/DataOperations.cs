@@ -31,7 +31,7 @@ namespace CompanionApp.Services
         }
         public static async Task<bool>           PostExists           (this DbSet<Post>          _dbSet, Guid postID)
         {
-            return await _dbSet.AnyAsync(post => post.Id.ToString().Equals(postID));
+            return await _dbSet.AnyAsync(post => post.Id.Equals(postID));
         }
         public static async Task<Post?>          GetPostAsync         (this DbSet<Post>          _dbSet, Guid postID)
         {
