@@ -1,46 +1,41 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.EntityFrameworkCore;
 using EntityFramework.Exceptions.SqlServer;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace CompanionApp.Models
 {
-    public partial class CompanionAppDBContext : DbContext
+    public partial class CompanionAppDBContext : IdentityDbContext
     {
-        readonly string _connectionString = null!;
-
         public CompanionAppDBContext()
         {
-            
         }
 
         public CompanionAppDBContext(DbContextOptions<CompanionAppDBContext> options)
             : base(options)
         {
-            _connectionString = Database.GetDbConnection().ConnectionString;
         }
-
-        public virtual DbSet<Comment      > Comments      { get; set; } = null!;
-        public virtual DbSet<Course       > Courses       { get; set; } = null!;
+        public virtual DbSet<Comment> Comments { get; set; } = null!;
+        public virtual DbSet<Course> Courses { get; set; } = null!;
         public virtual DbSet<CourseTakenBy> CourseTakenBy { get; set; } = null!;
-        public virtual DbSet<Following    > Followings    { get; set; } = null!;
-        public virtual DbSet<Like         > Likes         { get; set; } = null!;
-        public virtual DbSet<Post         > Posts         { get; set; } = null!;
-        public virtual DbSet<Profile      > Profiles      { get; set; } = null!;
-        public virtual DbSet<Semester     > Semesters     { get; set; } = null!;
+        public virtual DbSet<Following> Followings { get; set; } = null!;
+        public virtual DbSet<Like> Likes { get; set; } = null!;
+        public virtual DbSet<Post> Posts { get; set; } = null!;
+        public virtual DbSet<Profile> Profiles { get; set; } = null!;
+        public virtual DbSet<Semester> Semesters { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer(_connectionString);
+                optionsBuilder.UseSqlServer("name=DevDB");
             }
             optionsBuilder.UseExceptionProcessor();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+            
             modelBuilder.Entity<Comment>(entity =>
             {
                 entity.ToTable("COMMENTS", "CompanionApp");
@@ -342,12 +337,6 @@ namespace CompanionApp.Models
                     .HasMaxLength(50)
                     .IsUnicode(false)
                     .HasColumnName("MAJOR");
-
-                entity.Property(e => e.PasswordHash)
-                    .HasMaxLength(64)
-                    .IsUnicode(false)
-                    .HasColumnName("PASSWORD_HASH")
-                    .IsFixedLength();
             });
 
             modelBuilder.Entity<Semester>(entity =>

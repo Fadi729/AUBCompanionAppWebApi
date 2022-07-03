@@ -5,7 +5,7 @@ namespace CompanionApp.Extensions
 {
     public static class ProfileExtensions
     {
-        public static ProfileQueryDTO ToProfileQuerryDTO(this Profile profile)
+        public static ProfileQueryDTO   ToProfileQuerryDTO (this Profile profile)
         {
             return new ProfileQueryDTO
             {
@@ -17,7 +17,7 @@ namespace CompanionApp.Extensions
                 Class     = profile.Class
             };
         }
-        public static Profile         ToProfile         (this ProfileCommandDTO profile)
+        public static Profile           ToProfile          (this ProfileCommandDTO profile)
         {
             return new Profile
             {
@@ -29,11 +29,22 @@ namespace CompanionApp.Extensions
                 Class     = profile.Class,
             };
         }
-        public static Profile         ToProfile         (this ProfileCommandDTO profile, Guid id)
+        public static Profile           ToProfile          (this ProfileCommandDTO profile, Guid id)
         {
             return new Profile
             {
                 Id        = id,
+                FirstName = profile.FirstName,
+                LastName  = profile.LastName,
+                Email     = profile.Email,
+                Major     = profile.Major,
+                Class     = profile.Class,
+            };
+        }
+        public static ProfileCommandDTO ToProfileCommandDTO(this ProfileRegistrationDTO profile)
+        {
+            return new ProfileCommandDTO
+            {
                 FirstName = profile.FirstName,
                 LastName  = profile.LastName,
                 Email     = profile.Email,

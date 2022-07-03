@@ -7,7 +7,6 @@ using CompanionApp.Services.Contracts;
 using CompanionApp.Exceptions.PostExceptions;
 using CompanionApp.Exceptions.CommentExceptions;
 using CompanionApp.Exceptions.ProfileExceptions;
-using CompanionApp.Validation.CommentValidation;
 
 namespace CompanionApp.Services
 {
@@ -17,19 +16,14 @@ namespace CompanionApp.Services
         readonly DbSet<Comment>        _dbSetComment;
         readonly DbSet<Post>           _dbSetPost;
         readonly DbSet<Profile>        _dbSetProfile;
-        readonly AddCommentValidation  _addCommentValidator;
-        readonly EditCommentValidation _editCommentValidator;
+        
 
-        public CommentsService(CompanionAppDBContext context, 
-            AddCommentValidation  addValidator, 
-            EditCommentValidation editValidator)
+        public CommentsService(CompanionAppDBContext context)
         {
             _context              = context;
             _dbSetComment         = context.Comments;
             _dbSetPost            = context.Posts;
             _dbSetProfile         = context.Profiles;
-            _addCommentValidator  = addValidator;
-            _editCommentValidator = editValidator;
         }
 
         public async Task<CommentQueryDTO>              GetComment          (Guid commentID)
@@ -45,7 +39,7 @@ namespace CompanionApp.Services
         }
         public async Task<IEnumerable<CommentQueryDTO>> GetPostComments     (Guid postID)
         {
-            if (!await _dbSetPost.PostExists(postID.ToString()))
+            if (!await _dbSetPost.PostExists(postID))
             {
                 throw new PostNotFoundException();
             }
@@ -66,50 +60,69 @@ namespace CompanionApp.Services
         {
             return (await GetPostComments(postID)).Count();
         }
-        public async Task<CommentQueryDTO>              AddComment          (CommentPOSTCommandDTO comment)
+        public async Task<CommentQueryDTO>              AddComment          (CommentPOSTCommandDTO comment, Guid postID, Guid userID)
         {
-            await _addCommentValidator.ValidateAndThrowAsync(comment);
-            if (!await _dbSetPost.PostExists(comment.PostID.ToString()))
+            if (!await _dbSetPost.PostExists(postID))
             {
                 throw new PostNotFoundException();
             }
-            if (!await _dbSetProfile.ProfileExists(Guid.Parse(comment.UserID)))
+            if (!await _dbSetProfile.ProfileExists(userID))
             {
                 throw new ProfileNotFoundException();
             }
 
-            Comment newComment = comment.ToComment();
+            Comment newComment = comment.ToComment(postID, userID);
             _dbSetComment.Add(newComment);
             await _context.SaveChangesAsync();
             return newComment.ToCommentQueryDTO();
         }
-        public async Task                               EditComment         (CommentPUTCommandDTO comment)
+        public async Task                               EditComment         (CommentPOSTCommandDTO comment, Guid commentID, Guid postID, Guid userID)
         {
-            await _editCommentValidator.ValidateAndThrowAsync(comment);
-            if (!await _dbSetComment.CommentExists(comment.Id))
+            if (!await _dbSetProfile.ProfileExists(userID))
             {
-                throw new CommentNotFoundException();
+                throw new ProfileNotFoundException();
             }
-            if (!await _dbSetPost.PostExists(comment.PostID))
+            if (!await _dbSetPost.PostExists(postID))
             {
                 throw new PostNotFoundException();
             }
-            if (!await _dbSetProfile.ProfileExists(comment.UserID))
+            
+            Comment? commentToEdit = await _dbSetComment.GetCommentAsync(commentID);
+            if (commentToEdit is null)
+            {
+                throw new CommentNotFoundException();
+            }
+
+            if(!DataOperations.CommentBelongsToPost(commentToEdit.PostId, postID))
+            {
+                throw new CommentDoesNotBelongToPostException();
+            }
+            if(!DataOperations.UserOwnsComment(commentToEdit.UserId, userID))
+            {
+                throw new UserDoesNotOwnCommentException();
+            }
+
+            _dbSetComment.Update(comment.ToComment(commentID, postID, userID));
+            await _context.SaveChangesAsync();
+        }
+        public async Task                               DeleteComment       (Guid commentID, Guid userID)
+        {
+            if(!await _dbSetProfile.ProfileExists(userID))
             {
                 throw new ProfileNotFoundException();
             }
 
-            _dbSetComment.Update(comment.ToComment());
-            await _context.SaveChangesAsync();
-        }
-        public async Task                               DeleteComment       (Guid commentID)
-        {
-            if(!await _dbSetComment.CommentExists(commentID.ToString()))
+            Comment? commentToDelete = await _dbSetComment.GetCommentAsync(commentID);
+            if(commentToDelete is null)
             {
                 throw new CommentNotFoundException();
             }
+            if(!DataOperations.UserOwnsComment(commentToDelete.UserId, userID))
+            {
+                throw new UserDoesNotOwnCommentException();
+            }
 
-            _dbSetComment.Remove(new Comment { Id = commentID });
+            _dbSetComment.Remove(commentToDelete);
             await _context.SaveChangesAsync();
         }
     }
