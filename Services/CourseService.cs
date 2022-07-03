@@ -65,6 +65,7 @@ namespace CompanionApp.Services
             #region try   block
             try
             {
+                int counter = 0;
                 foreach (CourseDTO course in courses)
                 {
                     if (!(await _courseValidation.ValidateAsync(course)).IsValid)
@@ -77,6 +78,7 @@ namespace CompanionApp.Services
                     }
                     else
                         _dbSet.Add(course.ToCourse());
+                    Console.WriteLine(++counter);
                 }
 
                 await _context.SaveChangesAsync();

@@ -1,11 +1,14 @@
 ﻿using CompanionApp.ModelsDTO;
 using Microsoft.AspNetCore.Mvc;
 using CompanionApp.Services.Contracts;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace CompanionApp.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class CoursesController : ControllerBase
     {
         readonly ICourseService _courseService;

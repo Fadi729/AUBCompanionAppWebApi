@@ -12,12 +12,12 @@ using CompanionApp.Exceptions.ProfileExceptions;
 
 namespace CompanionApp.Services
 {
-    public class UserManager : IUserManager
+    public class UserService : IUserService
     {
         readonly UserManager<IdentityUser> _userManager;
         readonly JwtSettings               _jwtSettings;
         readonly IProfileService           _profileService;
-        public UserManager(UserManager<IdentityUser> userManager, JwtSettings jwtSettings, IProfileService profileService)
+        public UserService(UserManager<IdentityUser> userManager, JwtSettings jwtSettings, IProfileService profileService)
         {
             _userManager    = userManager;
             _jwtSettings    = jwtSettings;

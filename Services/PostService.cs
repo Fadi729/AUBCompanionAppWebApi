@@ -5,7 +5,6 @@ using CompanionApp.Extensions;
 using Microsoft.EntityFrameworkCore;
 using CompanionApp.Services.Contracts;
 using CompanionApp.Exceptions.PostExceptions;
-using CompanionApp.Validation.PostValidation;
 
 namespace CompanionApp.Services
 {
@@ -13,14 +12,10 @@ namespace CompanionApp.Services
     {
         readonly CompanionAppDBContext _context;
         readonly DbSet<Post>           _dbSet;
-        readonly AddPostValidation     _addPostValidator;
-        readonly EditPostValidation    _editPostValidator;
-        public PostService(CompanionAppDBContext dbContext, AddPostValidation PostValidator, EditPostValidation EditPostValidator)
+        public PostService(CompanionAppDBContext dbContext)
         {
             _context           = dbContext;
             _dbSet             = _context.Posts;
-            _addPostValidator  = PostValidator;
-            _editPostValidator = EditPostValidator;
         }
 
         public async Task<IEnumerable<PostsByUserDTO>> GetPostsByUserIDAsync        (Guid userID)
@@ -67,12 +62,11 @@ namespace CompanionApp.Services
 
             return post.ToPostQueryDTO();
         }
-        public async Task<PostQueryDTO>                CreatePostAsync              (PostPOSTCommandDTO post, string userID)
+        public async Task<PostQueryDTO>                CreatePostAsync              (PostPOSTCommandDTO post, Guid userID)
         {
             try
             {
-                //await _addPostValidator.ValidateAndThrowAsync(post);
-                Post newpost = post.ToPost(Guid.Parse(userID));
+                Post newpost = post.ToPost(userID);
                 _dbSet.Add(newpost);
                 await _context.SaveChangesAsync();
                 return newpost.ToPostQueryDTO();
@@ -82,23 +76,21 @@ namespace CompanionApp.Services
                 throw;
             }
         }
-        public async Task                              EditPostAsync                (PostPOSTCommandDTO post, string postID, string userId)
+        public async Task                              EditPostAsync                (PostPOSTCommandDTO post, Guid postID, Guid userId)
         {
             try
             {
-                Post? postToEdit = await _dbSet.GetPost(postID);
-
+                Post? postToEdit = await _dbSet.GetPostAsync(postID);
+                
                 if (postToEdit is null)
                 {
                     throw new PostNotFoundException();
                 }
-                if (!DataOperations.UserOwnsPost(postToEdit.UserId.ToString(), userId))
+                if (!DataOperations.UserOwnsPost(postToEdit.UserId, userId))
                 {
                     throw new UserDoesNotOwnPostException();
                 }
-                
-                //await _editPostValidator.ValidateAndThrowAsync(post);
-                _dbSet.Update(post.ToPost(Guid.Parse(postID), Guid.Parse(userId)));
+                _dbSet.Update(post.ToPost(postID, userId));
                 await _context.SaveChangesAsync();
             }
             catch (Exception)
@@ -106,20 +98,20 @@ namespace CompanionApp.Services
                 throw;
             }
         }
-        public async Task                              DeletePostAsync              (string postID, string userID)
+        public async Task                              DeletePostAsync              (Guid postID, Guid userID)
         {
-            Post? postToDelete = await _dbSet.GetPost(postID.ToString());
+            Post? postToDelete = await _dbSet.GetPostAsync(postID);
 
             if (postToDelete is null)
             {
                 throw new PostNotFoundException();
             }           
-            if (!DataOperations.UserOwnsPost(postToDelete.UserId.ToString(), userID.ToString()))
+            if (!DataOperations.UserOwnsPost(postToDelete.UserId, userID))
             {
                 throw new UnauthorizedAccessException();
             }
             
-            _dbSet.Remove(new Post() { Id = Guid.Parse(postID) });
+            _dbSet.Remove(postToDelete);
             await _context.SaveChangesAsync();
         }
     }

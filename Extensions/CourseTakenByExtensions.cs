@@ -5,17 +5,6 @@ namespace CompanionApp.Extensions
 {
     public static class CourseTakenByExtensions
     {
-        public static CourseTakenByDTO         ToCourseTakenByDTO        (this CourseTakenBy courseTakenBy)
-        {
-            return new CourseTakenByDTO
-            {
-                User     = courseTakenBy.User.ToProfileQuerryDTO(),
-                Course   = courseTakenBy.CCrnNavigation.ToCourseDTO(),
-                Semester = courseTakenBy.Semester.ToSemesterDTO(),
-                Grade    = courseTakenBy.Grade,
-
-            };
-        }
         public static CourseTakenBy_User_DTO   ToCourseTakenBy_User_DTO  (this CourseTakenBy courseTakenBy)
         {
             return new CourseTakenBy_User_DTO

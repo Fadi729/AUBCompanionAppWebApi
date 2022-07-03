@@ -9,8 +9,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.Text.Json.Serialization;
 using CompanionApp.Services.Contracts;
-using CompanionApp.Validation.PostValidation;
-using CompanionApp.Validation.CommentValidation;
 using CompanionApp.Exceptions.ExceptionMiddlewareNS;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
@@ -77,7 +75,7 @@ builder.Services.AddScoped<JwtSettings>();
 
 builder.Services
 #region Services
-    .AddScoped<IUserManager         , UserManager         >()
+    .AddScoped<IUserService         , UserService         >()
     .AddScoped<IProfileService      , ProfileService      >()
     .AddScoped<ICourseService       , CourseService       >()
     .AddScoped<IPostService         , PostService         >()
@@ -93,13 +91,7 @@ builder.Services
     .AddScoped<ProfileValidation      >()
     .AddScoped<CourseValidation       >()
     .AddScoped<SemesterValidation     >()
-    .AddScoped<CourseTakenByValidation>()
-    .AddScoped<AddCommentValidation   >()
-    .AddScoped<EditCommentValidation  >()
-    .AddScoped<FollowingsValidation   >()
-    .AddScoped<LikeValidation         >()
-    .AddScoped<AddPostValidation      >()
-    .AddScoped<EditPostValidation     >();
+    .AddScoped<CourseTakenByValidation>();
 #endregion
 
 JwtSettings jwtSettings = new();
@@ -139,8 +131,8 @@ app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
-
 app.MapControllers();
+
+app.UseAuthorization();
 
 app.Run();

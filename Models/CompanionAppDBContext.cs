@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using EntityFramework.Exceptions.SqlServer;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace CompanionApp.Models
 {
@@ -28,6 +29,7 @@ namespace CompanionApp.Models
             {
                 optionsBuilder.UseSqlServer("name=DevDB");
             }
+            optionsBuilder.UseExceptionProcessor();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

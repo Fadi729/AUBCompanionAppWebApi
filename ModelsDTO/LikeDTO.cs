@@ -1,6 +1,6 @@
 ﻿namespace CompanionApp.ModelsDTO
 {
-    public class LikeDTO
+    public class LikeQueryDTO
     {
         public Guid     PostId    { get; set; }
         public Guid     UserId    { get; set; }
@@ -11,7 +11,7 @@
         public virtual ProfileQueryDTO? User      { get; set; }
         public DateTime                 DateLiked { get; set; }
     }
-    public class LikePOSTDTO
+    public class LikeCommandDTO
     {
         public string PostId { get; set; } = null!;
         public string UserId { get; set; } = null!;

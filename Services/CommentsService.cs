@@ -7,7 +7,6 @@ using CompanionApp.Services.Contracts;
 using CompanionApp.Exceptions.PostExceptions;
 using CompanionApp.Exceptions.CommentExceptions;
 using CompanionApp.Exceptions.ProfileExceptions;
-using CompanionApp.Validation.CommentValidation;
 
 namespace CompanionApp.Services
 {
@@ -17,19 +16,14 @@ namespace CompanionApp.Services
         readonly DbSet<Comment>        _dbSetComment;
         readonly DbSet<Post>           _dbSetPost;
         readonly DbSet<Profile>        _dbSetProfile;
-        readonly AddCommentValidation  _addCommentValidator;
-        readonly EditCommentValidation _editCommentValidator;
+        
 
-        public CommentsService(CompanionAppDBContext context, 
-            AddCommentValidation  addValidator, 
-            EditCommentValidation editValidator)
+        public CommentsService(CompanionAppDBContext context)
         {
             _context              = context;
             _dbSetComment         = context.Comments;
             _dbSetPost            = context.Posts;
             _dbSetProfile         = context.Profiles;
-            _addCommentValidator  = addValidator;
-            _editCommentValidator = editValidator;
         }
 
         public async Task<CommentQueryDTO>              GetComment          (Guid commentID)
@@ -45,7 +39,7 @@ namespace CompanionApp.Services
         }
         public async Task<IEnumerable<CommentQueryDTO>> GetPostComments     (Guid postID)
         {
-            if (!await _dbSetPost.PostExists(postID.ToString()))
+            if (!await _dbSetPost.PostExists(postID))
             {
                 throw new PostNotFoundException();
             }
@@ -68,8 +62,7 @@ namespace CompanionApp.Services
         }
         public async Task<CommentQueryDTO>              AddComment          (CommentPOSTCommandDTO comment, Guid postID, Guid userID)
         {
-            await _addCommentValidator.ValidateAndThrowAsync(comment);
-            if (!await _dbSetPost.PostExists(postID.ToString()))
+            if (!await _dbSetPost.PostExists(postID))
             {
                 throw new PostNotFoundException();
             }
@@ -85,17 +78,16 @@ namespace CompanionApp.Services
         }
         public async Task                               EditComment         (CommentPOSTCommandDTO comment, Guid commentID, Guid postID, Guid userID)
         {
-            await _addCommentValidator.ValidateAndThrowAsync(comment);
             if (!await _dbSetProfile.ProfileExists(userID))
             {
                 throw new ProfileNotFoundException();
             }
-            if (!await _dbSetPost.PostExists(postID.ToString()))
+            if (!await _dbSetPost.PostExists(postID))
             {
                 throw new PostNotFoundException();
             }
             
-            Comment? commentToEdit = await _dbSetComment.GetComment(commentID);
+            Comment? commentToEdit = await _dbSetComment.GetCommentAsync(commentID);
             if (commentToEdit is null)
             {
                 throw new CommentNotFoundException();
@@ -120,7 +112,7 @@ namespace CompanionApp.Services
                 throw new ProfileNotFoundException();
             }
 
-            Comment? commentToDelete = await _dbSetComment.GetComment(commentID);
+            Comment? commentToDelete = await _dbSetComment.GetCommentAsync(commentID);
             if(commentToDelete is null)
             {
                 throw new CommentNotFoundException();

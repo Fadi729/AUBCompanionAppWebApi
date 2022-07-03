@@ -43,7 +43,7 @@ namespace CompanionApp.Controllers
         [HttpPost("{postID}")]
         public async Task<ActionResult<CommentQueryDTO>>              PostComment         (CommentPOSTCommandDTO comment, Guid postID)
         {
-            CommentQueryDTO newComment = await _commentsService.AddComment(comment, postID, Guid.Parse(HttpContext.GeUserID()));
+            CommentQueryDTO newComment = await _commentsService.AddComment(comment, postID, HttpContext.GetUserID());
             return CreatedAtAction("GetComment", new { commentID = newComment.Id }, newComment);
         }
 
@@ -51,7 +51,7 @@ namespace CompanionApp.Controllers
         [HttpPut("post/{postID}/comment/{commentID}")]
         public async Task<IActionResult>                              PutComment          (CommentPOSTCommandDTO comment, Guid commentID, Guid postID)
         {
-            await _commentsService.EditComment(comment, commentID, postID, Guid.Parse(HttpContext.GeUserID()));
+            await _commentsService.EditComment(comment, commentID, postID, HttpContext.GetUserID());
             return NoContent();
         }
 
@@ -59,7 +59,7 @@ namespace CompanionApp.Controllers
         [HttpDelete("{commentID}")]
         public async Task<IActionResult>                              DeleteComment       (Guid commentID)
         {
-            await _commentsService.DeleteComment(commentID, Guid.Parse(HttpContext.GeUserID()));
+            await _commentsService.DeleteComment(commentID, HttpContext.GetUserID());
             return NoContent();
         }
     }

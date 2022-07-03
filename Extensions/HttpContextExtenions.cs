@@ -2,13 +2,13 @@
 {
     public static class HttpContextExtenions
     {
-        public static string GeUserID(this HttpContext httpContext)
+        public static Guid GetUserID(this HttpContext httpContext)
         {
             if (httpContext is null)
             {
-                return string.Empty;
+                return Guid.Empty;
             }
-            return httpContext.User.Claims.Single(c => c.Type == "userID").Value;
+            return Guid.Parse(httpContext.User.Claims.Single(c => c.Type == "userID").Value);
         }
     }
 }
