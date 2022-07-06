@@ -1,6 +1,8 @@
-﻿namespace CompanionApp.Models
+﻿using CompanionApp.Models.Interfaces;
+
+namespace CompanionApp.Models
 {
-    public partial class Post
+    public partial class Post : IPost
     {
         public Post()
         {

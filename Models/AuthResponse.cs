@@ -1,6 +1,8 @@
-﻿namespace CompanionApp.Models
+﻿using CompanionApp.Models.Interfaces;
+
+namespace CompanionApp.Models
 {
-    public class AuthResponse
+    public class AuthResponse : IAuthResponse
     {
         public string               Token         { get; set; }
         public bool                 IsSuccessful  { get; set; }

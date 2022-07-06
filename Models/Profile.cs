@@ -1,6 +1,8 @@
-﻿namespace CompanionApp.Models
+﻿using CompanionApp.Models.Interfaces;
+using Microsoft.AspNetCore.Identity;
+namespace CompanionApp.Models
 {
-    public partial class Profile
+    public partial class Profile : IdentityUser<Guid>, IProfile
     {
         public Profile()
         {

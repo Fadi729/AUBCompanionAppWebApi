@@ -1,6 +1,8 @@
-﻿namespace CompanionApp.Models
+﻿using CompanionApp.Models.Interfaces;
+
+namespace CompanionApp.Models
 {
-    public partial class Following
+    public partial class Following : IFollowing
     {
         #region Attributes
         public Guid      UserId       { get; set; }
