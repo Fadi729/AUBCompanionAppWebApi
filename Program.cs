@@ -3,14 +3,15 @@ using CompanionApp.Jwt;
 using CompanionApp.Models;
 using CompanionApp.Services;
 using CompanionApp.Validation;
+using CompanionApp.Exceptions;
 using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.Text.Json.Serialization;
 using CompanionApp.Services.Contracts;
-using CompanionApp.Exceptions.ExceptionMiddlewareNS;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using CompanionApp.Exceptions.ExceptionMiddlewareNS;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -115,6 +116,10 @@ builder.Services.AddAuthentication(options =>
             ValidateAudience         = false,
             RequireExpirationTime    = false,
             ValidateLifetime         = true,
+        };
+        jwt.Events = new JwtBearerEvents
+        {
+            OnChallenge = async _ => throw new UnauthorizedRequestException()
         };
     });
 
