@@ -63,7 +63,7 @@ builder.Configuration
 
 #if DEBUG
 builder.Services.AddDbContext<CompanionAppDBContext>(
-    options => options.UseSqlServer(builder.Configuration["ConnectionStrings:DevDB"]));
+    options => options.UseSqlServer(builder.Configuration["ConnectionStrings:LocalDb"]));
 builder.Services.AddIdentityCore<IdentityUser>().AddEntityFrameworkStores<CompanionAppDBContext>();
 #else
 builder.Services.AddDbContext<CompanionAppDBContext>(
