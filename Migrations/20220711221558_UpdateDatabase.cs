@@ -4,7 +4,7 @@
 
 namespace CompanionApp.Migrations
 {
-    public partial class addcascadedeleteonlikesfromprofile : Migration
+    public partial class UpdateDatabase : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

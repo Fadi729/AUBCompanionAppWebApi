@@ -4,6 +4,7 @@ using CompanionApp.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CompanionApp.Migrations
 {
     [DbContext(typeof(CompanionAppDBContext))]
-    partial class CompanionAppDBContextModelSnapshot : ModelSnapshot
+    [Migration("20220711223308_RemovedFKConstraintBetweenLike_CommentAndProfile")]
+    partial class RemovedFKConstraintBetweenLike_CommentAndProfile
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -404,7 +406,6 @@ namespace CompanionApp.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("UserName")
-                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 

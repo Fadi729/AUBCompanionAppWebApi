@@ -5,11 +5,11 @@ using CompanionApp.Services;
 using CompanionApp.Validation;
 using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.Text.Json.Serialization;
 using CompanionApp.Services.Contracts;
 using CompanionApp.Exceptions.ExceptionMiddlewareNS;
+using CompanionApp.Models.Identity_models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -63,8 +63,11 @@ builder.Configuration
 
 #if DEBUG
 builder.Services.AddDbContext<CompanionAppDBContext>(
-    options => options.UseSqlServer(builder.Configuration["ConnectionStrings:LocalDb"]));
-builder.Services.AddIdentityCore<IdentityUser>().AddEntityFrameworkStores<CompanionAppDBContext>();
+    options => options.UseSqlServer(builder.Configuration["ConnectionStrings:DevDB"]));
+builder.Services.AddIdentity<Profile, AppRole>(options =>
+{
+    options.User.AllowedUserNameCharacters = null;
+}).AddEntityFrameworkStores<CompanionAppDBContext>();
 #else
 builder.Services.AddDbContext<CompanionAppDBContext>(
     options => options.UseSqlServer(builder.Configuration.GetConnectionString("CompanionAppDB")));

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CompanionApp.Migrations
 {
     [DbContext(typeof(CompanionAppDBContext))]
-    [Migration("20220711212158_add cascade delete on likes from profile")]
-    partial class addcascadedeleteonlikesfromprofile
+    [Migration("20220711224232_AddedUserNameToProfile")]
+    partial class AddedUserNameToProfile
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -406,6 +406,7 @@ namespace CompanionApp.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("UserName")
+                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
@@ -567,6 +568,7 @@ namespace CompanionApp.Migrations
                     b.HasOne("CompanionApp.Models.Profile", "User")
                         .WithMany("Comments")
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired()
                         .HasConstraintName("FK_COMMENTS_PROFILE");
 
@@ -645,6 +647,7 @@ namespace CompanionApp.Migrations
                     b.HasOne("CompanionApp.Models.Profile", "User")
                         .WithMany("Likes")
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired()
                         .HasConstraintName("FK_LIKES_PROFILE");
 

@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -313,13 +312,13 @@ namespace CompanionApp.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_LIKES", x => new { x.postID, x.userID });
-                    table.ForeignKey(
-                        name: "FK_LIKES_POST",
-                        column: x => x.postID,
-                        principalSchema: "CompanionApp",
-                        principalTable: "POST",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
+                    //table.ForeignKey(
+                    //    name: "FK_LIKES_POST",
+                    //    column: x => x.postID,
+                    //    principalSchema: "CompanionApp",
+                    //    principalTable: "POST",
+                    //    principalColumn: "ID",
+                    //    onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_LIKES_PROFILE",
                         column: x => x.userID,
