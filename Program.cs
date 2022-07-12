@@ -64,10 +64,7 @@ builder.Configuration
 #if DEBUG
 builder.Services.AddDbContext<CompanionAppDBContext>(
     options => options.UseSqlServer(builder.Configuration["ConnectionStrings:DevDB"]));
-builder.Services.AddIdentity<Profile, AppRole>(options =>
-{
-    options.User.AllowedUserNameCharacters = null;
-}).AddEntityFrameworkStores<CompanionAppDBContext>();
+builder.Services.AddIdentity<Profile, AppRole>().AddEntityFrameworkStores<CompanionAppDBContext>();
 #else
 builder.Services.AddDbContext<CompanionAppDBContext>(
     options => options.UseSqlServer(builder.Configuration.GetConnectionString("CompanionAppDB")));

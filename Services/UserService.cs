@@ -46,17 +46,9 @@ namespace CompanionApp.Services
                 LastName  = user.LastName,
                 Major     = user.Major,
                 Class     = user.Class,
-                UserName  = user.FirstName + " " + user.LastName 
+                UserName  = user.FirstName.ToLower() + "_" + user.LastName.ToLower()
             };
 
-            //ProfileQueryDTO profileDTO = await _profileService.CreateProfileAsync(newProfile);
-
-            //IdentityUser newUser = new()
-            //{
-            //    Id       = profileDTO.Id.ToString(),
-            //    UserName = user.Email,
-            //    Email    = user.Email,
-            //};
 
             var createProfile = await _userManager.CreateAsync(newProfile, user.Password);
 
