@@ -69,7 +69,7 @@ builder.Services.AddIdentity<Profile, AppRole>().AddEntityFrameworkStores<Compan
 #else
 builder.Services.AddDbContext<CompanionAppDBContext>(
     options => options.UseSqlServer(builder.Configuration.GetConnectionString("CompanionAppDB")));
-builder.Services.AddIdentityCore<IdentityUser>().AddEntityFrameworkStores<CompanionAppDBContext>();
+builder.Services.AddIdentity<Profile, AppRole>().AddEntityFrameworkStores<CompanionAppDBContext>();
 #endif
 
 builder.Services.AddScoped<JwtSettings>();
