@@ -4,6 +4,7 @@ using CompanionApp.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CompanionApp.Migrations
 {
     [DbContext(typeof(CompanionAppDBContext))]
-    partial class CompanionAppDBContextModelSnapshot : ModelSnapshot
+    [Migration("20220711223308_RemovedFKConstraintBetweenLike_CommentAndProfile")]
+    partial class RemovedFKConstraintBetweenLike_CommentAndProfile
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -345,6 +347,7 @@ namespace CompanionApp.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasMaxLength(50)
                         .IsUnicode(false)
                         .HasColumnType("varchar(50)")
@@ -417,8 +420,7 @@ namespace CompanionApp.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.HasIndex(new[] { "Email" }, "UQ__PROFILE__161CF72470A5A43A")
-                        .IsUnique()
-                        .HasFilter("[EMAIL] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("PROFILE", "CompanionApp");
                 });

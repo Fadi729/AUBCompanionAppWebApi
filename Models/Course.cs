@@ -1,6 +1,8 @@
-﻿namespace CompanionApp.Models
+﻿using CompanionApp.Models.Interfaces;
+
+namespace CompanionApp.Models
 {
-    public partial class Course
+    public partial class Course : ICourse
     {
         public Course()
         {

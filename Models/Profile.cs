@@ -1,6 +1,8 @@
-﻿namespace CompanionApp.Models
+﻿using CompanionApp.Models.Interfaces;
+using Microsoft.AspNetCore.Identity;
+namespace CompanionApp.Models
 {
-    public partial class Profile
+    public partial class Profile : IdentityUser<Guid>, IProfile
     {
         public Profile()
         {
@@ -13,13 +15,10 @@
         }
 
         #region Attributes
-        public Guid    Id        { get; set; }
-        public string? PasswordHash { get; set; }
-        public string  FirstName { get; set; } = null!;
-        public string  LastName  { get; set; } = null!;
-        public string  Email     { get; set; } = null!;
-        public string? Major     { get; set; }
-        public string? Class     { get; set; }
+        public string  FirstName    { get; set; } = null!;
+        public string  LastName     { get; set; } = null!;
+        public string? Major        { get; set; }
+        public string? Class        { get; set; }
         #endregion
         #region Navigation Properties
         public virtual ICollection<Comment      > Comments                        { get; set; }

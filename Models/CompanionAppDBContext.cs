@@ -1,10 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CompanionApp.Models.Identity_models;
+using Microsoft.EntityFrameworkCore;
 using EntityFramework.Exceptions.SqlServer;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace CompanionApp.Models
 {
-    public partial class CompanionAppDBContext : IdentityDbContext
+    public partial class CompanionAppDBContext : IdentityDbContext<Profile,AppRole,Guid> 
     {
         public CompanionAppDBContext()
         {
@@ -62,7 +63,7 @@ namespace CompanionApp.Models
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.Comments)
                     .HasForeignKey(d => d.UserId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.NoAction)
                     .HasConstraintName("FK_COMMENTS_PROFILE");
             });
 
@@ -274,7 +275,7 @@ namespace CompanionApp.Models
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.Likes)
                     .HasForeignKey(d => d.UserId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.NoAction)
                     .HasConstraintName("FK_LIKES_PROFILE");
             });
 

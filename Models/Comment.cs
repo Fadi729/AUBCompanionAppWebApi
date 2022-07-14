@@ -1,6 +1,8 @@
-﻿namespace CompanionApp.Models
+﻿using CompanionApp.Models.Interfaces;
+
+namespace CompanionApp.Models
 {
-    public partial class Comment
+    public partial class Comment : IComment
     {
         #region Attributes
         public Guid     PostId      { get; set; }

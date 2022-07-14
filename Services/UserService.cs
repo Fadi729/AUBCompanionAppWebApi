@@ -14,10 +14,10 @@ namespace CompanionApp.Services
 {
     public class UserService : IUserService
     {
-        readonly UserManager<IdentityUser> _userManager;
-        readonly JwtSettings               _jwtSettings;
-        readonly IProfileService           _profileService;
-        public UserService(UserManager<IdentityUser> userManager, JwtSettings jwtSettings, IProfileService profileService)
+        readonly UserManager<Profile> _userManager;
+        readonly JwtSettings          _jwtSettings;
+        readonly IProfileService      _profileService;
+        public UserService(UserManager<Profile> userManager, JwtSettings jwtSettings, IProfileService profileService)
         {
             _userManager    = userManager;
             _jwtSettings    = jwtSettings;
@@ -38,25 +38,19 @@ namespace CompanionApp.Services
                 };
             }
 
-            ProfileCommandDTO newProfile = new()
+            Profile newProfile = new()
             {
+                Id        = Guid.NewGuid(),
                 Email     = user.Email,
                 FirstName = user.FirstName,
                 LastName  = user.LastName,
                 Major     = user.Major,
-                Class     = user.Class
+                Class     = user.Class,
+                UserName  = user.FirstName.ToLower() + "_" + user.LastName.ToLower()
             };
 
-            ProfileQueryDTO profileDTO = await _profileService.CreateProfileAsync(newProfile);
 
-            IdentityUser newUser = new()
-            {
-                Id       = profileDTO.Id.ToString(),
-                UserName = user.Email,
-                Email    = user.Email,
-            };
-
-            var createProfile = await _userManager.CreateAsync(newUser, user.Password);
+            var createProfile = await _userManager.CreateAsync(newProfile, user.Password);
 
             if (!createProfile.Succeeded)
             {
@@ -66,7 +60,7 @@ namespace CompanionApp.Services
                 };
             }
 
-            return AuthenticationTokenGenerator(profileDTO);
+            return AuthenticationTokenGenerator(newProfile);
         }
         public async Task<AuthResponse> LoginAsync                  (ProfileLoginDTO user)
         {
@@ -89,7 +83,7 @@ namespace CompanionApp.Services
                 };
             }
 
-            return AuthenticationTokenGenerator(await _profileService.GetProfileAsync(Guid.Parse(profile.Id)));
+            return AuthenticationTokenGenerator(profile);
         }
         public async Task               DeleteAsync                 (Guid userID)
         {
@@ -109,7 +103,7 @@ namespace CompanionApp.Services
 
             await _profileService.DeleteProfileAsync(userID);
         }
-        private      AuthResponse       AuthenticationTokenGenerator(ProfileQueryDTO newProfile)
+        private      AuthResponse       AuthenticationTokenGenerator(Profile newProfile)
         {
             byte[] key = Encoding.ASCII.GetBytes(_jwtSettings.Secret);
             JwtSecurityTokenHandler tokenHandler = new();

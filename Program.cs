@@ -1,17 +1,17 @@
-using System.Text;
+using CompanionApp.Exceptions;
+using CompanionApp.Exceptions.ExceptionMiddlewareNS;
 using CompanionApp.Jwt;
 using CompanionApp.Models;
-using CompanionApp.Services;
-using CompanionApp.Validation;
-using CompanionApp.Exceptions;
-using Microsoft.OpenApi.Models;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
-using System.Text.Json.Serialization;
-using CompanionApp.Services.Contracts;
+using CompanionApp.Models.Identity_models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using CompanionApp.Exceptions.ExceptionMiddlewareNS;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using System.Text;
+using System.Text.Json.Serialization;
+using CompanionApp.Services;
+using CompanionApp.Services.Contracts;
+using CompanionApp.Validation;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -65,7 +65,7 @@ builder.Configuration
 #if DEBUG
 builder.Services.AddDbContext<CompanionAppDBContext>(
     options => options.UseSqlServer(builder.Configuration["ConnectionStrings:DevDB"]));
-builder.Services.AddIdentityCore<IdentityUser>().AddEntityFrameworkStores<CompanionAppDBContext>();
+builder.Services.AddIdentity<Profile, AppRole>().AddEntityFrameworkStores<CompanionAppDBContext>();
 #else
 builder.Services.AddDbContext<CompanionAppDBContext>(
     options => options.UseSqlServer(builder.Configuration.GetConnectionString("CompanionAppDB")));

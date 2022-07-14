@@ -1,6 +1,8 @@
-﻿namespace CompanionApp.Models
+﻿using CompanionApp.Models.Interfaces;
+
+namespace CompanionApp.Models
 {
-    public partial class CourseTakenBy
+    public partial class CourseTakenBy : ICourseTakenBy
     {
         #region Attributes
         public Guid    UserId     { get; set; }

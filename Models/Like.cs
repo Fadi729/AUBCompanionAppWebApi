@@ -1,6 +1,8 @@
-﻿namespace CompanionApp.Models
+﻿using CompanionApp.Models.Interfaces;
+
+namespace CompanionApp.Models
 {
-    public partial class Like
+    public partial class Like : ILike
     {
         #region Attributes
         public Guid     PostId    { get; set; }
