@@ -66,17 +66,25 @@ builder.Services.AddDbContext<CompanionAppDBContext>(
     options => options.UseSqlServer(builder.Configuration["ConnectionStrings:DevDB"]));
 builder.Services.AddIdentity<Profile, AppRole>(options =>
 {
-    options.Password.RequireDigit = false;
-    options.Password.RequireLowercase = false;
-    options.Password.RequireUppercase = false;
+    options.Password.RequireDigit           = false;
+    options.Password.RequireLowercase       = false;
+    options.Password.RequireUppercase       = false;
     options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequiredLength = 0;
-    options.Password.RequiredUniqueChars = 0;
+    options.Password.RequiredLength         = 0;
+    options.Password.RequiredUniqueChars    = 0;
 }).AddEntityFrameworkStores<CompanionAppDBContext>();
 #else
 builder.Services.AddDbContext<CompanionAppDBContext>(
     options => options.UseSqlServer(builder.Configuration.GetConnectionString("CompanionAppDB")));
-builder.Services.AddIdentityCore<IdentityUser>().AddEntityFrameworkStores<CompanionAppDBContext>();
+builder.Services.AddIdentity<Profile, AppRole>(options =>
+{
+    options.Password.RequireDigit           = false;
+    options.Password.RequireLowercase       = false;
+    options.Password.RequireUppercase       = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequiredLength         = 0;
+    options.Password.RequiredUniqueChars    = 0;
+}).AddEntityFrameworkStores<CompanionAppDBContext>();
 #endif
 
 builder.Services.AddScoped<JwtSettings>();
