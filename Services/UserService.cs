@@ -46,7 +46,7 @@ namespace CompanionApp.Services
                 LastName  = user.LastName,
                 Major     = user.Major,
                 Class     = user.Class,
-                UserName  = user.FirstName.ToLower() + "_" + user.LastName.ToLower()
+                UserName  = user.Username
             };
 
 
