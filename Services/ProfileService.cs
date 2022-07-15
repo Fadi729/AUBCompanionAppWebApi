@@ -12,20 +12,20 @@ namespace CompanionApp.Services
 {
     public class ProfileService : IProfileService
     {
-        readonly CompanionAppDBContext _context;
-        readonly DbSet<Profile>        _dbSet;
-        readonly ProfileRegistrationValidation     _registrationValidationRules;
+        readonly CompanionAppDBContext         _context;
+        readonly DbSet<Profile>                _dbSet;
+        readonly ProfileRegistrationValidation _registrationValidationRules;
 
         public ProfileService(CompanionAppDBContext DBcontext, ProfileRegistrationValidation registrationValidation)
         {
-            _context         = DBcontext;
-            _dbSet           = DBcontext.Profiles;
+            _context                     = DBcontext;
+            _dbSet                       = DBcontext.Profiles;
             _registrationValidationRules = registrationValidation;
         }
 
-        public async Task<ProfileQueryDTO> GetProfileAsync   (Guid id)
+        public async Task<ProfileQueryDTO> GetProfileAsync   (Guid id, CancellationToken cancellationToken)
         {
-            Profile? profile = await _dbSet.FindAsync(id);
+            Profile? profile = await _dbSet.FindAsync(new object?[] { id }, cancellationToken);
             if (profile is null)
             {
                 throw new ProfileNotFoundException();
@@ -33,11 +33,11 @@ namespace CompanionApp.Services
 
             return profile.ToProfileQuerryDTO();
         }
-        public async Task                  ValidateProfile   (ProfileRegistrationDTO profile)
+        public async Task                  ValidateProfile   (ProfileRegistrationDTO profile,     CancellationToken cancellationToken)
         {
-            await _registrationValidationRules.ValidateAndThrowAsync(profile);
+            await _registrationValidationRules.ValidateAndThrowAsync(profile, cancellationToken);
         }
-        public async Task<ProfileQueryDTO> CreateProfileAsync(ProfileCommandDTO profile)
+        public async Task<ProfileQueryDTO> CreateProfileAsync(ProfileCommandDTO profile,          CancellationToken cancellationToken)
         {
             #region try block
             try
@@ -45,7 +45,7 @@ namespace CompanionApp.Services
                 Profile newProfile = profile.ToProfile();
 
                 _dbSet.Add(newProfile);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(cancellationToken);
 
                 return newProfile.ToProfileQuerryDTO();
             }
@@ -57,24 +57,24 @@ namespace CompanionApp.Services
             }
             #endregion
         }
-        public async Task                  EditProfileAsync  (Guid id, ProfileCommandDTO profile)
+        public async Task                  EditProfileAsync  (Guid id, ProfileCommandDTO profile, CancellationToken cancellationToken)
         {
-            if (!await _dbSet.ProfileExists(id))
+            if (!await _dbSet.ProfileExists(id, cancellationToken))
             {
                 throw new ProfileNotFoundException();
             }
 
             _dbSet.Attach(profile.ToProfile(id)).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
         }
-        public async Task                  DeleteProfileAsync(Guid id)
+        public async Task                  DeleteProfileAsync(Guid id, CancellationToken cancellationToken)
         {
-            if (!await _dbSet.ProfileExists(id))
+            if (!await _dbSet.ProfileExists(id, cancellationToken))
             {
                 throw new ProfileNotFoundException();
             }
             _dbSet.Remove(new Profile() { Id = id });
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

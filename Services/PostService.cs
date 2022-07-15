@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using CompanionApp.Models;
+﻿using CompanionApp.Models;
 using CompanionApp.ModelsDTO;
 using CompanionApp.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -14,23 +13,23 @@ namespace CompanionApp.Services
         readonly DbSet<Post>           _dbSet;
         public PostService(CompanionAppDBContext dbContext)
         {
-            _context           = dbContext;
-            _dbSet             = _context.Posts;
+            _context = dbContext;
+            _dbSet   = _context.Posts;
         }
 
-        public async Task<IEnumerable<PostsByUserDTO>> GetPostsByUserIDAsync        (Guid userID)
+        public async Task<IEnumerable<PostsByUserDTO>> GetPostsByUserIDAsync        (Guid userID, CancellationToken cancellationToken)
         {
-            List<PostsByUserDTO> posts = await _dbSet
+            IEnumerable<PostsByUserDTO> posts = await _dbSet
                 .Where (post => post.UserId == userID)
                 .Select(p => p.ToPostsByUserDTO())
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
             if (!posts.Any())
             {
                 throw new NoPostsFoundException();
             }
             return posts;
         }
-        public async Task<IEnumerable<PostQueryDTO>>   GetPostsByUserFollowingsAsync(Guid userID)
+        public async Task<IEnumerable<PostQueryDTO>>   GetPostsByUserFollowingsAsync(Guid userID, CancellationToken cancellationToken)
         {
             IEnumerable<PostQueryDTO> posts = await _dbSet
                 .Where(
@@ -40,9 +39,9 @@ namespace CompanionApp.Services
                             .Select  (following => following.IsFollowing)
                             .Contains(post.UserId)
                 )
-                .Include(post => post.User)
-                .Select (post => post.ToPostQueryDTO())
-                .ToListAsync();
+                .Include    (post => post.User)
+                .Select     (post => post.ToPostQueryDTO())
+                .ToListAsync(cancellationToken);
 
             if (!posts.Any())
             {
@@ -51,9 +50,11 @@ namespace CompanionApp.Services
 
             return posts;
         }
-        public async Task<PostQueryDTO>                GetPostByIdAsync             (Guid id)
+        public async Task<PostQueryDTO>                GetPostByIdAsync             (Guid id,     CancellationToken cancellationToken)
         {
-            Post? post = await _dbSet.Include(p => p.User).FirstOrDefaultAsync(p => p.Id == id);
+            Post? post = await _dbSet
+                .Include            (p => p.User)
+                .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
 
             if (post == null)
             {
@@ -62,13 +63,13 @@ namespace CompanionApp.Services
 
             return post.ToPostQueryDTO();
         }
-        public async Task<PostQueryDTO>                CreatePostAsync              (PostPOSTCommandDTO post, Guid userID)
+        public async Task<PostQueryDTO>                CreatePostAsync              (PostPOSTCommandDTO post, Guid userID,              CancellationToken cancellationToken)
         {
             try
             {
                 Post newpost = post.ToPost(userID);
                 _dbSet.Add(newpost);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(cancellationToken);
                 return newpost.ToPostQueryDTO();
             }
             catch (Exception)
@@ -76,11 +77,11 @@ namespace CompanionApp.Services
                 throw;
             }
         }
-        public async Task                              EditPostAsync                (PostPOSTCommandDTO post, Guid postID, Guid userId)
+        public async Task                              EditPostAsync                (PostPOSTCommandDTO post, Guid postID, Guid userId, CancellationToken cancellationToken)
         {
             try
             {
-                Post? postToEdit = await _dbSet.GetPostAsync(postID);
+                Post? postToEdit = await _dbSet.GetPostAsync(postID, cancellationToken);
                 
                 if (postToEdit is null)
                 {
@@ -91,16 +92,16 @@ namespace CompanionApp.Services
                     throw new UserDoesNotOwnPostException();
                 }
                 _dbSet.Update(post.ToPost(postID, userId));
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(cancellationToken);
             }
             catch (Exception)
             {
                 throw;
             }
         }
-        public async Task                              DeletePostAsync              (Guid postID, Guid userID)
+        public async Task                              DeletePostAsync              (Guid postID, Guid userID,                          CancellationToken cancellationToken)
         {
-            Post? postToDelete = await _dbSet.GetPostAsync(postID);
+            Post? postToDelete = await _dbSet.GetPostAsync(postID, cancellationToken);
 
             if (postToDelete is null)
             {
@@ -112,7 +113,7 @@ namespace CompanionApp.Services
             }
             
             _dbSet.Remove(postToDelete);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

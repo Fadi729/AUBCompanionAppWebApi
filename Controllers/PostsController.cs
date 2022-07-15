@@ -20,41 +20,41 @@ namespace CompanionApp.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<PostQueryDTO>>                GetPostById             (Guid id)
+        public async Task<ActionResult<PostQueryDTO>>                GetPostById             (Guid id,                              CancellationToken cancellationToken)
         {
-            return await _postService.GetPostByIdAsync(id);
+            return await _postService.GetPostByIdAsync(id, cancellationToken);
         }
         
         [HttpGet("user")]
-        public async Task<ActionResult<IEnumerable<PostsByUserDTO>>> GetPostsByUserID        ()
+        public async Task<ActionResult<IEnumerable<PostsByUserDTO>>> GetPostsByUserID        (                                      CancellationToken cancellationToken)
         {
-            return Ok(await _postService.GetPostsByUserIDAsync(HttpContext.GetUserID()));
+            return Ok(await _postService.GetPostsByUserIDAsync(HttpContext.GetUserID(), cancellationToken));
         }
 
         [HttpGet("user/followings")]
-        public async Task<ActionResult<IEnumerable<PostQueryDTO>>>   GetPostsByUserFollowings()
+        public async Task<ActionResult<IEnumerable<PostQueryDTO>>>   GetPostsByUserFollowings(                                      CancellationToken cancellationToken)
         {
-            return Ok(await _postService.GetPostsByUserFollowingsAsync(HttpContext.GetUserID()));
+            return Ok(await _postService.GetPostsByUserFollowingsAsync(HttpContext.GetUserID(), cancellationToken));
         }
 
         [HttpPost]
-        public async Task<ActionResult<PostPOSTCommandDTO>>          PostPost                (PostPOSTCommandDTO post)
+        public async Task<ActionResult<PostPOSTCommandDTO>>          PostPost                (PostPOSTCommandDTO post,              CancellationToken cancellationToken)
         {
-            PostQueryDTO newpost = await _postService.CreatePostAsync(post, HttpContext.GetUserID());
+            PostQueryDTO newpost = await _postService.CreatePostAsync(post, HttpContext.GetUserID(), cancellationToken);
             return CreatedAtAction("GetPostById", new { id = newpost.Id }, newpost);
         }
 
         [HttpPut("{postID}")]
-        public async Task<IActionResult>                             PutPost                 (PostPOSTCommandDTO post, Guid postID)
+        public async Task<IActionResult>                             PutPost                 (PostPOSTCommandDTO post, Guid postID, CancellationToken cancellationToken)
         {
-            await _postService.EditPostAsync(post, postID, HttpContext.GetUserID());
+            await _postService.EditPostAsync(post, postID, HttpContext.GetUserID(), cancellationToken);
             return NoContent();
         }
         
         [HttpDelete("{postID}")]
-        public async Task<IActionResult>                             DeletePost              (Guid postID)
+        public async Task<IActionResult>                             DeletePost              (Guid postID,                          CancellationToken cancellationToken)
         {
-            await _postService.DeletePostAsync(postID, HttpContext.GetUserID());
+            await _postService.DeletePostAsync(postID, HttpContext.GetUserID(), cancellationToken);
             return NoContent();
         }
     }

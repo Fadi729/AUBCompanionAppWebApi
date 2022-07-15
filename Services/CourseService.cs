@@ -22,33 +22,33 @@ namespace CompanionApp.Services
             _courseValidation = validation;
         }
 
-        public async Task<IEnumerable<CourseDTO>> GetAllCoursesAsync()
+        public async Task<IEnumerable<CourseDTO>> GetAllCoursesAsync(CancellationToken cancellationToken)
         {
-            IEnumerable<CourseDTO> coursesDTOs = await _dbSet.Select(c => c.ToCourseDTO()).ToListAsync();
+            IEnumerable<CourseDTO> coursesDTOs = await _dbSet.Select(c => c.ToCourseDTO()).ToListAsync(cancellationToken);
             if (!coursesDTOs.Any())
             {
                 throw new NoCoursesFoundException();
             }
             return coursesDTOs;
         }
-        public async Task<CourseDTO>              GetCourseAsync    (int crn)
+        public async Task<CourseDTO>              GetCourseAsync    (int crn,          CancellationToken cancellationToken)
         {
-            Course? course = await _dbSet.FindAsync(crn);
+            Course? course = await _dbSet.FindAsync(new object?[] { crn }, cancellationToken);
             if (course is null)
             {
                 throw new CourseNotFoundException();
             }
             return course.ToCourseDTO();
         }
-        public async Task<CourseDTO>              AddCourseAsync    (CourseDTO course)
+        public async Task<CourseDTO>              AddCourseAsync    (CourseDTO course, CancellationToken cancellationToken)
         {
             #region try block
             try
             {
-                await _courseValidation.ValidateAndThrowAsync(course);
+                await _courseValidation.ValidateAndThrowAsync(course, cancellationToken);
                 Course newCourse = course.ToCourse();
                 _dbSet.Add(newCourse);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(cancellationToken);
                 return newCourse.ToCourseDTO();
             }
             #endregion
@@ -59,7 +59,7 @@ namespace CompanionApp.Services
             }
             #endregion
         }
-        public async Task<IEnumerable<CourseDTO>> AddCoursesAsync   (IEnumerable<CourseDTO> courses)
+        public async Task<IEnumerable<CourseDTO>> AddCoursesAsync   (IEnumerable<CourseDTO> courses, CancellationToken cancellationToken)
         {
             IList<CourseDTO> failedToAddCourses = new List<CourseDTO>();
             #region try   block
@@ -67,11 +67,11 @@ namespace CompanionApp.Services
             {
                 foreach (CourseDTO course in courses)
                 {
-                    if (!(await _courseValidation.ValidateAsync(course)).IsValid)
+                    if (!(await _courseValidation.ValidateAsync(course, cancellationToken)).IsValid)
                     {
                         failedToAddCourses.Add(course);
                     }
-                    else if (await _dbSet.CourseExists(course.Crn))
+                    else if (await _dbSet.CourseExists(course.Crn, cancellationToken))
                     {
                         _dbSet.Update(course.ToCourse());
                     }
@@ -79,7 +79,7 @@ namespace CompanionApp.Services
                         _dbSet.Add(course.ToCourse());
                 }
 
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(cancellationToken);
 
                 return failedToAddCourses;
             }
@@ -91,26 +91,26 @@ namespace CompanionApp.Services
             } 
             #endregion
         }
-        public async Task                         EditCourseAsync   (CourseDTO course)
+        public async Task                         EditCourseAsync   (CourseDTO course, CancellationToken cancellationToken)
         {
-            await _courseValidation.ValidateAndThrowAsync(course);
-            if (!await _dbSet.CourseExists(course.Crn))
+            await _courseValidation.ValidateAndThrowAsync(course,cancellationToken);
+            if (!await _dbSet.CourseExists(course.Crn, cancellationToken))
             {
                 throw new CourseNotFoundException();
             }
             _dbSet.Update(course.ToCourse());
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
         }
-        public async Task                         DeleteCourseAsync (int crn)
+        public async Task                         DeleteCourseAsync (int crn,          CancellationToken cancellationToken)
         {
             try
             {
-                if (!await _dbSet.CourseExists(crn.ToString()))
+                if (!await _dbSet.CourseExists(crn.ToString(), cancellationToken))
                 {
                     throw new CourseNotFoundException();
                 }
                 _dbSet.Remove(new Course() { Crn = crn });
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(cancellationToken);
             }
             catch (Exception)
             {

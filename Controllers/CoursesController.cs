@@ -20,31 +20,32 @@ namespace CompanionApp.Controllers
 
         
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CourseDTO>>> GetCourses  ()
+        public async Task<ActionResult<IEnumerable<CourseDTO>>> GetCourses  (CancellationToken cancellationToken)
         {
-            return Ok(await _courseService.GetAllCoursesAsync());
+            return Ok(await _courseService.GetAllCoursesAsync(cancellationToken));
         }
 
         
         [HttpGet("{id}")]
-        public async Task<ActionResult<CourseDTO>>              GetCourse   (int id)
+        public async Task<ActionResult<CourseDTO>>              GetCourse   (int id, CancellationToken cancellationToken)
         {
-            return Ok(await _courseService.GetCourseAsync(id));
+            return Ok(await _courseService.GetCourseAsync(id, cancellationToken));
         }
 
 
         [HttpPut]
-        public async Task<IActionResult>                        PutCourse   (CourseDTO course)
+        public async Task<IActionResult>                        PutCourse   (CourseDTO course, CancellationToken cancellationToken)
         {
-            await _courseService.EditCourseAsync(course);
+            await _courseService.EditCourseAsync(course, cancellationToken);
             return NoContent();
         }
 
         
         [HttpPost("single")]
-        public async Task<ActionResult<CourseDTO>>              PostCourse  (CourseDTO course)
+        public async Task<ActionResult<CourseDTO>>              PostCourse  (CourseDTO course, CancellationToken cancellationToken)
         {
-            CourseDTO newCourse = await _courseService.AddCourseAsync(course);
+            
+            CourseDTO newCourse = await _courseService.AddCourseAsync(course, cancellationToken);
             return CreatedAtAction("GetCourse", new { id = newCourse.Crn }, newCourse);
             
         }
@@ -53,18 +54,19 @@ namespace CompanionApp.Controllers
         /// Adds A List of Courses
         /// </summary>
         /// <param name="courses">Courses to Add</param>
+        /// <param name="cancellationToken"></param>
         /// <response code="200">A List of courses that were not added</response>
         [HttpPost("many")]
-        public async Task<ActionResult<IEnumerable<CourseDTO>>> PostCourses (IEnumerable<CourseDTO> courses)
+        public async Task<ActionResult<IEnumerable<CourseDTO>>> PostCourses (IEnumerable<CourseDTO> courses, CancellationToken cancellationToken)
         {
-            return Ok((await _courseService.AddCoursesAsync(courses)).ToList());
+            return Ok((await _courseService.AddCoursesAsync(courses, cancellationToken)).ToList());
         }
 
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult>                        DeleteCourse(int id)
+        public async Task<IActionResult>                        DeleteCourse(int id, CancellationToken cancellationToken)
         {
-            await _courseService.DeleteCourseAsync(id);
+            await _courseService.DeleteCourseAsync(id, cancellationToken);
             return NoContent();
         }
     }

@@ -22,15 +22,15 @@ namespace CompanionApp.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<ProfileQueryDTO>> GetProfile   (Guid id)
+        public async Task<ActionResult<ProfileQueryDTO>> GetProfile   (Guid id, CancellationToken cancellationToken)
         {
-            return Ok(await _profileService.GetProfileAsync(id));
+            return Ok(await _profileService.GetProfileAsync(id, cancellationToken));
         }
 
         [HttpDelete]
-        public async Task<IActionResult>                 DeleteProfile()
+        public async Task<IActionResult>                 DeleteProfile(CancellationToken cancellationToken)
         {
-            await _userManager.DeleteAsync(HttpContext.GetUserID());
+            await _userManager.DeleteAsync(HttpContext.GetUserID(), cancellationToken);
             return NoContent();
         }
     }

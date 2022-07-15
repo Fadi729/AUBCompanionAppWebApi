@@ -21,30 +21,30 @@ namespace CompanionApp.Controllers
 
 
         [HttpGet("isfollowing/{userID}")]
-        public async Task<ActionResult<IEnumerable<IsFollowingDTO>>> GetFollowing   (Guid userID)
+        public async Task<ActionResult<IEnumerable<IsFollowingDTO>>> GetFollowing   (Guid userID,           CancellationToken cancellationToken)
         {
-            return Ok(await _followingsService.GetIsFollowing(userID));
+            return Ok(await _followingsService.GetIsFollowing(userID, cancellationToken));
         }
         
         
         [HttpGet("followers/{userID}")]
-        public async Task<ActionResult<IEnumerable<FollowersDTO>>>   GetFollowers   (Guid userID)
+        public async Task<ActionResult<IEnumerable<FollowersDTO>>>   GetFollowers   (Guid userID,           CancellationToken cancellationToken)
         {
-            return Ok(await _followingsService.GetFollowers(userID));
+            return Ok(await _followingsService.GetFollowers(userID, cancellationToken));
         }
 
 
         [HttpPost("{userToFollowID}")]
-        public async Task<ActionResult<FollowingPOSTDTO>>            PostFollowing  (Guid userToFollowID)
+        public async Task<ActionResult<FollowingPOSTDTO>>            PostFollowing  (Guid userToFollowID,   CancellationToken cancellationToken)
         {
-            return Ok(await _followingsService.Follow(HttpContext.GetUserID(),userToFollowID));
+            return Ok(await _followingsService.Follow(HttpContext.GetUserID(), userToFollowID, cancellationToken));
         }
 
 
         [HttpDelete("{userToUnfollowID}")]
-        public async Task<IActionResult>                             DeleteFollowing(Guid userToUnfollowID)
+        public async Task<IActionResult>                             DeleteFollowing(Guid userToUnfollowID, CancellationToken cancellationToken)
         {
-            await _followingsService.Unfollow(HttpContext.GetUserID(), userToUnfollowID);
+            await _followingsService.Unfollow(HttpContext.GetUserID(), userToUnfollowID, cancellationToken);
             return NoContent();
         }
     }

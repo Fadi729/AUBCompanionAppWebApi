@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using CompanionApp.Models;
+﻿using CompanionApp.Models;
 using CompanionApp.ModelsDTO;
 using CompanionApp.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -18,14 +17,14 @@ namespace CompanionApp.Services
 
         public FollowingsService(CompanionAppDBContext context)
         {
-            _context             = context;
-            _dbSetFollowing      = context.Followings;
-            _dbSetProfile        = context.Profiles;
+            _context        = context;
+            _dbSetFollowing = context.Followings;
+            _dbSetProfile   = context.Profiles;
         }
 
-        public async Task<IEnumerable<IsFollowingDTO>> GetIsFollowing(Guid userID)
+        public async Task<IEnumerable<IsFollowingDTO>> GetIsFollowing(Guid userID,                        CancellationToken cancellationToken)
         {
-            if (!await _dbSetProfile.ProfileExists(userID))
+            if (!await _dbSetProfile.ProfileExists(userID, cancellationToken))
             {
                 throw new ProfileNotFoundException();
             }
@@ -33,7 +32,7 @@ namespace CompanionApp.Services
                 .Include(followings => followings.IsFollowingNavigation)
                 .Where  (followings => followings.UserId == userID)
                 .Select (followings => followings.ToIsFollowingDTO())
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
             if (!isfollowing.Any())
             {
@@ -41,9 +40,9 @@ namespace CompanionApp.Services
             }
             return isfollowing;
         }
-        public async Task<IEnumerable<FollowersDTO>>   GetFollowers  (Guid userID)
+        public async Task<IEnumerable<FollowersDTO>>   GetFollowers  (Guid userID,                        CancellationToken cancellationToken)
         {
-            if (!await _dbSetProfile.ProfileExists(userID))
+            if (!await _dbSetProfile.ProfileExists(userID, cancellationToken))
             {
                 throw new ProfileNotFoundException();
             }
@@ -51,7 +50,7 @@ namespace CompanionApp.Services
                 .Include(followings => followings.User)
                 .Where  (followings => followings.IsFollowing == userID)
                 .Select (followings => followings.ToFollowersDTO())
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
             if (!followers.Any())
             {
@@ -59,13 +58,13 @@ namespace CompanionApp.Services
             }
             return followers;
         }
-        public async Task<FollowingPOSTDTO>            Follow        (Guid userID, Guid userToFollowID)
+        public async Task<FollowingPOSTDTO>            Follow        (Guid userID, Guid userToFollowID,   CancellationToken cancellationToken)
         {
-            if (!await _dbSetProfile.ProfileExists(userID))
+            if (!await _dbSetProfile.ProfileExists(userID, cancellationToken))
             {
                 throw new ProfileNotFoundException();
             }
-            if (!await _dbSetProfile.ProfileExists(userToFollowID))
+            if (!await _dbSetProfile.ProfileExists(userToFollowID, cancellationToken))
             {
                 throw new ProfileNotFoundException("Profile trying to follow is not found.");
             }
@@ -78,7 +77,7 @@ namespace CompanionApp.Services
                     IsFollowing = userToFollowID
                 };
                 _dbSetFollowing.Add(follow);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(cancellationToken);
                 return follow.ToFollowingPOSTDTO();
             }
             catch (UniqueConstraintException)
@@ -86,18 +85,18 @@ namespace CompanionApp.Services
                 throw new FollowingAlreadyExistsException();
             }
         }
-        public async Task                              Unfollow      (Guid userID, Guid userToUnfollowID)
+        public async Task                              Unfollow      (Guid userID, Guid userToUnfollowID, CancellationToken cancellationToken)
         {
-            if (!await _dbSetProfile.ProfileExists(userID))
+            if (!await _dbSetProfile.ProfileExists(userID, cancellationToken))
             {
                 throw new ProfileNotFoundException();
             }
-            if (!await _dbSetProfile.ProfileExists(userToUnfollowID))
+            if (!await _dbSetProfile.ProfileExists(userToUnfollowID, cancellationToken))
             {
                 throw new ProfileNotFoundException("Profile trying to unfollow is not found.");
             }
 
-            Following? following = await _dbSetFollowing.GetFollowingAsync(userID, userToUnfollowID);
+            Following? following = await _dbSetFollowing.GetFollowingAsync(userID, userToUnfollowID, cancellationToken);
             if (following is null)
             {
                 throw new FollowingNotFoundException();
@@ -108,7 +107,7 @@ namespace CompanionApp.Services
             }
 
             _dbSetFollowing.Remove(following);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

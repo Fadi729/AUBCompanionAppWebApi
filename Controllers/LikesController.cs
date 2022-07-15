@@ -21,28 +21,28 @@ namespace CompanionApp.Controllers
 
 
         [HttpGet("post/{postID}")]
-        public async Task<ActionResult<IEnumerable<LikeDTOUsers>>> GetPostLikes       (Guid postID)
+        public async Task<ActionResult<IEnumerable<LikeDTOUsers>>> GetPostLikes       (Guid postID, CancellationToken cancellationToken)
         {
-            return Ok(await _likeService.GetPostLikes(postID));
+            return Ok(await _likeService.GetPostLikes(postID, cancellationToken));
 
         }
 
         [HttpGet("counter/{postID}")]
-        public async Task<ActionResult<int>>                       GetPostLikesCounter(Guid postID)
+        public async Task<ActionResult<int>>                       GetPostLikesCounter(Guid postID, CancellationToken cancellationToken)
         {
-            return Ok(await _likeService.GetPostLikesCount(postID));
+            return Ok(await _likeService.GetPostLikesCount(postID, cancellationToken));
         }
 
         [HttpPost("post/{postID}")]
-        public async Task<ActionResult<LikeQueryDTO>>              PostLike           (Guid postID)
+        public async Task<ActionResult<LikeQueryDTO>>              PostLike           (Guid postID, CancellationToken cancellationToken)
         {
-            return await _likeService.LikePost(postID, HttpContext.GetUserID());
+            return await _likeService.LikePost(postID, HttpContext.GetUserID(), cancellationToken);
         }
 
         [HttpDelete("post/{postID}")]
-        public async Task<IActionResult>                           DeleteLike         (Guid postID)
+        public async Task<IActionResult>                           DeleteLike         (Guid postID, CancellationToken cancellationToken)
         {
-            await _likeService.UnlikePost(postID, HttpContext.GetUserID());
+            await _likeService.UnlikePost(postID, HttpContext.GetUserID(), cancellationToken);
             return NoContent();
         }
     }

@@ -104,15 +104,15 @@ builder.Services
 
 builder.Services
 #region Validations
-    .AddScoped<ProfileRegistrationValidation      >()
-    .AddScoped<CourseValidation       >()
-    .AddScoped<SemesterValidation     >()
-    .AddScoped<CourseTakenByValidation>();
+    .AddScoped<ProfileRegistrationValidation>()
+    .AddScoped<CourseValidation             >()
+    .AddScoped<SemesterValidation           >()
+    .AddScoped<CourseTakenByValidation      >();
 #endregion
 
 JwtSettings jwtSettings = new();
-builder.Configuration.Bind(nameof(JwtSettings), jwtSettings) ;
-builder.Services.AddSingleton(jwtSettings) ;
+builder.Configuration.Bind(nameof(JwtSettings), jwtSettings);
+builder.Services.AddSingleton(jwtSettings);
 
 builder.Services.AddAuthentication(options =>
 {

@@ -19,34 +19,34 @@ namespace CompanionApp.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<SemesterDTO>>> GetSemesters  ()
+        public async Task<ActionResult<IEnumerable<SemesterDTO>>> GetSemesters  (CancellationToken cancellationToken)
         {
-            return Ok(await _semesterService.GetSemestersAsync());
+            return Ok(await _semesterService.GetSemestersAsync(cancellationToken));
         }
         
         [HttpGet("{id}")]
-        public async Task<ActionResult<SemesterDTO>>              GetSemester   (string id)
+        public async Task<ActionResult<SemesterDTO>>              GetSemester   (string id, CancellationToken cancellationToken)
         {
-            return Ok(await _semesterService.GetSemesterAsync(id));
+            return Ok(await _semesterService.GetSemesterAsync(id, cancellationToken));
         }
         
         [HttpPost("single")]
-        public async Task<ActionResult<SemesterDTO>>              PostSemester  (SemesterDTO semesterDTO)
+        public async Task<ActionResult<SemesterDTO>>              PostSemester  (SemesterDTO semesterDTO, CancellationToken cancellationToken)
         {
-            await _semesterService.AddSemesterAsync(semesterDTO);
+            await _semesterService.AddSemesterAsync(semesterDTO, cancellationToken);
             return CreatedAtAction("GetSemester", new { id = semesterDTO.Id }, semesterDTO);
         }
         
         [HttpPost("many")]
-        public async Task<ActionResult<IEnumerable<SemesterDTO>>> PostSemesters (IEnumerable<SemesterDTO> semesters)
+        public async Task<ActionResult<IEnumerable<SemesterDTO>>> PostSemesters (IEnumerable<SemesterDTO> semesters, CancellationToken cancellationToken)
         {
-            return Ok(await _semesterService.AddSemestersAsync(semesters));
+            return Ok(await _semesterService.AddSemestersAsync(semesters, cancellationToken));
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult>                          DeleteSemester(string id)
+        public async Task<IActionResult>                          DeleteSemester(string id, CancellationToken cancellationToken)
         {
-            await _semesterService.DeleteSemesterAsync(id);
+            await _semesterService.DeleteSemesterAsync(id, cancellationToken);
             return NoContent();
         }
     }

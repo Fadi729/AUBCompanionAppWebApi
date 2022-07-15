@@ -21,37 +21,37 @@ namespace CompanionApp.Controllers
 
 
         [HttpGet("user/{userID}")]
-        public async Task<ActionResult<IEnumerable<CourseTakenBy_User_DTO>>>   GetCoursesTakenByUser          (Guid userID)
+        public async Task<ActionResult<IEnumerable<CourseTakenBy_User_DTO>>>   GetCoursesTakenByUser          (Guid userID,                          CancellationToken cancellationToken)
         {
-            return Ok(await _courseTakenByService.GetCoursesTakenByUser(userID));
+            return Ok(await _courseTakenByService.GetCoursesTakenByUser(userID, cancellationToken));
         }
         
         
         [HttpGet("user/{userID}/semester/{semesterID}")]
-        public async Task<ActionResult<IEnumerable<CourseTakenBy_User_DTO>>>   GetCoursesTakenByUserInSemester(Guid userID, string semesterID)
+        public async Task<ActionResult<IEnumerable<CourseTakenBy_User_DTO>>>   GetCoursesTakenByUserInSemester(Guid userID, string semesterID,       CancellationToken cancellationToken)
         {
-            return Ok(await _courseTakenByService.GetCoursesTakenByUserInSemester(userID, semesterID));
+            return Ok(await _courseTakenByService.GetCoursesTakenByUserInSemester(userID, semesterID, cancellationToken));
         }
 
         
         [HttpGet("course/{crn}")]
-        public async Task<ActionResult<IEnumerable<CourseTakenBy_Course_DTO>>> GetUsersTakingCourse           (int crn)
+        public async Task<ActionResult<IEnumerable<CourseTakenBy_Course_DTO>>> GetUsersTakingCourse           (int crn,                              CancellationToken cancellationToken)
         {
-            return Ok(await _courseTakenByService.GetUsersTakingCourse(crn));
+            return Ok(await _courseTakenByService.GetUsersTakingCourse(crn, cancellationToken));
         }
 
         
         [HttpPost]
-        public async Task<ActionResult<CourseTakenBy_POST_DTO>>                PostUserTakingCourse           (CourseTakenBy_POST_DTO courseTakenBy)
+        public async Task<ActionResult<CourseTakenBy_POST_DTO>>                PostUserTakingCourse           (CourseTakenBy_POST_DTO courseTakenBy, CancellationToken cancellationToken)
         {
-            return await _courseTakenByService.AddCourseToUser(courseTakenBy);
+            return await _courseTakenByService.AddCourseToUser(courseTakenBy, cancellationToken);
         }
 
         
         [HttpDelete("{crn}/{semesterID}")]
-        public async Task<IActionResult>                                       DeleteCoursesTakenBy           (int crn, string semesterID)
+        public async Task<IActionResult>                                       DeleteCoursesTakenBy           (int crn, string semesterID,           CancellationToken cancellationToken)
         {
-            await _courseTakenByService.DeleteCoursesTakenByUser(HttpContext.GetUserID(), crn, semesterID);
+            await _courseTakenByService.DeleteCoursesTakenByUser(HttpContext.GetUserID(), crn, semesterID, cancellationToken);
             return NoContent();
         }
     }

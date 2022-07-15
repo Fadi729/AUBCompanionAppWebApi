@@ -24,10 +24,10 @@ namespace CompanionApp.Services
             _profileService = profileService;
         }
 
-        public async Task<AuthResponse> RegisterAsync               (ProfileRegistrationDTO user)
+        public async Task<AuthResponse> RegisterAsync(ProfileRegistrationDTO user, CancellationToken cancellationToken)
         {
-            await _profileService.ValidateProfile(user);
-
+            await _profileService.ValidateProfile(user, cancellationToken);
+            
             Profile? profile = await _userManager.FindByEmailAsync(user.Email);
 
             if (profile is not null)
@@ -50,25 +50,22 @@ namespace CompanionApp.Services
                 UserName  = user.Username
             };
 
-
             IdentityResult? createProfile = await _userManager.CreateAsync(newProfile, user.Password);
 
             if (!createProfile.Succeeded)
             {
                 throw new AuthException
                 {
-                    ErrorCode = (int)System.Net.HttpStatusCode.BadRequest,
+                    ErrorCode     = (int)System.Net.HttpStatusCode.BadRequest,
                     ErrorMessages = createProfile.Errors.Select(e => e.Description)
                 };
             }
 
-            
-
             return AuthenticationTokenGenerator(newProfile);
         }
-        public async Task<AuthResponse> LoginAsync                  (ProfileLoginDTO user)
+        public async Task<AuthResponse> LoginAsync   (ProfileLoginDTO user,        CancellationToken cancellationToken)
         {
-            var profile = await _userManager.FindByEmailAsync(user.Email);
+            Profile? profile = await _userManager.FindByEmailAsync(user.Email);
 
             if (profile is null)
             {
@@ -91,19 +88,19 @@ namespace CompanionApp.Services
 
             return AuthenticationTokenGenerator(profile);
         }
-        public async Task               DeleteAsync                 (Guid userID)
+        public async Task               DeleteAsync  (Guid userID,                 CancellationToken cancellationToken)
         {
-            var profile = await _userManager.FindByIdAsync(userID.ToString());
+            Profile? profile = await _userManager.FindByIdAsync(userID.ToString());
 
             if (profile is null)
             {
                 throw new ProfileNotFoundException();
             }
 
-            var result = await _userManager.DeleteAsync(profile);
-            
+            await _userManager.DeleteAsync(profile);
         }
-                     AuthResponse       AuthenticationTokenGenerator(Profile newProfile)
+
+        AuthResponse AuthenticationTokenGenerator(Profile newProfile)
         {
             byte[] key = Encoding.ASCII.GetBytes(_jwtSettings.Secret);
             JwtSecurityTokenHandler tokenHandler = new();
