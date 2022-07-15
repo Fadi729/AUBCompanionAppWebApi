@@ -14,13 +14,13 @@ namespace CompanionApp.Services
     {
         readonly CompanionAppDBContext _context;
         readonly DbSet<Profile>        _dbSet;
-        readonly ProfileValidation     _validationRules;
+        readonly ProfileRegistrationValidation     _registrationValidationRules;
 
-        public ProfileService(CompanionAppDBContext DBcontext, ProfileValidation validation)
+        public ProfileService(CompanionAppDBContext DBcontext, ProfileRegistrationValidation registrationValidation)
         {
             _context         = DBcontext;
             _dbSet           = DBcontext.Profiles;
-            _validationRules = validation;
+            _registrationValidationRules = registrationValidation;
         }
 
         public async Task<ProfileQueryDTO> GetProfileAsync   (Guid id)
@@ -33,9 +33,9 @@ namespace CompanionApp.Services
 
             return profile.ToProfileQuerryDTO();
         }
-        public async Task                  ValidateProfile   (ProfileCommandDTO profile)
+        public async Task                  ValidateProfile   (ProfileRegistrationDTO profile)
         {
-            await _validationRules.ValidateAndThrowAsync(profile);
+            await _registrationValidationRules.ValidateAndThrowAsync(profile);
         }
         public async Task<ProfileQueryDTO> CreateProfileAsync(ProfileCommandDTO profile)
         {
@@ -64,7 +64,6 @@ namespace CompanionApp.Services
                 throw new ProfileNotFoundException();
             }
 
-            await _validationRules.ValidateAndThrowAsync(profile);
             _dbSet.Attach(profile.ToProfile(id)).State = EntityState.Modified;
             await _context.SaveChangesAsync();
         }

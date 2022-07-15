@@ -18,11 +18,19 @@ namespace CompanionApp.Exceptions.ExceptionMiddlewareNS
             {
                 await _request(context);
             }
-            #region Bad Request Exception
+            #region ValidationException Exception
             catch (ValidationException ex)
             {
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 var error = ex.ToValidationExceptionDetails();
+                await context.Response.WriteAsJsonAsync(error);
+            }
+            #endregion
+            #region Auth Exception
+            catch (AuthException ex)
+            {
+                context.Response.StatusCode = ex.ErrorCode;
+                var error = ex.ToAuthExceptionDetails();
                 await context.Response.WriteAsJsonAsync(error);
             }
             #endregion
@@ -42,7 +50,7 @@ namespace CompanionApp.Exceptions.ExceptionMiddlewareNS
                 await context.Response.WriteAsJsonAsync(error);
             }
             #endregion
-            #region Unauthorized Operation Exception
+            #region Unauthorized Request Exception
             catch(Exception ex)  when (ex.GetErrorCode() == (int)HttpStatusCode.Unauthorized)
             {
                 context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;

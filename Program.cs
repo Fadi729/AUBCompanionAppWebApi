@@ -64,7 +64,15 @@ builder.Configuration
 #if DEBUG
 builder.Services.AddDbContext<CompanionAppDBContext>(
     options => options.UseSqlServer(builder.Configuration["ConnectionStrings:DevDB"]));
-builder.Services.AddIdentity<Profile, AppRole>().AddEntityFrameworkStores<CompanionAppDBContext>();
+builder.Services.AddIdentity<Profile, AppRole>(options =>
+{
+    options.Password.RequireDigit = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequiredLength = 0;
+    options.Password.RequiredUniqueChars = 0;
+}).AddEntityFrameworkStores<CompanionAppDBContext>();
 #else
 builder.Services.AddDbContext<CompanionAppDBContext>(
     options => options.UseSqlServer(builder.Configuration.GetConnectionString("CompanionAppDB")));
@@ -88,7 +96,7 @@ builder.Services
 
 builder.Services
 #region Validations
-    .AddScoped<ProfileValidation      >()
+    .AddScoped<ProfileRegistrationValidation      >()
     .AddScoped<CourseValidation       >()
     .AddScoped<SemesterValidation     >()
     .AddScoped<CourseTakenByValidation>();

@@ -68,5 +68,28 @@ namespace CompanionApp.Exceptions.ExceptionMiddlewareNS
             error.Errors.Add(new KeyValuePair<string, string[]>(HttpStatusCode.Unauthorized.ToString(), new[] { exception.Message }));
             return error;
         }
+
+        public static ValidationProblemDetails ToAuthExceptionDetails(this AuthException exception)
+        {
+            ValidationProblemDetails error = new();
+            switch (exception.ErrorCode)
+            {
+                case (int)HttpStatusCode.Conflict:
+                    error.Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.8";
+                    break;
+                case (int)HttpStatusCode.Unauthorized:
+                    error.Type = "https://datatracker.ietf.org/doc/html/rfc7235#section-3.1";
+                    break;
+                case (int)HttpStatusCode.BadRequest:
+                    error.Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.1";
+                    break;
+            }
+
+            error.Title = ((HttpStatusCode) exception.ErrorCode).ToString();
+            error.Status = exception.ErrorCode;
+            error.Errors.Add(new KeyValuePair<string, string[]>(((HttpStatusCode) exception.ErrorCode).ToString(), exception.ErrorMessages.ToArray()));
+            
+            return error;
+        }
     }
 }

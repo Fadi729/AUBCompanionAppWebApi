@@ -3,10 +3,10 @@ using CompanionApp.Jwt;
 using CompanionApp.Models;
 using System.Security.Claims;
 using CompanionApp.ModelsDTO;
-using CompanionApp.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using CompanionApp.Exceptions;
 using CompanionApp.Services.Contracts;
 using CompanionApp.Exceptions.ProfileExceptions;
 
@@ -26,14 +26,15 @@ namespace CompanionApp.Services
 
         public async Task<AuthResponse> RegisterAsync               (ProfileRegistrationDTO user)
         {
-            await _profileService.ValidateProfile(user.ToProfileCommandDTO());
+            await _profileService.ValidateProfile(user);
 
-            var profile = await _userManager.FindByEmailAsync(user.Email);
+            Profile? profile = await _userManager.FindByEmailAsync(user.Email);
 
             if (profile is not null)
             {
-                return new AuthResponse
+                throw new AuthException
                 {
+                    ErrorCode     = (int)System.Net.HttpStatusCode.Conflict,
                     ErrorMessages = new[] { "User with this email address already exists" }
                 };
             }
@@ -50,15 +51,18 @@ namespace CompanionApp.Services
             };
 
 
-            var createProfile = await _userManager.CreateAsync(newProfile, user.Password);
+            IdentityResult? createProfile = await _userManager.CreateAsync(newProfile, user.Password);
 
             if (!createProfile.Succeeded)
             {
-                return new AuthResponse
+                throw new AuthException
                 {
+                    ErrorCode = (int)System.Net.HttpStatusCode.BadRequest,
                     ErrorMessages = createProfile.Errors.Select(e => e.Description)
                 };
             }
+
+            
 
             return AuthenticationTokenGenerator(newProfile);
         }
@@ -68,18 +72,20 @@ namespace CompanionApp.Services
 
             if (profile is null)
             {
-                return new AuthResponse
+                throw new AuthException
                 {
-                    ErrorMessages = new[] { "Incorrect Credentials" }
+                    ErrorCode     = (int)System.Net.HttpStatusCode.Unauthorized,
+                    ErrorMessages = new[] { "Invalid Credentials" }
                 };
             }
 
-            var isValidPassword = await _userManager.CheckPasswordAsync(profile, user.Password);
+            bool isValidPassword = await _userManager.CheckPasswordAsync(profile, user.Password);
             if (!isValidPassword)
             {
-                return new AuthResponse
+                throw new AuthException
                 {
-                    ErrorMessages = new[] { "Incorrect Credentials" }
+                    ErrorCode     = (int)System.Net.HttpStatusCode.Unauthorized,
+                    ErrorMessages = new[] { "Invalid Credentials" }
                 };
             }
 
@@ -96,14 +102,8 @@ namespace CompanionApp.Services
 
             var result = await _userManager.DeleteAsync(profile);
             
-            if(!result.Succeeded)
-            {
-                return;
-            }
-
-            await _profileService.DeleteProfileAsync(userID);
         }
-        private      AuthResponse       AuthenticationTokenGenerator(Profile newProfile)
+                     AuthResponse       AuthenticationTokenGenerator(Profile newProfile)
         {
             byte[] key = Encoding.ASCII.GetBytes(_jwtSettings.Secret);
             JwtSecurityTokenHandler tokenHandler = new();
@@ -128,7 +128,6 @@ namespace CompanionApp.Services
 
             return new AuthResponse
             {
-                IsSuccessful = true,
                 Token = tokenHandler.WriteToken(token)
             };
         }
