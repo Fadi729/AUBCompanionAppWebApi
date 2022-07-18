@@ -14,15 +14,15 @@ namespace CompanionApp.Services
     {
         readonly CompanionAppDBContext _context;
         readonly DbSet<Like>           _dbSetLikes;
-        readonly DbSet<Profile>        _dbSetProfile;
         readonly DbSet<Post>           _dbSetPost;
+        readonly IUserService          _userService;
 
-        public LikesService(CompanionAppDBContext context)
+        public LikesService(CompanionAppDBContext context, IUserService userService)
         {
-            _context      = context;
-            _dbSetLikes   = _context.Likes;
-            _dbSetProfile = _context.Profiles;
-            _dbSetPost    = _context.Posts;
+            _context     = context;
+            _dbSetLikes  = _context.Likes;
+            _dbSetPost   = _context.Posts;
+            _userService = userService;
         }
 
         public async Task<IEnumerable<LikeDTOUsers>> GetPostLikes     (Guid postID,              CancellationToken cancellationToken)
@@ -69,7 +69,8 @@ namespace CompanionApp.Services
                 {
                     throw new PostNotFoundException();
                 }
-                if (!await _dbSetProfile.ProfileExists(userID, cancellationToken))
+                
+                if (await _userService.GetProfileAsync(userID, cancellationToken) is null)
                 {
                     throw new ProfileNotFoundException();
                 }
@@ -96,9 +97,9 @@ namespace CompanionApp.Services
             {
                 throw new PostNotFoundException();
             }
-            if (!await _dbSetProfile.ProfileExists(userID, cancellationToken))
+            if (await _userService.GetProfileAsync(userID, cancellationToken) is null)
             {
-                throw new ProfileAlreadyExistsException();
+                throw new ProfileNotFoundException();
             }
 
             Like? likeToDelete = await _dbSetLikes.GetLikeAsync(postID, userID, cancellationToken);

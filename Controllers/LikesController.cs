@@ -33,7 +33,7 @@ namespace CompanionApp.Controllers
             return Ok(await _likeService.GetPostLikesCount(postID, cancellationToken));
         }
 
-        [HttpPost("post/{postID}")]
+        [HttpPost("post/{postID}/{userID}")]
         public async Task<ActionResult<LikeQueryDTO>>              PostLike           (Guid postID, CancellationToken cancellationToken)
         {
             return await _likeService.LikePost(postID, HttpContext.GetUserID(), cancellationToken);

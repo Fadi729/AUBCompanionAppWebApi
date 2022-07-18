@@ -19,16 +19,16 @@ namespace CompanionApp.Services
         readonly DbSet<CourseTakenBy>    _dbSetCourseTakenBy;
         readonly DbSet<Course>           _dbSetCourse;
         readonly DbSet<Semester>         _dbSetSemester;
-        readonly DbSet<Profile>          _dbSetProfile;
+        readonly IUserService            _userService;
         readonly CourseTakenByValidation _courseTakenByValidation;
 
-        public CourseTakenByService(CompanionAppDBContext context, CourseTakenByValidation validation)
+        public CourseTakenByService(CompanionAppDBContext context, IUserService userService, CourseTakenByValidation validation)
         {
             _context                 = context;
             _dbSetCourseTakenBy      = _context.CourseTakenBy;
             _dbSetCourse             = _context.Courses;
             _dbSetSemester           = _context.Semesters;
-            _dbSetProfile            = _context.Profiles;
+            _userService             = userService;
             _courseTakenByValidation = validation;
         }
 
@@ -56,7 +56,7 @@ namespace CompanionApp.Services
 
         public async Task<IEnumerable<CourseTakenBy_User_DTO>>   GetCoursesTakenByUser          (Guid userID, CancellationToken cancellationToken)
         {
-            if (!await _dbSetProfile.ProfileExists(userID, cancellationToken))
+            if (await _userService.GetProfileAsync(userID, cancellationToken) is null)
             {
                 throw new ProfileNotFoundException();
             }
@@ -78,7 +78,7 @@ namespace CompanionApp.Services
         
         public async Task<IEnumerable<CourseTakenBy_User_DTO>>   GetCoursesTakenByUserInSemester(Guid userID, string semesterID,          CancellationToken cancellationToken)
         {
-            if (!await _dbSetProfile.ProfileExists(userID, cancellationToken))
+            if (await _userService.GetProfileAsync(userID, cancellationToken) is null)
             {
                 throw new ProfileNotFoundException();
             }
@@ -109,7 +109,7 @@ namespace CompanionApp.Services
             {
                 await _courseTakenByValidation.ValidateAndThrowAsync(courseTakenBy, cancellationToken);
 
-                if (!await _dbSetProfile.ProfileExists(courseTakenBy.UserId, cancellationToken))
+                if (await _userService.GetProfileAsync(Guid.Parse(courseTakenBy.UserId), cancellationToken) is null)
                 {
                     throw new ProfileNotFoundException();
                 }
@@ -144,7 +144,7 @@ namespace CompanionApp.Services
         
         public async Task                                        DeleteCoursesTakenByUser       (Guid userID, int crn, string semesterID, CancellationToken cancellationToken)
         {
-            if (!await _dbSetProfile.ProfileExists(userID, cancellationToken))
+            if (await _userService.GetProfileAsync(userID, cancellationToken) is null)
             {
                 throw new ProfileNotFoundException();
             }

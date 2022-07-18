@@ -13,21 +13,22 @@ namespace CompanionApp.Services
     {
         readonly CompanionAppDBContext _context;
         readonly DbSet<Following>      _dbSetFollowing;
-        readonly DbSet<Profile>        _dbSetProfile;
+        readonly IUserService          _userService;
 
-        public FollowingsService(CompanionAppDBContext context)
+        public FollowingsService(CompanionAppDBContext context, IUserService userService)
         {
             _context        = context;
             _dbSetFollowing = context.Followings;
-            _dbSetProfile   = context.Profiles;
+            _userService    = userService;
         }
 
         public async Task<IEnumerable<IsFollowingDTO>> GetIsFollowing(Guid userID,                        CancellationToken cancellationToken)
         {
-            if (!await _dbSetProfile.ProfileExists(userID, cancellationToken))
+            if (await _userService.GetProfileAsync(userID, cancellationToken) is null)
             {
                 throw new ProfileNotFoundException();
             }
+            
             IEnumerable<IsFollowingDTO>? isfollowing = await _dbSetFollowing
                 .Include(followings => followings.IsFollowingNavigation)
                 .Where  (followings => followings.UserId == userID)
@@ -42,10 +43,11 @@ namespace CompanionApp.Services
         }
         public async Task<IEnumerable<FollowersDTO>>   GetFollowers  (Guid userID,                        CancellationToken cancellationToken)
         {
-            if (!await _dbSetProfile.ProfileExists(userID, cancellationToken))
+            if (await _userService.GetProfileAsync(userID, cancellationToken) is null)
             {
                 throw new ProfileNotFoundException();
             }
+            
             IEnumerable<FollowersDTO>? followers = await _dbSetFollowing
                 .Include(followings => followings.User)
                 .Where  (followings => followings.IsFollowing == userID)
@@ -60,13 +62,13 @@ namespace CompanionApp.Services
         }
         public async Task<FollowingPOSTDTO>            Follow        (Guid userID, Guid userToFollowID,   CancellationToken cancellationToken)
         {
-            if (!await _dbSetProfile.ProfileExists(userID, cancellationToken))
+            if (await _userService.GetProfileAsync(userID, cancellationToken) is null)
             {
                 throw new ProfileNotFoundException();
             }
-            if (!await _dbSetProfile.ProfileExists(userToFollowID, cancellationToken))
+            if (await _userService.GetProfileAsync(userToFollowID, cancellationToken) is null)
             {
-                throw new ProfileNotFoundException("Profile trying to follow is not found.");
+                throw new ProfileNotFoundException();
             }
 
             try
@@ -87,14 +89,15 @@ namespace CompanionApp.Services
         }
         public async Task                              Unfollow      (Guid userID, Guid userToUnfollowID, CancellationToken cancellationToken)
         {
-            if (!await _dbSetProfile.ProfileExists(userID, cancellationToken))
+            if (await _userService.GetProfileAsync(userID, cancellationToken) is null)
             {
                 throw new ProfileNotFoundException();
             }
-            if (!await _dbSetProfile.ProfileExists(userToUnfollowID, cancellationToken))
+            if (await _userService.GetProfileAsync(userToUnfollowID, cancellationToken) is null)
             {
-                throw new ProfileNotFoundException("Profile trying to unfollow is not found.");
+                throw new ProfileNotFoundException();
             }
+
 
             Following? following = await _dbSetFollowing.GetFollowingAsync(userID, userToUnfollowID, cancellationToken);
             if (following is null)

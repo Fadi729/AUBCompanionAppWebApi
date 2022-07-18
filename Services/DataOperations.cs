@@ -5,14 +5,6 @@ namespace CompanionApp.Services
 {
     public static class DataOperations
     {
-        public static async Task<bool> ProfileExists        (this DbSet<Profile>  _dbSet, string? email,                 CancellationToken cancellationToken)
-        {
-            return await _dbSet.AnyAsync(profile => profile.Email == email, cancellationToken);
-        }
-        public static async Task<bool> ProfileExists        (this DbSet<Profile>  _dbSet, Guid userID,                   CancellationToken cancellationToken)
-        {
-            return await _dbSet.AnyAsync(profile => profile.Id == userID, cancellationToken);
-        }
         public static async Task<bool> CourseExists         (this DbSet<Course>   _dbSet, string crn,                    CancellationToken cancellationToken)
         {
             return await _dbSet.AnyAsync(course => course.Crn.ToString().Equals(crn), cancellationToken);

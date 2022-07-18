@@ -14,15 +14,15 @@ namespace CompanionApp.Services
         readonly CompanionAppDBContext _context;
         readonly DbSet<Comment>        _dbSetComment;
         readonly DbSet<Post>           _dbSetPost;
-        readonly DbSet<Profile>        _dbSetProfile;
-        
+        readonly IUserService          _userService;
 
-        public CommentsService(CompanionAppDBContext context)
+
+        public CommentsService(CompanionAppDBContext context, IUserService userService)
         {
             _context      = context;
             _dbSetComment = context.Comments;
             _dbSetPost    = context.Posts;
-            _dbSetProfile = context.Profiles;
+            _userService  = userService;
         }
 
         public async Task<CommentQueryDTO>              GetComment          (Guid commentID, CancellationToken cancellationToken)
@@ -67,7 +67,7 @@ namespace CompanionApp.Services
             {
                 throw new PostNotFoundException();
             }
-            if (!await _dbSetProfile.ProfileExists(userID, cancellationToken))
+            if (await _userService.GetProfileAsync(userID, cancellationToken) is null)
             {
                 throw new ProfileNotFoundException();
             }
@@ -79,7 +79,7 @@ namespace CompanionApp.Services
         }
         public async Task                               EditComment         (CommentPOSTCommandDTO comment, Guid commentID, Guid postID, Guid userID, CancellationToken cancellationToken)
         {
-            if (!await _dbSetProfile.ProfileExists(userID, cancellationToken))
+            if (await _userService.GetProfileAsync(userID, cancellationToken) is null)
             {
                 throw new ProfileNotFoundException();
             }
@@ -108,7 +108,7 @@ namespace CompanionApp.Services
         }
         public async Task                               DeleteComment       (Guid commentID, Guid userID, CancellationToken cancellationToken)
         {
-            if(!await _dbSetProfile.ProfileExists(userID, cancellationToken))
+            if (await _userService.GetProfileAsync(userID, cancellationToken) is null)
             {
                 throw new ProfileNotFoundException();
             }
