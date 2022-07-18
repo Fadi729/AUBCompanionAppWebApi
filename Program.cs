@@ -92,7 +92,6 @@ builder.Services.AddScoped<JwtSettings>();
 builder.Services
 #region Services
     .AddScoped<IUserService         , UserService         >()
-    .AddScoped<IProfileService      , ProfileService      >()
     .AddScoped<ICourseService       , CourseService       >()
     .AddScoped<IPostService         , PostService         >()
     .AddScoped<ISemesterService     , SemesterService     >()

@@ -9,24 +9,27 @@ using System.IdentityModel.Tokens.Jwt;
 using CompanionApp.Exceptions;
 using CompanionApp.Services.Contracts;
 using CompanionApp.Exceptions.ProfileExceptions;
+using CompanionApp.Validation;
+using FluentValidation;
+using CompanionApp.Extensions;
 
 namespace CompanionApp.Services
 {
     public class UserService : IUserService
     {
-        readonly UserManager<Profile> _userManager;
-        readonly JwtSettings          _jwtSettings;
-        readonly IProfileService      _profileService;
-        public UserService(UserManager<Profile> userManager, JwtSettings jwtSettings, IProfileService profileService)
+        readonly UserManager<Profile>          _userManager;
+        readonly JwtSettings                   _jwtSettings;
+        readonly ProfileRegistrationValidation _registrationValidationRules;
+        public UserService(UserManager<Profile> userManager, JwtSettings jwtSettings, ProfileRegistrationValidation registrationValidationRules)
         {
-            _userManager    = userManager;
-            _jwtSettings    = jwtSettings;
-            _profileService = profileService;
+            _userManager                 = userManager;
+            _jwtSettings                 = jwtSettings;
+            _registrationValidationRules = registrationValidationRules;
         }
 
-        public async Task<AuthResponse> RegisterAsync(ProfileRegistrationDTO user, CancellationToken cancellationToken)
+        public async Task<AuthResponse>    RegisterAsync     (ProfileRegistrationDTO user, CancellationToken cancellationToken)
         {
-            await _profileService.ValidateProfile(user, cancellationToken);
+            await _registrationValidationRules.ValidateAndThrowAsync(user, cancellationToken);
             
             Profile? profile = await _userManager.FindByEmailAsync(user.Email);
 
@@ -63,7 +66,7 @@ namespace CompanionApp.Services
 
             return AuthenticationTokenGenerator(newProfile);
         }
-        public async Task<AuthResponse> LoginAsync   (ProfileLoginDTO user,        CancellationToken cancellationToken)
+        public async Task<AuthResponse>    LoginAsync        (ProfileLoginDTO user,        CancellationToken cancellationToken)
         {
             Profile? profile = await _userManager.FindByEmailAsync(user.Email);
 
@@ -88,7 +91,17 @@ namespace CompanionApp.Services
 
             return AuthenticationTokenGenerator(profile);
         }
-        public async Task               DeleteAsync  (Guid userID,                 CancellationToken cancellationToken)
+        public async Task<ProfileQueryDTO> GetProfileAsync   (Guid id, CancellationToken cancellationToken)
+        {
+            Profile profile = await _userManager.FindByIdAsync(id.ToString());
+            if (profile is null)
+            {
+                throw new ProfileNotFoundException();
+            }
+            
+            return profile.ToProfileQuerryDTO();
+        }
+        public async Task                  DeleteProfileAsync(Guid userID,                 CancellationToken cancellationToken)
         {
             Profile? profile = await _userManager.FindByIdAsync(userID.ToString());
 
