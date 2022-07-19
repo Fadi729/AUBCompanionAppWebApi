@@ -60,7 +60,6 @@ builder.Configuration
 #endregion
 
 
-
 #if DEBUG
 builder.Services.AddDbContext<CompanionAppDBContext>(
     options => options.UseSqlServer(builder.Configuration["ConnectionStrings:DevDB"]));
