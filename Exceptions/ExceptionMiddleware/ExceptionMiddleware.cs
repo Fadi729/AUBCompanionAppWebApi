@@ -53,8 +53,8 @@ namespace CompanionApp.Exceptions.ExceptionMiddlewareNS
             #region Unauthorized Request Exception
             catch(Exception ex)  when (ex.GetErrorCode() == (int)HttpStatusCode.Unauthorized)
             {
-                context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                var error                   = ex.ToUnauthorizedRequestExceptionDetails();
+                context.Response.StatusCode   = (int)HttpStatusCode.Unauthorized;
+                var error= ex.ToUnauthorizedRequestExceptionDetails();
                 await context.Response.WriteAsJsonAsync(error);
             }
             #endregion

@@ -43,7 +43,8 @@ namespace CompanionApp.Exceptions.ExceptionMiddlewareNS
             ValidationProblemDetails error =  new()
             {
                 Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.8",
-                Status = (int)HttpStatusCode.Conflict
+                Status = (int)HttpStatusCode.Conflict,
+                Title = HttpStatusCode.Conflict.ToString()
             };
             error.Errors.Add(new KeyValuePair<string, string[]>(HttpStatusCode.Conflict.ToString(),new[] { exception.Message }));
             return error;
@@ -53,7 +54,9 @@ namespace CompanionApp.Exceptions.ExceptionMiddlewareNS
             ValidationProblemDetails error =  new()
             {
                 Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.4",
-                Status = (int)HttpStatusCode.NotFound
+                Status = (int)HttpStatusCode.NotFound,
+                Title = HttpStatusCode.NotFound.ToString(),
+                
             };
             error.Errors.Add(new KeyValuePair<string, string[]>(HttpStatusCode.NotFound.ToString(),new[] { exception.Message }));
             return error;
@@ -63,7 +66,8 @@ namespace CompanionApp.Exceptions.ExceptionMiddlewareNS
             ValidationProblemDetails error = new()
             {
                 Type   = "https://datatracker.ietf.org/doc/html/rfc7235#section-3.1",
-                Status = (int)HttpStatusCode.Unauthorized
+                Status = (int)HttpStatusCode.Unauthorized,
+                Title = HttpStatusCode.Unauthorized.ToString()
             };
             error.Errors.Add(new KeyValuePair<string, string[]>(HttpStatusCode.Unauthorized.ToString(), new[] { exception.Message }));
             return error;

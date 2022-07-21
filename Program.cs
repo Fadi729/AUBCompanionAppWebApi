@@ -1,16 +1,17 @@
-using System.Text;
+using CompanionApp.Exceptions;
+using CompanionApp.Exceptions.ExceptionMiddlewareNS;
 using CompanionApp.Jwt;
 using CompanionApp.Models;
-using CompanionApp.Services;
-using CompanionApp.Validation;
-using Microsoft.OpenApi.Models;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.Text.Json.Serialization;
-using CompanionApp.Services.Contracts;
-using CompanionApp.Exceptions.ExceptionMiddlewareNS;
 using CompanionApp.Models.Identity_models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using System.Text;
+using System.Text.Json.Serialization;
+using CompanionApp.Services;
+using CompanionApp.Services.Contracts;
+using CompanionApp.Validation;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -129,6 +130,10 @@ builder.Services.AddAuthentication(options =>
             ValidateAudience         = false,
             RequireExpirationTime    = false,
             ValidateLifetime         = true,
+        };
+        jwt.Events = new JwtBearerEvents
+        {
+            OnChallenge = async _ => throw new UnauthorizedRequestException()
         };
     });
 
