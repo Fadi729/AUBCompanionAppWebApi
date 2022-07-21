@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using CompanionApp.Models;
+﻿using CompanionApp.Models;
 using CompanionApp.ModelsDTO;
 using CompanionApp.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -15,31 +14,31 @@ namespace CompanionApp.Services
         readonly CompanionAppDBContext _context;
         readonly DbSet<Comment>        _dbSetComment;
         readonly DbSet<Post>           _dbSetPost;
-        readonly DbSet<Profile>        _dbSetProfile;
-        
+        readonly IUserService          _userService;
 
-        public CommentsService(CompanionAppDBContext context)
+
+        public CommentsService(CompanionAppDBContext context, IUserService userService)
         {
-            _context              = context;
-            _dbSetComment         = context.Comments;
-            _dbSetPost            = context.Posts;
-            _dbSetProfile         = context.Profiles;
+            _context      = context;
+            _dbSetComment = context.Comments;
+            _dbSetPost    = context.Posts;
+            _userService  = userService;
         }
 
-        public async Task<CommentQueryDTO>              GetComment          (Guid commentID)
+        public async Task<CommentQueryDTO>              GetComment          (Guid commentID, CancellationToken cancellationToken)
         {
             Comment? comment = await _dbSetComment
                 .Include            (comment => comment.User)
-                .FirstOrDefaultAsync(comment => comment.Id == commentID);
+                .FirstOrDefaultAsync(comment => comment.Id == commentID, cancellationToken);
             if (comment == null)
             {
                 throw new CommentNotFoundException();
             }
             return comment.ToCommentQueryDTO();
         }
-        public async Task<IEnumerable<CommentQueryDTO>> GetPostComments     (Guid postID)
+        public async Task<IEnumerable<CommentQueryDTO>> GetPostComments     (Guid postID,    CancellationToken cancellationToken)
         {
-            if (!await _dbSetPost.PostExists(postID))
+            if (!await _dbSetPost.PostExists(postID, cancellationToken))
             {
                 throw new PostNotFoundException();
             }
@@ -48,7 +47,7 @@ namespace CompanionApp.Services
                 .Include(comment => comment.User)
                 .Where  (comment => comment.PostId == postID)
                 .Select (comment => comment.ToCommentQueryDTO())
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
             if (!comments.Any())
             {
@@ -56,38 +55,40 @@ namespace CompanionApp.Services
             }
             return comments;
         }
-        public async Task<int>                          GetPostCommentsCount(Guid postID)
+        public async Task<int>                          GetPostCommentsCount(Guid postID,    CancellationToken cancellationToken)
         {
-            return (await GetPostComments(postID)).Count();
+            return await _dbSetComment
+                .Where(comment => comment.PostId == postID)
+                .CountAsync(cancellationToken);
         }
-        public async Task<CommentQueryDTO>              AddComment          (CommentPOSTCommandDTO comment, Guid postID, Guid userID)
+        public async Task<CommentQueryDTO>              AddComment          (CommentPOSTCommandDTO comment, Guid postID, Guid userID, CancellationToken cancellationToken)
         {
-            if (!await _dbSetPost.PostExists(postID))
+            if (!await _dbSetPost.PostExists(postID, cancellationToken))
             {
                 throw new PostNotFoundException();
             }
-            if (!await _dbSetProfile.ProfileExists(userID))
+            if (await _userService.GetProfileAsync(userID, cancellationToken) is null)
             {
                 throw new ProfileNotFoundException();
             }
 
             Comment newComment = comment.ToComment(postID, userID);
             _dbSetComment.Add(newComment);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
             return newComment.ToCommentQueryDTO();
         }
-        public async Task                               EditComment         (CommentPOSTCommandDTO comment, Guid commentID, Guid postID, Guid userID)
+        public async Task                               EditComment         (CommentPOSTCommandDTO comment, Guid commentID, Guid postID, Guid userID, CancellationToken cancellationToken)
         {
-            if (!await _dbSetProfile.ProfileExists(userID))
+            if (await _userService.GetProfileAsync(userID, cancellationToken) is null)
             {
                 throw new ProfileNotFoundException();
             }
-            if (!await _dbSetPost.PostExists(postID))
+            if (!await _dbSetPost.PostExists(postID, cancellationToken))
             {
                 throw new PostNotFoundException();
             }
             
-            Comment? commentToEdit = await _dbSetComment.GetCommentAsync(commentID);
+            Comment? commentToEdit = await _dbSetComment.GetCommentAsync(commentID, cancellationToken);
             if (commentToEdit is null)
             {
                 throw new CommentNotFoundException();
@@ -103,16 +104,16 @@ namespace CompanionApp.Services
             }
 
             _dbSetComment.Update(comment.ToComment(commentID, postID, userID));
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
         }
-        public async Task                               DeleteComment       (Guid commentID, Guid userID)
+        public async Task                               DeleteComment       (Guid commentID, Guid userID, CancellationToken cancellationToken)
         {
-            if(!await _dbSetProfile.ProfileExists(userID))
+            if (await _userService.GetProfileAsync(userID, cancellationToken) is null)
             {
                 throw new ProfileNotFoundException();
             }
 
-            Comment? commentToDelete = await _dbSetComment.GetCommentAsync(commentID);
+            Comment? commentToDelete = await _dbSetComment.GetCommentAsync(commentID, cancellationToken);
             if(commentToDelete is null)
             {
                 throw new CommentNotFoundException();
@@ -123,7 +124,7 @@ namespace CompanionApp.Services
             }
 
             _dbSetComment.Remove(commentToDelete);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

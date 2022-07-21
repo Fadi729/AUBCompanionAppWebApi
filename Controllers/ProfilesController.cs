@@ -12,25 +12,23 @@ namespace CompanionApp.Controllers
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ProfilesController : ControllerBase
     {
-        readonly IProfileService _profileService;
-        readonly IUserService    _userManager;
+        readonly IUserService _userService;
 
-        public ProfilesController(IProfileService profileService, IUserService userManager)
+        public ProfilesController(IUserService userService)
         {
-            _profileService = profileService;
-            _userManager    = userManager;
+            _userService    = userService;
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<ProfileQueryDTO>> GetProfile   (Guid id)
+        public async Task<ActionResult<ProfileQueryDTO>> GetProfile   (Guid id, CancellationToken cancellationToken)
         {
-            return Ok(await _profileService.GetProfileAsync(id));
+            return Ok(await _userService.GetProfileAsync(id, cancellationToken));
         }
 
         [HttpDelete]
-        public async Task<IActionResult>                 DeleteProfile()
+        public async Task<IActionResult>                 DeleteProfile(CancellationToken cancellationToken)
         {
-            await _userManager.DeleteAsync(HttpContext.GetUserID());
+            await _userService.DeleteProfileAsync(HttpContext.GetUserID(), cancellationToken);
             return NoContent();
         }
     }

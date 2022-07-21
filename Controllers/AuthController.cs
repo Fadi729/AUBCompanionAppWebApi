@@ -19,42 +19,16 @@ namespace CompanionApp.Controllers
 
         [HttpPost("auth/register")]
         [AllowAnonymous]
-        public async Task<IActionResult> Register(ProfileRegistrationDTO user)
+        public async Task<IActionResult> Register(ProfileRegistrationDTO user, CancellationToken cancellationToken)
         {
-            var authResponse = await _auth.RegisterAsync(user);
-            
-            if(!authResponse.IsSuccessful)
-            {
-                return BadRequest(new AuthFailResponse
-                {
-                    ErrorMessages = authResponse.ErrorMessages
-                });
-            }
-
-            return Ok(new AuthSuccessResponse
-            {
-                Token = authResponse.Token
-            });
+            return Ok(await _auth.RegisterAsync(user, cancellationToken));
         }
 
         [HttpPost("auth/login")]
         [AllowAnonymous]
-        public async Task<IActionResult> Login(ProfileLoginDTO user)
+        public async Task<IActionResult> Login   (ProfileLoginDTO user,        CancellationToken cancellationToken)
         {
-            var authResponse = await _auth.LoginAsync(user);
-            
-            if(!authResponse.IsSuccessful)
-            {
-                return BadRequest(new AuthFailResponse
-                {
-                    ErrorMessages = authResponse.ErrorMessages
-                });
-            }
-
-            return Ok(new AuthSuccessResponse
-            {
-                Token = authResponse.Token
-            });
+            return Ok(await _auth.LoginAsync(user, cancellationToken));
         }        
         
     }

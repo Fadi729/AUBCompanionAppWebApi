@@ -61,15 +61,30 @@ builder.Configuration
 #endregion
 
 
-
 #if DEBUG
 builder.Services.AddDbContext<CompanionAppDBContext>(
     options => options.UseSqlServer(builder.Configuration["ConnectionStrings:DevDB"]));
-builder.Services.AddIdentity<Profile, AppRole>().AddEntityFrameworkStores<CompanionAppDBContext>();
+builder.Services.AddIdentity<Profile, AppRole>(options =>
+{
+    options.Password.RequireDigit           = false;
+    options.Password.RequireLowercase       = false;
+    options.Password.RequireUppercase       = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequiredLength         = 0;
+    options.Password.RequiredUniqueChars    = 0;
+}).AddEntityFrameworkStores<CompanionAppDBContext>();
 #else
 builder.Services.AddDbContext<CompanionAppDBContext>(
     options => options.UseSqlServer(builder.Configuration.GetConnectionString("CompanionAppDB")));
-builder.Services.AddIdentity<Profile, AppRole>().AddEntityFrameworkStores<CompanionAppDBContext>();
+builder.Services.AddIdentity<Profile, AppRole>(options =>
+{
+    options.Password.RequireDigit           = false;
+    options.Password.RequireLowercase       = false;
+    options.Password.RequireUppercase       = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequiredLength         = 0;
+    options.Password.RequiredUniqueChars    = 0;
+}).AddEntityFrameworkStores<CompanionAppDBContext>();
 #endif
 
 builder.Services.AddScoped<JwtSettings>();
@@ -77,7 +92,6 @@ builder.Services.AddScoped<JwtSettings>();
 builder.Services
 #region Services
     .AddScoped<IUserService         , UserService         >()
-    .AddScoped<IProfileService      , ProfileService      >()
     .AddScoped<ICourseService       , CourseService       >()
     .AddScoped<IPostService         , PostService         >()
     .AddScoped<ISemesterService     , SemesterService     >()
@@ -89,15 +103,15 @@ builder.Services
 
 builder.Services
 #region Validations
-    .AddScoped<ProfileValidation      >()
-    .AddScoped<CourseValidation       >()
-    .AddScoped<SemesterValidation     >()
-    .AddScoped<CourseTakenByValidation>();
+    .AddScoped<ProfileRegistrationValidation>()
+    .AddScoped<CourseValidation             >()
+    .AddScoped<SemesterValidation           >()
+    .AddScoped<CourseTakenByValidation      >();
 #endregion
 
 JwtSettings jwtSettings = new();
-builder.Configuration.Bind(nameof(JwtSettings), jwtSettings) ;
-builder.Services.AddSingleton(jwtSettings) ;
+builder.Configuration.Bind(nameof(JwtSettings), jwtSettings);
+builder.Services.AddSingleton(jwtSettings);
 
 builder.Services.AddAuthentication(options =>
 {
